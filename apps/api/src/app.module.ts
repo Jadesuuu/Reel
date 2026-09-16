@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { CriteriaModule } from './criteria/criteria.module.js';
 import { IngestModule } from './ingest/ingest.module.js';
+import { PostingsModule } from './postings/postings.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { IngestModule } from './ingest/ingest.module.js';
     UsersModule,
     CriteriaModule,
     IngestModule,
+    PostingsModule,
   ],
 })
 export class AppModule {}

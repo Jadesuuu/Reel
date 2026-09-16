@@ -1,13 +1,82 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
+import type { ListPostingsQueryDto } from './dto/list-postings.query.js';
 import type { ParsedPosting } from '../hn/hn.parser.js';
 import type { HnItem } from '../hn/hn.types.js';
 
 export type ParsedWithMeta = { item: HnItem; parsed: ParsedPosting };
 
+const LIST_SELECT = {
+  id: true,
+  source: true,
+  externalId: true,
+  threadId: true,
+  author: true,
+  postedAt: true,
+  company: true,
+  role: true,
+  location: true,
+  remote: true,
+  salaryText: true,
+  salaryMinUsd: true,
+  salaryMaxUsd: true,
+  stackKeywords: true,
+  applyUrl: true,
+  headline: true,
+  fingerprint: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+const DETAIL_SELECT = { ...LIST_SELECT, rawText: true } as const;
+
 @Injectable()
 export class PostingsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async list(
+    query: ListPostingsQueryDto,
+  ): Promise<Paginated<Record<string, unknown>>> {
+    const { page, pageSize, q, remote, threadId } = query;
+
+    const where = {
+      ...(remote ? { remote } : {}),
+      ...(threadId ? { threadId } : {}),
+      ...(q
+        ? {
+            OR: [
+              { headline: { contains: q, mode: 'insensitive' as const } },
+              { company: { contains: q, mode: 'insensitive' as const } },
+              { role: { contains: q, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+    };
+
+    const [items, total] = await Promise.all([
+      this.prisma.posting.findMany({
+        where,
+        select: LIST_SELECT,
+        orderBy: { postedAt: 'desc' },
+        ...toSkipTake(page, pageSize),
+      }),
+      this.prisma.posting.count({ where }),
+    ]);
+
+    return paginate(items, page, pageSize, total);
+  }
+
+  async findOne(id: string): Promise<Record<string, unknown>> {
+    const posting = await this.prisma.posting.findUnique({
+      where: { id },
+      select: DETAIL_SELECT,
+    });
+    if (!posting) {
+      throw new NotFoundException('Posting not found');
+    }
+    return posting;
+  }
 
   async upsertMany(
     threadId: string,
