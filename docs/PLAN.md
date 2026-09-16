@@ -8,10 +8,16 @@ edit this plan in the same PR. Never let them drift silently.
 
 ## 0. How to use this plan
 
-Work one step at a time, in order. Each step is one branch → one PR → merge. Before coding a step,
-read its "Learn first" list and make sure you can explain each concept in your own words. Then read
-"Files" and "Acceptance criteria". Write the code. Write the tests. Run
-`pnpm lint && pnpm typecheck && pnpm test`. Open the PR. Merge when CI is green.
+**Working mode (changed 16 Sep 2026).** The project is built end to end for Jade, who studies it
+afterwards from the per-step reviewers under `reviewers/`. Code carries no comments — Jade writes
+those himself. Each step is still its own branch, stacked in plan order; Jade pushes and merges them
+himself, one at a time. This changes *who types the code*, not *what gets built*: every name, schema
+field, endpoint, and rule below still holds, and the "Learn first" lists now describe what each
+reviewer should teach rather than what to study before typing.
+
+Each step is one branch → PR → merge. The gate before a branch is done:
+`pnpm lint && pnpm format:check && pnpm typecheck && pnpm test` (plus `pnpm test:e2e` where the step
+adds e2e). Merge with a merge commit (not squash) so the next stacked branch applies cleanly.
 
 Sections 1–6 are reference and change only through a PR that explains why. Section 7 is the work.
 
@@ -79,8 +85,9 @@ impossible, change it in a PR that edits this table and explains why.
 | HTML → text | `he` (decode entities) + a small regex strip | HN comment `text` is HTML. Avoid a full DOM parser. |
 | Email | Interface `Mailer` with `ConsoleMailer` (dev/test) and `ResendMailer` (prod) | Swappable via DI; no real emails in tests. |
 | Logging | `nestjs-pino` | Structured JSON logs; request IDs. |
-| Testing | Jest + `@nestjs/testing` + `supertest` | Nest default. Unit tests next to files (`*.spec.ts`), e2e in `apps/api/test/`. |
-| Lint/format | ESLint 9 flat config + Prettier | Root-level, shared. |
+| Testing | **Vitest** + `@nestjs/testing` + `supertest` | What `nest new` ships now (not Jest). Unit tests next to files (`*.spec.ts`), e2e in `apps/api/test/`. Where the plan later says "Jest", read "the test runner". |
+| Lint/format | **oxlint** + Prettier | What `nest new` ships now (not ESLint). Root-level `.oxlintrc.json`, shared. |
+| Module system | **ESM** (`"type": "module"`) | The Nest 12 scaffold is ESM, so relative imports end in `.js` (`'./app.module.js'`). Correct, not a bug. |
 | CI | GitHub Actions: lint → typecheck → build → test, with Postgres + Redis service containers | Every PR. |
 | Containers | `docker-compose.yml` for local infra; `apps/api/Dockerfile` (multi-stage) for deploy | |
 | Frontend | Next.js 16 App Router, Tailwind, shadcn/ui, TanStack Query | Built last. Skills allowed here. |
