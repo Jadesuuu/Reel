@@ -6,6 +6,7 @@ import { AppBullModule } from './bull/bull.module.js';
 import { HealthModule } from './health/health.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
+import { CriteriaModule } from './criteria/criteria.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module.js';
     HealthModule,
     AuthModule,
     UsersModule,
+    CriteriaModule,
   ],
 })
 export class AppModule {}
