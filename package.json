@@ -7,9 +7,9 @@
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "db:generate": "pnpm --filter api prisma generate",
-    "db:migrate": "pnpm --filter api prisma migrate dev",
-    "db:studio": "pnpm --filter api prisma studio"
+    "db:generate": "pnpm --filter api exec prisma generate",
+    "db:migrate": "pnpm --filter api exec prisma migrate dev",
+    "db:studio": "pnpm --filter api exec prisma studio"
   },
   "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531",
   "devDependencies": {
