@@ -1,11 +1,11 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { RemindersService } from './reminders.service.js';
+import { RemindersProcessor } from './reminders.processor.js';
 import { REMINDERS_QUEUE } from './reminders.constants.js';
 
 @Module({
   imports: [BullModule.registerQueue({ name: REMINDERS_QUEUE })],
-  providers: [RemindersService],
-  exports: [RemindersService, BullModule],
+  providers: [RemindersProcessor],
+  exports: [BullModule],
 })
-export class RemindersModule {}
+export class RemindersWorkerModule {}

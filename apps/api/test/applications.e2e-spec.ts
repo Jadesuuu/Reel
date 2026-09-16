@@ -1,6 +1,9 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma/prisma.service.js';
+import { getQueueToken } from '@nestjs/bullmq';
+import type { Queue } from 'bullmq';
+import { REMINDERS_QUEUE } from '../src/reminders/reminders.constants.js';
 import { createTestApp } from './create-app.js';
 
 const THREAD_ID = 'e2e-applications-thread';
@@ -11,6 +14,7 @@ describe('Applications (e2e)', () => {
   let cookie: string;
   let otherCookie: string;
   let postingId: string;
+  let reminders: Queue;
 
   const email = `apps-${Date.now()}@example.com`;
   const otherEmail = `apps-other-${Date.now()}@example.com`;
@@ -28,6 +32,7 @@ describe('Applications (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
+    reminders = app.get<Queue>(getQueueToken(REMINDERS_QUEUE));
 
     cookie = await register(email);
     otherCookie = await register(otherEmail);
@@ -55,6 +60,7 @@ describe('Applications (e2e)', () => {
   });
 
   afterAll(async () => {
+    await reminders.obliterate({ force: true });
     await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
     await prisma.user.deleteMany({
       where: { email: { in: [email, otherEmail] } },
@@ -135,7 +141,8 @@ describe('Applications (e2e)', () => {
     expect(
       detail.body.events.map((e: { toStage: string }) => e.toStage),
     ).toEqual(['SAVED', 'APPLIED', 'INTERVIEWING', 'OFFER']);
-    expect(detail.body.reminders).toEqual([]);
+    expect(detail.body.reminders).toHaveLength(1);
+    expect(detail.body.reminders[0].cancelledAt).not.toBeNull();
   });
 
   it('filters the list by stage', async () => {
@@ -184,6 +191,51 @@ describe('Applications (e2e)', () => {
       .set('Cookie', otherCookie)
       .send({ to: 'APPLIED' })
       .expect(404);
+  });
+
+  it('schedules a reminder on APPLIED and cancels it on the next move', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ company: 'Reminder Co', role: 'Engineer' })
+      .expect(201);
+
+    const id: string = created.body.id;
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/stage`)
+      .set('Cookie', cookie)
+      .send({ to: 'APPLIED' })
+      .expect(200);
+
+    const applied = await request(app.getHttpServer())
+      .get(`/api/v1/applications/${id}`)
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(applied.body.reminders).toHaveLength(1);
+    const reminder = applied.body.reminders[0];
+    expect(reminder.kind).toBe('STALE_APPLICATION');
+    expect(reminder.cancelledAt).toBeNull();
+    expect(reminder.sentAt).toBeNull();
+
+    const dueIn = new Date(reminder.dueAt).getTime() - Date.now();
+    const tenDays = 10 * 24 * 60 * 60 * 1000;
+    expect(Math.abs(dueIn - tenDays)).toBeLessThan(60_000);
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/stage`)
+      .set('Cookie', cookie)
+      .send({ to: 'INTERVIEWING' })
+      .expect(200);
+
+    const moved = await request(app.getHttpServer())
+      .get(`/api/v1/applications/${id}`)
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(moved.body.reminders).toHaveLength(1);
+    expect(moved.body.reminders[0].cancelledAt).not.toBeNull();
   });
 
   it('deletes an application', async () => {
