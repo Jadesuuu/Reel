@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { decode } from 'he';
+import he from 'he';
 import type { HnItem } from './hn.types.js';
 
 export type RemoteType = 'REMOTE' | 'HYBRID' | 'ONSITE' | 'UNKNOWN';
@@ -100,7 +100,8 @@ export function htmlToText(html: string): string {
     .replace(/<\s*p\s*>/gi, '\n\n')
     .replace(/<\s*br\s*\/?\s*>/gi, '\n')
     .replace(/<[^>]+>/g, '');
-  return decode(withBreaks)
+  return he
+    .decode(withBreaks)
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
