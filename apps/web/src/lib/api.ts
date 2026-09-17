@@ -29,7 +29,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      ...(init.headers ?? {}),
+      ...init.headers,
     },
   });
 
