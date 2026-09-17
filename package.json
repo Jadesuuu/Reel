@@ -1,0 +1,38 @@
+{
+  "name": "reel",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,worker,web -c blue,yellow,magenta \"pnpm --filter api start:dev\" \"pnpm --filter api start:worker:dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm -r build",
+    "lint": "oxlint -c .oxlintrc.json apps/api/src apps/api/test apps/web/src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter api test:e2e",
+    "db:generate": "pnpm --filter api exec prisma generate",
+    "db:migrate": "pnpm --filter api exec prisma migrate dev",
+    "db:deploy": "pnpm --filter api exec prisma migrate deploy",
+    "db:seed": "pnpm --filter api exec prisma db seed",
+    "db:studio": "pnpm --filter api exec prisma studio"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "oxlint": "^1.58.0",
+    "prettier": "^3.4.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "argon2",
+      "esbuild",
+      "msgpackr-extract",
+      "prisma"
+    ]
+  }
+}
