@@ -1,17 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
+import type { NormalizedPosting, Source } from '../sources/source.types.js';
 import type { ListPostingsQueryDto } from './dto/list-postings.query.js';
-import type { ParsedPosting } from '../hn/hn.parser.js';
-import type { HnItem } from '../hn/hn.types.js';
-
-export type ParsedWithMeta = { item: HnItem; parsed: ParsedPosting };
 
 const LIST_SELECT = {
   id: true,
   source: true,
   externalId: true,
-  threadId: true,
+  boardId: true,
   author: true,
   postedAt: true,
   company: true,
@@ -23,6 +20,7 @@ const LIST_SELECT = {
   salaryMaxUsd: true,
   stackKeywords: true,
   applyUrl: true,
+  url: true,
   headline: true,
   fingerprint: true,
   createdAt: true,
@@ -31,6 +29,16 @@ const LIST_SELECT = {
 
 const DETAIL_SELECT = { ...LIST_SELECT, rawText: true } as const;
 
+export type PostingStats = {
+  total: number;
+  bySource: Array<{
+    source: string;
+    count: number;
+    latestPostedAt: Date | null;
+  }>;
+  byRemote: Array<{ remote: string; count: number }>;
+};
+
 @Injectable()
 export class PostingsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -38,11 +46,13 @@ export class PostingsService {
   async list(
     query: ListPostingsQueryDto,
   ): Promise<Paginated<Record<string, unknown>>> {
-    const { page, pageSize, q, remote, threadId } = query;
+    const { page, pageSize, q, remote, source, boardId, stack } = query;
 
     const where = {
       ...(remote ? { remote } : {}),
-      ...(threadId ? { threadId } : {}),
+      ...(source ? { source } : {}),
+      ...(boardId ? { boardId } : {}),
+      ...(stack ? { stackKeywords: { has: stack.trim().toLowerCase() } } : {}),
       ...(q
         ? {
             OR: [
@@ -78,53 +88,79 @@ export class PostingsService {
     return posting;
   }
 
+  async stats(): Promise<PostingStats> {
+    const [total, bySource, byRemote] = await Promise.all([
+      this.prisma.posting.count(),
+      this.prisma.posting.groupBy({
+        by: ['source'],
+        _count: { _all: true },
+        _max: { postedAt: true },
+      }),
+      this.prisma.posting.groupBy({ by: ['remote'], _count: { _all: true } }),
+    ]);
+
+    return {
+      total,
+      bySource: bySource
+        .map((row) => ({
+          source: row.source,
+          count: row._count._all,
+          latestPostedAt: row._max.postedAt,
+        }))
+        .toSorted((a, b) => b.count - a.count),
+      byRemote: byRemote
+        .map((row) => ({ remote: row.remote, count: row._count._all }))
+        .toSorted((a, b) => b.count - a.count),
+    };
+  }
+
   async upsertMany(
-    threadId: string,
-    entries: ParsedWithMeta[],
+    source: Source,
+    boardId: string,
+    items: NormalizedPosting[],
   ): Promise<{ created: number; updated: number }> {
-    if (entries.length === 0) {
+    if (items.length === 0) {
       return { created: 0, updated: 0 };
     }
 
-    const externalIds = entries.map((entry) => String(entry.item.id));
+    const externalIds = items.map((item) => item.externalId);
     const existing = await this.prisma.posting.findMany({
-      where: { source: 'HN', externalId: { in: externalIds } },
+      where: { source, externalId: { in: externalIds } },
       select: { externalId: true },
     });
     const existingIds = new Set(existing.map((row) => row.externalId));
 
-    for (const { item, parsed } of entries) {
-      const externalId = String(item.id);
+    for (const item of items) {
       const fields = {
-        threadId,
-        author: item.by ?? 'unknown',
-        postedAt: new Date(item.time * 1000),
-        company: parsed.company,
-        role: parsed.role,
-        location: parsed.location,
-        remote: parsed.remote,
-        salaryText: parsed.salaryText,
-        salaryMinUsd: parsed.salaryMinUsd,
-        salaryMaxUsd: parsed.salaryMaxUsd,
-        stackKeywords: parsed.stackKeywords,
-        applyUrl: parsed.applyUrl,
-        rawHtml: item.text ?? '',
-        rawText: parsed.rawText,
-        headline: parsed.headline,
-        fingerprint: parsed.fingerprint,
+        boardId,
+        author: item.author,
+        postedAt: item.postedAt,
+        company: item.company,
+        role: item.role,
+        location: item.location,
+        remote: item.remote,
+        salaryText: item.salaryText,
+        salaryMinUsd: item.salaryMinUsd,
+        salaryMaxUsd: item.salaryMaxUsd,
+        stackKeywords: item.stackKeywords,
+        applyUrl: item.applyUrl,
+        url: item.url,
+        rawHtml: item.rawHtml,
+        rawText: item.rawText,
+        headline: item.headline,
+        fingerprint: item.fingerprint,
       };
 
       await this.prisma.posting.upsert({
-        where: { source_externalId: { source: 'HN', externalId } },
-        create: { source: 'HN', externalId, ...fields },
+        where: { source_externalId: { source, externalId: item.externalId } },
+        create: { source, externalId: item.externalId, ...fields },
         update: fields,
       });
     }
 
-    const created = entries.filter(
-      (entry) => !existingIds.has(String(entry.item.id)),
+    const created = items.filter(
+      (item) => !existingIds.has(item.externalId),
     ).length;
-
-    return { created, updated: entries.length - created };
+    return { created, updated: items.length - created };
   }
 }

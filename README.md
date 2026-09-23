@@ -1,33 +1,45 @@
 # Reel
 
-**A job-hunt tracker that does the boring part for you** — it reads the monthly Hacker News
-"Who is hiring?" thread, scores every posting against criteria you set, and chases you when an
-application goes quiet.
+**A job-hunt tracker that does the boring part for you.** Reel reads ten public job sources on
+a schedule, scores every posting against criteria you set, and tracks each application from saved
+to offer with reminders that only fire when something has gone quiet.
 
-> Live: _pending deploy_ · See [docs/DEPLOY.md](docs/DEPLOY.md)
->
-> _Demo GIF goes here once the app is deployed._
+> **Live demo:** _link pending — see [Demo](#demo)_ · **Stack:** NestJS 12 · Prisma 7 · Postgres ·
+> Redis / BullMQ · Next.js 16 · TanStack Query
+
+![Dashboard](docs/screenshots/dashboard-desktop.png)
 
 ## Why
 
-Job hunting fails on logistics, not ambition. The good postings are buried in a thread with a
-thousand comments, and the ones you do send disappear into silence — you find out weeks later
-that you never followed up on the one that mattered. Reel turns both halves into something a
-computer handles: it reads the thread for you, and it remembers what you forgot.
+Job hunting fails on logistics, not ambition. The good postings are spread across a dozen
+boards and a thousand-comment thread, and the applications you do send disappear into silence
+until you realise, weeks later, that you never followed up on the one that mattered. Reel turns
+both halves into something a computer does: it reads the boards for you, and it remembers what
+you forgot.
 
 ## What it does
 
-**Inbox** — every posting scored against your criteria, highest first, with the reasons shown as
-chips (`remote`, `role:full stack`, `stack:typescript`). Dismiss the noise, save the rest.
+**Ten sources, one inbox.** Hacker News "Who is hiring?", Remotive, Remote OK, Arbeitnow,
+Himalayas, Jobicy and We Work Remotely as feeds, plus any company careers page on Greenhouse,
+Lever or Ashby that you watch. Every posting is parsed into the same shape and scored against
+your criteria. The score is the sum of the chips beside it — `remote`, `role · full stack`,
+`typescript` — and the rules are plain arithmetic you can read in the settings.
 
-**Pipeline** — saved roles move through `SAVED → APPLIED → INTERVIEWING → OFFER`, with every
-transition written to an immutable history. Invalid moves are rejected by the server, not just
-hidden in the UI.
+![Inbox](docs/screenshots/inbox-desktop.png)
 
-**Reminders** — ten days after you mark something APPLIED, a follow-up email arrives. Move the
-application on and the reminder cancels itself.
+**A pipeline you can trust.** Saved → Applied → Interviewing → Offer, with Rejected and Withdrawn
+as exits. Drag a card between columns; the server enforces the allowed moves and every change is
+written to an immutable timeline alongside your notes, contacts and next steps. Applications
+found anywhere — a referral, LinkedIn, a friend — go in by hand and get the same treatment.
 
-_Screenshots pending deploy._
+![Pipeline](docs/screenshots/pipeline-desktop.png)
+
+**Reminders that don't nag twice.** Ten days after you mark something Applied, an email arrives.
+Move it on and the reminder cancels itself. Set your own follow-up date on any application. The
+job id is deterministic and the worker re-reads the database before sending, so a reminder can
+never fire twice or fire for something that already moved.
+
+![Timeline](docs/screenshots/application-timeline-desktop.png)
 
 ## Architecture
 
@@ -38,64 +50,77 @@ flowchart LR
   API -->|enqueue| R[(Redis / BullMQ)]
   W[Worker process<br/>same image] -->|consume| R
   W --> PG
-  W -->|HTTP| HN[Hacker News<br/>Algolia + Firebase]
+  W -->|HTTP| S[Ten job sources<br/>JSON + RSS]
   W -->|send| M[Resend]
 ```
 
 The API and the worker are **the same image with a different command**. The API only ever
-enqueues; it never waits on HN or on an email provider, so no request is hostage to a third
-party being slow. The worker owns everything with a clock in it: the six-hourly ingest
-scheduler and the delayed reminder jobs. Either can restart without the other noticing, and
-scaling the ingest never means scaling the HTTP tier.
+enqueues; it never waits on a job board or an email provider. The worker owns everything with a
+clock in it: the six-hourly `ingest-all` scheduler, the per-source `ingest-source` jobs it fans
+out to, and the delayed reminder jobs. Either process restarts without the other noticing.
+
+Each source is an **adapter** — one class, one network call, one pure `mapX(payload)` function
+tested against a fixture captured from the live API. A pure `normalizePosting()` turns every
+adapter's output into the same `Posting` row, so the scorer, the inbox and the pipeline never
+learned a second shape when nine sources joined the first.
 
 ## Decisions and trade-offs
 
 **A separate worker process, not `@Cron` in the API.** A cron decorator inside the API means
-every replica fires the same job. BullMQ's scheduler dedupes by key, and the worker can be
-restarted or scaled independently of request traffic.
+every replica fires the same job. BullMQ's scheduler dedupes by key, and the worker scales
+independently of request traffic.
 
-**Reminders are idempotent by construction.** The job id is derived from the application id
-(`stale-<id>`), so re-scheduling replaces rather than duplicates. The processor then re-reads
-the database and compares `stageChangedAt` against the value captured when the job was queued —
-if the application moved on, or moved out and back, the email is skipped. Deleting a queue job
-is best-effort; correctness lives in the re-check, not the delete.
+**Fan-out ingest, one run per source.** `ingest-all` does no fetching; it enqueues one job per
+enabled source and watched board. A board that times out fails and retries alone, and the
+settings page can show exactly which source is unhappy.
 
-**Ingestion upserts on `(source, externalId)`.** Re-running an ingest over the same thread is
-free, so retries and overlapping runs are safe. Created versus updated counts come from one
-`findMany` of existing ids, not a query per comment.
+**Reminders are idempotent by construction.** Job ids derive from the application id
+(`stale-<id>`, `followup-<id>`), so rescheduling replaces rather than duplicates. The processor
+re-reads the row and the application before sending. Deleting a queue job is best-effort;
+correctness lives in the re-check.
 
-**The parser is pure and fixture-tested.** `parseComment(item)` takes an HN item and returns a
-plain object — no database, no network, no Nest. Real comments become fixtures, so fixing a
-parse bug means adding the comment that broke it and watching the test go red first.
+**Pure parsing, fixture-tested.** The HN comment parser, the source normaliser, the scorer and
+the stats summary are plain functions with no framework in them. Real payloads become fixtures;
+fixing a parse bug means adding the payload that broke it and watching the test go red first.
+The most recent such bug: Hacker News entity-encodes `href` attributes, which no fixture had
+caught until the UI showed "Apply on &".
 
-**JWT in an httpOnly cookie, not localStorage.** A token in `localStorage` is readable by any
-script that gets onto the page. The cookie costs a CORS configuration and is invisible to XSS.
+**Hand-written rename migrations.** When `threadId` became `boardId`, Prisma's generated
+migration would have dropped the column and its 264 rows. The migration says
+`ALTER TABLE … RENAME COLUMN` instead, and `prisma migrate diff` confirms the schema and the
+database agree afterwards.
 
-**Offset pagination.** Cursors are better under churn, but this dataset is roughly a thousand
-rows a month and offsets keep the client trivial. At a hundred times the volume the ordering
-key becomes the cursor.
+**One seam for the network.** Every request in the web app goes through one `apiFetch`. That is
+what makes the demo build possible: in demo mode that function hands the call to an in-browser
+implementation of the same contract, and no page or component knows.
 
-**No refresh tokens.** One seven-day cookie. A real multi-device product needs rotation and
-revocation; a single-user tool does not, and pretending otherwise would be the more expensive
-mistake.
+**JWT in an httpOnly cookie, offset pagination, no refresh tokens.** The v1 choices held: a
+cookie is invisible to XSS at the cost of a CORS configuration; offsets are fine at a few thousand
+rows; a single-user tool does not need rotation.
 
 ## Testing
 
-| Layer | Runner                                             | Count             |
-| ----- | -------------------------------------------------- | ----------------- |
-| Unit  | Vitest                                             | 67 across 9 files |
-| E2E   | Vitest + supertest against real Postgres and Redis | 27 across 6 files |
+| Layer | Runner                                             | Count               |
+| ----- | -------------------------------------------------- | ------------------- |
+| Unit  | Vitest                                             | 125 across 14 files |
+| E2E   | Vitest + supertest against real Postgres and Redis | 47 across 7 files   |
 
-Pure logic — the parser, the scorer, the stage machine, keyword normalisation — is tested
-without Nest at all. Services are tested with mocked Prisma and queues. HTTP is tested end to
-end through a bootstrap helper (`apps/api/test/create-app.ts`) that applies the same middleware
-as `main.ts`, so a mistake in helmet or cookie parsing fails a test instead of shipping.
+Pure logic — the parser, the ten adapter mappers, the normaliser, the scorer, the stage machine,
+the stats summary — is tested without Nest. Services are tested with mocked Prisma and queues.
+HTTP is tested end to end through the same middleware as production, so a mistake in helmet or
+cookie parsing fails a test instead of shipping. CI runs lint → format → typecheck → build →
+unit → e2e on every push with Postgres and Redis service containers.
 
-E2E specs run serially: they share one database, and concurrent fixture teardown was corrupting
-other specs' writes.
+## Demo
 
-CI runs lint → format → typecheck → build → test on every push, with Postgres and Redis service
-containers.
+The interface can run with no backend at all. Built with `NEXT_PUBLIC_DEMO_MODE=true`, the web
+app answers its own API calls in the browser from seeded, synthetic data (fifty-four postings
+across all ten sources, fourteen applications with histories, two ingest cycles), persisted in
+`localStorage`. The demo banner can reset the data or fast-forward the clock ten days so pending
+reminders fire and their emails appear under Settings → Account. Everything in the demo is
+invented; nothing names a real employer.
+
+![Reminder emails](docs/screenshots/account-outbox-desktop.png)
 
 ## Run locally
 
@@ -109,9 +134,9 @@ pnpm db:seed
 pnpm dev
 ```
 
-API: http://localhost:4000/api/v1/health · Web: http://localhost:3000
-
-`pnpm dev` runs three processes: API, worker, and web.
+API: http://localhost:4000/api/v1/health · Web: http://localhost:3000. `pnpm dev` runs three
+processes: API, worker, and web. For the demo build instead:
+`NEXT_PUBLIC_DEMO_MODE=true pnpm --filter web dev`.
 
 ## Checks
 
@@ -119,29 +144,24 @@ API: http://localhost:4000/api/v1/health · Web: http://localhost:3000
 pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:e2e
 ```
 
-## Container
-
-```bash
-docker build -f apps/api/Dockerfile -t reel-api .
-docker run -p 4000:4000 --env-file apps/api/.env reel-api
-```
-
-**Healthcheck path:** `GET /api/v1/health` — `200 {"status":"ok","db":true,"redis":true}` when
-Postgres and Redis both answer, `503` otherwise.
-
 ## Deploy
 
-See [docs/DEPLOY.md](docs/DEPLOY.md) — Railway for the API and worker, Vercel for the web app,
-every environment variable and where it comes from.
+See [docs/DEPLOY.md](docs/DEPLOY.md) — Railway for the API and worker, Vercel for the web app
+and for the free demo build, every environment variable and where it comes from.
+
+## Reading the code
+
+`reviewers/` holds one document per build step, written to be read after the code: what the
+step adds, the files in reading order, the concepts, and what actually broke. Start with
+[reviewers/README.md](reviewers/README.md). `docs/PLAN.md` is the plan the code was built from
+and the record of every decision that changed along the way.
 
 ## What I'd do next
 
-- **A second source.** The ingest pipeline is source-shaped already (`Source` enum, per-source
-  external ids); Wellfound or a company board would slot in beside HN.
-- **Full-text search.** `ILIKE` over three columns is fine at a thousand rows and wrong at a
+- **Full-text search.** `ILIKE` over three columns is fine at two thousand rows and wrong at two
   hundred thousand. Postgres `tsvector` with a GIN index is the next step.
-- **Per-user ingest filters.** Today every user scores every posting. Filtering at ingest time
-  would cut the rescore loop dramatically once there is more than one user.
-- **Refresh tokens.** Needed the moment this is used from more than one device.
-- **A better headline parser.** The current segment rules follow the HN convention, and roughly
-  one posting in ten does not. Each miss is a fixture waiting to be written.
+- **Per-user ingest filters.** Every user scores every posting today. Filtering at ingest time
+  cuts the rescore loop once there is more than one user.
+- **A better headline parser for HN.** The pipe convention covers nine postings in ten. Each miss
+  is a fixture waiting to be written.
+- **Refresh tokens.** The moment this is used from more than one device.

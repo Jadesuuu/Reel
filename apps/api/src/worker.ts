@@ -5,7 +5,7 @@ import type { Queue } from 'bullmq';
 import { WorkerModule } from './worker.module.js';
 import {
   INGEST_CRON,
-  INGEST_JOB,
+  INGEST_ALL_JOB,
   INGEST_QUEUE,
   INGEST_SCHEDULER_ID,
 } from './ingest/ingest.constants.js';
@@ -20,7 +20,7 @@ async function bootstrap(): Promise<void> {
   await queue.upsertJobScheduler(
     INGEST_SCHEDULER_ID,
     { pattern: INGEST_CRON },
-    { name: INGEST_JOB, data: {} },
+    { name: INGEST_ALL_JOB, data: {} },
   );
 
   logger.log(`Worker ready, ingest scheduled at "${INGEST_CRON}"`);

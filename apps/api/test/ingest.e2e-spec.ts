@@ -31,7 +31,7 @@ describe('Ingest (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.ingestRun.deleteMany({ where: { externalThreadId: '1' } });
+    await prisma.ingestRun.deleteMany({ where: { boardId: '1' } });
     await prisma.user.deleteMany({ where: { email } });
     await queue.obliterate({ force: true });
     await app.close();
@@ -45,7 +45,7 @@ describe('Ingest (e2e)', () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/ingest/run')
       .set('Cookie', cookie)
-      .send({ threadId: '1' })
+      .send({ source: 'HN', boardId: '1' })
       .expect(202);
 
     expect(res.body.jobId).toEqual(expect.any(String));

@@ -1,0 +1,43 @@
+{
+  "jobs": [
+    {
+      "id": "7458d4e9-da2e-47bd-98cb-adfda43d42b2",
+      "title": "Engineering Manager - EU",
+      "department": "Engineering",
+      "team": "EMEA Engineering",
+      "employmentType": "FullTime",
+      "location": "Remote - European Union",
+      "publishedAt": "2024-03-04T14:29:08.532+00:00",
+      "isListed": true,
+      "isRemote": true,
+      "workplaceType": "Remote",
+      "jobUrl": "https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2",
+      "applyUrl": "https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2/application",
+      "descriptionHtml": "<p style=\"min-height:1.5em\">Hi 👋 I’m <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://uk.linkedin.com/in/colinhoweuk\"><u>Colin</u></a>, Director of Engineering, Europe. How do you feel about software engineers writing product specs, making product decisions, and not breaking down projects into individual tickets? If that sounds exciting (even if a bit scary), read on because I’m looking for an eng …",
+      "compensation": {
+        "compensationTierSummary": "€110K – €185K • Offers Equity • Offers Bonus",
+        "scrapeableCompensationSalarySummary": "€110K - €185K"
+      }
+    },
+    {
+      "id": "d573471b-2005-482c-9fbf-d1df9550cb57",
+      "title": "Engineering Manager - UK",
+      "department": "Engineering",
+      "team": "EMEA Engineering",
+      "employmentType": "FullTime",
+      "location": "United Kingdom",
+      "publishedAt": "2025-04-01T14:39:51.428+00:00",
+      "isListed": true,
+      "isRemote": true,
+      "workplaceType": "Remote",
+      "jobUrl": "https://jobs.ashbyhq.com/ashby/d573471b-2005-482c-9fbf-d1df9550cb57",
+      "applyUrl": "https://jobs.ashbyhq.com/ashby/d573471b-2005-482c-9fbf-d1df9550cb57/application",
+      "descriptionHtml": "<p style=\"min-height:1.5em\">Hi 👋 I’m <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://uk.linkedin.com/in/colinhoweuk\"><u>Colin</u></a>, Director of Engineering, Europe. How do you feel about software engineers writing product specs, making product decisions, and not breaking down projects into individual tickets? If that sounds exciting (even if a bit scary), read on because I’m looking for an eng …",
+      "compensation": {
+        "compensationTierSummary": "£110K – £200K",
+        "scrapeableCompensationSalarySummary": "£110K - £200K"
+      }
+    }
+  ],
+  "apiVersion": "1"
+}

@@ -13,6 +13,11 @@ export class PostingsController {
     return this.postings.list(query);
   }
 
+  @Get('stats')
+  stats() {
+    return this.postings.stats();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postings.findOne(id);

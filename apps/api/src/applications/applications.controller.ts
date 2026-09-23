@@ -16,9 +16,11 @@ import {
 } from '../auth/current-user.decorator.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ApplicationsService } from './applications.service.js';
+import { AddNoteDto } from './dto/add-note.dto.js';
 import { ChangeStageDto } from './dto/change-stage.dto.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { ListApplicationsQueryDto } from './dto/list-applications.query.js';
+import { ScheduleReminderDto } from './dto/schedule-reminder.dto.js';
 import { UpdateApplicationDto } from './dto/update-application.dto.js';
 
 @Controller('applications')
@@ -40,6 +42,11 @@ export class ApplicationsController {
     @Query() query: ListApplicationsQueryDto,
   ) {
     return this.applications.list(user.userId, query);
+  }
+
+  @Get('stats')
+  stats(@CurrentUser() user: CurrentUserPayload) {
+    return this.applications.stats(user.userId);
   }
 
   @Get(':id')
@@ -64,6 +71,38 @@ export class ApplicationsController {
     @Body() dto: ChangeStageDto,
   ) {
     return this.applications.changeStage(user.userId, id, dto.to, dto.note);
+  }
+
+  @Post(':id/notes')
+  addNote(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: AddNoteDto,
+  ) {
+    return this.applications.addNote(user.userId, id, dto.note);
+  }
+
+  @Post(':id/reminders')
+  scheduleReminder(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Body() dto: ScheduleReminderDto,
+  ) {
+    return this.applications.scheduleFollowUp(
+      user.userId,
+      id,
+      new Date(dto.dueAt),
+    );
+  }
+
+  @Delete(':id/reminders/:reminderId')
+  @HttpCode(204)
+  async cancelReminder(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Param('reminderId') reminderId: string,
+  ): Promise<void> {
+    await this.applications.cancelReminder(user.userId, id, reminderId);
   }
 
   @Delete(':id')

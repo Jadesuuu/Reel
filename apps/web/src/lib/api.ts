@@ -1,3 +1,5 @@
+import { demoFetch, isDemoMode } from '../demo';
+
 export class ApiError extends Error {
   readonly status: number;
 
@@ -24,6 +26,10 @@ function messageFrom(body: unknown, fallback: string): string {
 }
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (isDemoMode()) {
+    return demoFetch<T>(path, init);
+  }
+
   const response = await fetch(`${BASE_URL}${path}`, {
     ...init,
     credentials: 'include',

@@ -9,3 +9,6 @@ apps/api/src/generated/
 *.tsbuildinfo
 .DS_Store
 CLAUDE.local.md
+apps/web/.impeccable/review/
+apps/web/.impeccable/build/
+apps/web/.impeccable/review-demo/

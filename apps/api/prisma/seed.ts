@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import argon2 from 'argon2';
 import { PrismaClient } from '../src/generated/prisma/client.js';
+import { SOURCES } from '../src/sources/source.types.js';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -40,6 +41,11 @@ async function main(): Promise<void> {
       ],
       excludeKeywords: ['php', 'wordpress', 'principal', 'staff'],
     },
+  });
+
+  await prisma.sourceSetting.createMany({
+    data: SOURCES.map((source) => ({ source, enabled: true })),
+    skipDuplicates: true,
   });
 }
 

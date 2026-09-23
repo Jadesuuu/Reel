@@ -3,9 +3,16 @@ import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
-import { INGEST_JOB, INGEST_QUEUE } from './ingest.constants.js';
+import type { Source } from '../sources/source.types.js';
+import {
+  INGEST_ALL_JOB,
+  INGEST_JOB_OPTIONS,
+  INGEST_QUEUE,
+  INGEST_SOURCE_JOB,
+  ingestStamp,
+} from './ingest.constants.js';
 
-export type IngestJobData = { threadId?: string };
+export type IngestJobData = { source?: Source; boardId?: string };
 
 @Injectable()
 export class IngestService {
@@ -14,17 +21,25 @@ export class IngestService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async enqueue(threadId?: string): Promise<{ jobId: string }> {
+  async enqueue(data: IngestJobData = {}): Promise<{ jobId: string }> {
+    const stamp = ingestStamp();
+
+    if (data.source) {
+      const job = await this.queue.add(
+        INGEST_SOURCE_JOB,
+        { source: data.source, boardId: data.boardId },
+        {
+          ...INGEST_JOB_OPTIONS,
+          jobId: `manual-${data.source}-${data.boardId ?? 'latest'}-${stamp}`,
+        },
+      );
+      return { jobId: String(job.id) };
+    }
+
     const job = await this.queue.add(
-      INGEST_JOB,
-      { threadId },
-      {
-        jobId: `manual-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')}`,
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 10_000 },
-        removeOnComplete: 50,
-        removeOnFail: 100,
-      },
+      INGEST_ALL_JOB,
+      {},
+      { ...INGEST_JOB_OPTIONS, jobId: `manual-all-${stamp}` },
     );
     return { jobId: String(job.id) };
   }
@@ -32,13 +47,16 @@ export class IngestService {
   async listRuns(
     page: number,
     pageSize: number,
+    source?: Source,
   ): Promise<Paginated<{ id: string }>> {
+    const where = source ? { source } : {};
     const [items, total] = await Promise.all([
       this.prisma.ingestRun.findMany({
+        where,
         orderBy: { startedAt: 'desc' },
         ...toSkipTake(page, pageSize),
       }),
-      this.prisma.ingestRun.count(),
+      this.prisma.ingestRun.count({ where }),
     ]);
     return paginate(items, page, pageSize, total);
   }

@@ -1,61 +1,86 @@
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import { Button } from './button';
 
 export function PageHeader({
   title,
-  subtitle,
+  lede,
   actions,
+  className,
 }: {
   title: string;
-  subtitle?: string;
+  lede?: React.ReactNode;
   actions?: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="text-lg font-medium text-text-100">{title}</h1>
-        {subtitle ? <p className="mt-0.5 text-xs text-text-500">{subtitle}</p> : null}
+    <div className={cn('mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3', className)}>
+      <div className="min-w-0">
+        <h1 className="text-[22px] font-semibold tracking-tight text-fg">{title}</h1>
+        {lede ? <p className="mt-1 max-w-[60ch] text-sm text-muted">{lede}</p> : null}
       </div>
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>
   );
 }
 
-export function EmptyState({
-  title,
-  hint,
-  action,
+export function SectionTitle({
+  children,
+  aside,
+  className,
 }: {
-  title: string;
-  hint?: string;
-  action?: React.ReactNode;
+  children: React.ReactNode;
+  aside?: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="rounded border border-dashed border-ink-700 bg-ink-900/50 px-6 py-12 text-center">
-      <p className="text-sm text-text-300">{title}</p>
-      {hint ? <p className="mt-1 text-xs text-text-500">{hint}</p> : null}
-      {action ? <div className="mt-4">{action}</div> : null}
+    <div className={cn('mb-3 flex items-baseline justify-between gap-3', className)}>
+      <h2 className="text-[13px] font-semibold tracking-tight text-fg">{children}</h2>
+      {aside ? <div className="text-xs text-faint">{aside}</div> : null}
     </div>
   );
 }
 
-export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded bg-ink-800', className)} />;
-}
-
-export function RowsSkeleton({ rows = 5 }: { rows?: number }) {
+export function ErrorState({
+  message,
+  onRetry,
+  className,
+}: {
+  message: string;
+  onRetry?: () => void;
+  className?: string;
+}) {
   return (
-    <div className="space-y-2">
-      {Array.from({ length: rows }, (_, index) => (
-        <Skeleton key={index} className="h-16 w-full" />
-      ))}
+    <div
+      role="alert"
+      className={cn(
+        'flex flex-wrap items-center gap-3 rounded-md border border-danger/40 bg-danger-soft px-4 py-3 text-sm text-fg',
+        className,
+      )}
+    >
+      <AlertTriangle className="size-4 shrink-0 text-danger" aria-hidden />
+      <span className="flex-1">{message}</span>
+      {onRetry ? (
+        <Button size="sm" variant="outline" onClick={onRetry}>
+          <RefreshCw className="size-3.5" /> Try again
+        </Button>
+      ) : null}
     </div>
   );
 }
 
-export function ErrorState({ message }: { message: string }) {
+export function Panel({
+  children,
+  className,
+  padded = true,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  padded?: boolean;
+}) {
   return (
-    <div className="rounded border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-      {message}
-    </div>
+    <section className={cn('rounded-lg border border-line bg-surface', padded && 'p-4', className)}>
+      {children}
+    </section>
   );
 }

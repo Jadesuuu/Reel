@@ -1,5 +1,6 @@
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination.query.js';
+import { SOURCES, type Source } from '../../sources/source.types.js';
 
 export enum RemoteTypeQuery {
   REMOTE = 'REMOTE',
@@ -19,7 +20,16 @@ export class ListPostingsQueryDto extends PaginationQueryDto {
   remote?: RemoteTypeQuery;
 
   @IsOptional()
+  @IsIn(SOURCES)
+  source?: Source;
+
+  @IsOptional()
   @IsString()
-  @MaxLength(32)
-  threadId?: string;
+  @MaxLength(80)
+  boardId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  stack?: string;
 }

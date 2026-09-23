@@ -36,13 +36,13 @@ describe('Matches (e2e)', () => {
       })
       .expect(200);
 
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     await prisma.posting.createMany({
       data: [
         {
           source: 'HN',
           externalId: `${THREAD_ID}-strong`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'alice',
           postedAt: new Date(),
           company: 'Northwind Labs',
@@ -58,7 +58,7 @@ describe('Matches (e2e)', () => {
         {
           source: 'HN',
           externalId: `${THREAD_ID}-weak`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'bob',
           postedAt: new Date(),
           company: 'Initech',
@@ -73,7 +73,7 @@ describe('Matches (e2e)', () => {
         {
           source: 'HN',
           externalId: `${THREAD_ID}-excluded`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'carol',
           postedAt: new Date(),
           company: 'Legacy Co',
@@ -90,7 +90,7 @@ describe('Matches (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     await prisma.user.deleteMany({ where: { email } });
     await app.close();
   });
@@ -106,7 +106,7 @@ describe('Matches (e2e)', () => {
 
   it('writes a match for the strong posting and none for the others', async () => {
     const postings = await prisma.posting.findMany({
-      where: { threadId: THREAD_ID },
+      where: { boardId: THREAD_ID },
       select: { id: true, externalId: true },
     });
     const byExternalId = new Map(

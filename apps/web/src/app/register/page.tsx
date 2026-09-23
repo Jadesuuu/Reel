@@ -8,15 +8,9 @@ export default function RegisterPage() {
 
   return (
     <AuthForm
-      title="Create your account"
-      submitLabel="Create account"
+      mode="register"
       pending={register.isPending}
       error={register.error}
-      footer={{
-        prompt: 'Already have one?',
-        href: '/login',
-        label: 'Sign in',
-      }}
       onSubmit={(credentials) => register.mutate(credentials)}
     />
   );
