@@ -48,6 +48,8 @@ describe('Applications (e2e)', () => {
         company: 'Northwind Labs',
         role: 'Full Stack Engineer',
         remote: 'REMOTE',
+        location: 'Remote, US',
+        salaryText: '$150k-$180k',
         applyUrl: 'https://northwind.example/apply',
         stackKeywords: [],
         rawHtml: '<p>x</p>',
@@ -254,5 +256,186 @@ describe('Applications (e2e)', () => {
       .get(`/api/v1/applications/${created.body.id}`)
       .set('Cookie', cookie)
       .expect(404);
+  });
+
+  it('copies location, salary and source label from the posting', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ postingId })
+      .expect(201);
+
+    expect(res.body.via).toBe('Hacker News');
+    expect(res.body.location).toBe('Remote, US');
+    expect(res.body.salaryText).toBe('$150k-$180k');
+    expect(res.body.appliedAt).toBeNull();
+  });
+
+  it('accepts the richer manual fields and rejects a bad contact email', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({
+        company: 'Manual Co',
+        role: 'Engineer',
+        via: 'LinkedIn',
+        location: 'Manila',
+        salaryText: 'PHP 120k',
+        nextStepAt: '2026-10-05T09:00:00.000Z',
+        contactName: 'Sam Recruiter',
+        contactEmail: 'sam@manual.example',
+      })
+      .expect(201);
+    expect(res.body).toMatchObject({
+      via: 'LinkedIn',
+      location: 'Manila',
+      contactName: 'Sam Recruiter',
+      nextStepAt: '2026-10-05T09:00:00.000Z',
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({
+        company: 'Manual Co',
+        role: 'Engineer',
+        contactEmail: 'not-an-email',
+      })
+      .expect(400);
+  });
+
+  it('sets appliedAt on the first move to APPLIED and searches by company', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ company: 'Searchable Widgets', role: 'Engineer' })
+      .expect(201);
+
+    const moved = await request(app.getHttpServer())
+      .post(`/api/v1/applications/${created.body.id}/stage`)
+      .set('Cookie', cookie)
+      .send({ to: 'APPLIED' })
+      .expect(200);
+    expect(moved.body.appliedAt).toEqual(expect.any(String));
+
+    const found = await request(app.getHttpServer())
+      .get('/api/v1/applications?q=widgets')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(found.body.total).toBe(1);
+    expect(found.body.items[0].company).toBe('Searchable Widgets');
+    expect(found.body.items[0].reminders).toHaveLength(1);
+  });
+
+  it('logs a note as a NOTE event without changing the stage', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ company: 'Notes Co', role: 'Engineer' })
+      .expect(201);
+    const id: string = created.body.id;
+
+    const note = await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/notes`)
+      .set('Cookie', cookie)
+      .send({ note: 'Spoke to the hiring manager' })
+      .expect(201);
+    expect(note.body).toMatchObject({
+      kind: 'NOTE',
+      fromStage: 'SAVED',
+      toStage: 'SAVED',
+    });
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/notes`)
+      .set('Cookie', cookie)
+      .send({ note: '' })
+      .expect(400);
+
+    const detail = await request(app.getHttpServer())
+      .get(`/api/v1/applications/${id}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(detail.body.stage).toBe('SAVED');
+    expect(detail.body.events.map((e: { kind: string }) => e.kind)).toEqual([
+      'STAGE_CHANGE',
+      'NOTE',
+    ]);
+  });
+
+  it('schedules, replaces, and cancels a follow-up reminder', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ company: 'Follow Up Co', role: 'Engineer' })
+      .expect(201);
+    const id: string = created.body.id;
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/reminders`)
+      .set('Cookie', cookie)
+      .send({ dueAt: '2020-01-01T00:00:00.000Z' })
+      .expect(400);
+
+    const first = await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/reminders`)
+      .set('Cookie', cookie)
+      .send({ dueAt: new Date(Date.now() + 2 * 86_400_000).toISOString() })
+      .expect(201);
+    expect(first.body.kind).toBe('FOLLOW_UP');
+
+    const laterDue = new Date(Date.now() + 5 * 86_400_000).toISOString();
+    const second = await request(app.getHttpServer())
+      .post(`/api/v1/applications/${id}/reminders`)
+      .set('Cookie', cookie)
+      .send({ dueAt: laterDue })
+      .expect(201);
+    expect(second.body.id).toBe(first.body.id);
+    expect(second.body.dueAt).toBe(laterDue);
+
+    const detail = await request(app.getHttpServer())
+      .get(`/api/v1/applications/${id}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(detail.body.reminders).toHaveLength(1);
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/applications/${id}/reminders/${first.body.id}`)
+      .set('Cookie', cookie)
+      .expect(204);
+
+    const after = await request(app.getHttpServer())
+      .get(`/api/v1/applications/${id}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(after.body.reminders[0].cancelledAt).not.toBeNull();
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/applications/${id}/reminders/does-not-exist`)
+      .set('Cookie', cookie)
+      .expect(404);
+  });
+
+  it('GET /applications/stats returns the summary shape', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/applications/stats')
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(res.body.total).toBeGreaterThan(0);
+    expect(res.body.byStage).toMatchObject({
+      OFFER: expect.any(Number),
+      SAVED: expect.any(Number),
+    });
+    expect(res.body.appliedThisWeek).toBeGreaterThanOrEqual(2);
+    expect(res.body.responseRate).toBeGreaterThan(0);
+    expect(res.body.weekly).toHaveLength(8);
+    expect(Array.isArray(res.body.upcoming)).toBe(true);
+    const other = await request(app.getHttpServer())
+      .get('/api/v1/applications/stats')
+      .set('Cookie', otherCookie)
+      .expect(200);
+    expect(other.body.total).toBe(0);
+    expect(other.body.responseRate).toBeNull();
   });
 });

@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsISO8601,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateApplicationDto {
   @IsOptional()
@@ -25,4 +32,33 @@ export class CreateApplicationDto {
   @IsString()
   @MaxLength(10_000)
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  salaryText?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  via?: string;
+
+  @IsOptional()
+  @IsISO8601()
+  nextStepAt?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  contactName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(254)
+  contactEmail?: string;
 }

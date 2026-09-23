@@ -135,7 +135,7 @@ takes the whole array and enqueues them in one round-trip.
 - **BullMQ rejects `:` in custom job ids.** v1's plan wrote `stale:<id>`; the code already used
   `stale-<id>`. Every id here uses `-`: `manual-all-202609231400`, `cycle-GREENHOUSE-stripe-…`.
 - **Greenhouse double-escapes `content`.** The HTML arrives as `&lt;h2&gt;…`. `htmlToText`
-  decodes entities *after* stripping tags, so it would have stripped nothing. The adapter runs
+  decodes entities _after_ stripping tags, so it would have stripped nothing. The adapter runs
   `he.decode` once first; the test asserts `rawText` starts with `Who we are`, not `<h2>`.
 - **We Work Remotely escapes `<description>` rather than using CDATA.** `rss.ts` handles both:
   CDATA is unwrapped as-is, anything else is entity-decoded once. The result is HTML either way,
@@ -151,4 +151,4 @@ takes the whole array and enqueues them in one round-trip.
   the rename. The workaround was to write the migration SQL by hand, apply it with
   `migrate deploy`, and confirm with `migrate diff` that nothing drifted.
 - **`lastRun` per source in one query**: `findMany({ distinct: ['source'], orderBy: { startedAt:
-  'desc' } })` — Prisma applies `DISTINCT ON` after ordering, so the newest run per source wins.
+'desc' } })` — Prisma applies `DISTINCT ON` after ordering, so the newest run per source wins.

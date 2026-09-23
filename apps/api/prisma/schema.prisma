@@ -44,6 +44,12 @@ enum Stage {
 
 enum ReminderKind {
   STALE_APPLICATION
+  FOLLOW_UP
+}
+
+enum EventKind {
+  STAGE_CHANGE
+  NOTE
 }
 
 model User {
@@ -175,6 +181,13 @@ model Application {
   url            String?
   stage          Stage    @default(SAVED)
   notes          String?
+  location       String?
+  salaryText     String?   @map("salary_text")
+  via            String?
+  appliedAt      DateTime? @map("applied_at")
+  nextStepAt     DateTime? @map("next_step_at")
+  contactName    String?   @map("contact_name")
+  contactEmail   String?   @map("contact_email")
   stageChangedAt DateTime @default(now()) @map("stage_changed_at")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -193,6 +206,7 @@ model StageEvent {
   applicationId String   @map("application_id")
   fromStage     Stage?   @map("from_stage")
   toStage       Stage    @map("to_stage")
+  kind          EventKind @default(STAGE_CHANGE)
   note          String?
   createdAt     DateTime @default(now()) @map("created_at")
 

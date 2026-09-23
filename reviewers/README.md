@@ -11,17 +11,18 @@ Read them in order. Each one follows the same shape:
 - **Concepts** — the things worth being able to explain in your own words
 - **Gotchas** — what actually broke while building it, and why
 
-| Step | Document                                           | Branch              |
-| ---- | -------------------------------------------------- | ------------------- |
-| —    | [Repairs to steps 1–6](step-00-repairs.md)         | `feat/ingest-job`   |
-| 7    | [Ingest job and worker](step-07-ingest.md)         | `feat/ingest-job`   |
-| 8    | [Postings API](step-08-postings.md)                | `feat/postings-api` |
-| 9    | [Scoring and matches](step-09-matching.md)         | `feat/matching`     |
-| 10   | [Applications and stages](step-10-applications.md) | `feat/applications` |
-| 11   | [Reminders and mailer](step-11-reminders.md)       | `feat/reminders`    |
-| 12   | [Hardening and Dockerfile](step-12-hardening.md)   | `chore/hardening`   |
-| 13   | [Frontend](step-13-frontend.md)                    | `feat/web-*`        |
-| 16   | [Sources](step-16-sources.md)                      | `feat/sources`      |
+| Step | Document                                              | Branch                 |
+| ---- | ----------------------------------------------------- | ---------------------- |
+| —    | [Repairs to steps 1–6](step-00-repairs.md)            | `feat/ingest-job`      |
+| 7    | [Ingest job and worker](step-07-ingest.md)            | `feat/ingest-job`      |
+| 8    | [Postings API](step-08-postings.md)                   | `feat/postings-api`    |
+| 9    | [Scoring and matches](step-09-matching.md)            | `feat/matching`        |
+| 10   | [Applications and stages](step-10-applications.md)    | `feat/applications`    |
+| 11   | [Reminders and mailer](step-11-reminders.md)          | `feat/reminders`       |
+| 12   | [Hardening and Dockerfile](step-12-hardening.md)      | `chore/hardening`      |
+| 13   | [Frontend](step-13-frontend.md)                       | `feat/web-*`           |
+| 16   | [Sources](step-16-sources.md)                         | `feat/sources`         |
+| 17   | [Application tracking v2](step-17-applications-v2.md) | `feat/applications-v2` |
 
 Steps 1–6 were built in an earlier pass and have no reviewer yet. The repairs document covers
 what was wrong with them; the code itself is small enough to read directly, starting at
