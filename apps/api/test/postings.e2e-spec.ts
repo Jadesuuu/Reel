@@ -25,13 +25,13 @@ describe('Postings (e2e)', () => {
     const setCookie = res.headers['set-cookie'];
     cookie = Array.isArray(setCookie) ? setCookie[0] : String(setCookie);
 
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     await prisma.posting.createMany({
       data: [
         {
           source: 'HN',
           externalId: `${THREAD_ID}-1`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'alice',
           postedAt: new Date('2026-09-01T00:00:00Z'),
           company: 'Northwind Labs',
@@ -47,7 +47,7 @@ describe('Postings (e2e)', () => {
         {
           source: 'HN',
           externalId: `${THREAD_ID}-2`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'bob',
           postedAt: new Date('2026-09-02T00:00:00Z'),
           company: 'Contoso',
@@ -63,7 +63,7 @@ describe('Postings (e2e)', () => {
         {
           source: 'HN',
           externalId: `${THREAD_ID}-3`,
-          threadId: THREAD_ID,
+          boardId: THREAD_ID,
           author: 'carol',
           postedAt: new Date('2026-09-03T00:00:00Z'),
           company: 'Initech',
@@ -81,7 +81,7 @@ describe('Postings (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     await prisma.user.deleteMany({ where: { email } });
     await app.close();
   });
@@ -92,7 +92,7 @@ describe('Postings (e2e)', () => {
 
   it('lists every posting in the thread, newest first, without rawHtml', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/api/v1/postings?threadId=${THREAD_ID}`)
+      .get(`/api/v1/postings?boardId=${THREAD_ID}`)
       .set('Cookie', cookie)
       .expect(200);
 
@@ -104,7 +104,7 @@ describe('Postings (e2e)', () => {
 
   it('filters by remote type', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/api/v1/postings?threadId=${THREAD_ID}&remote=REMOTE`)
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&remote=REMOTE`)
       .set('Cookie', cookie)
       .expect(200);
 
@@ -113,7 +113,7 @@ describe('Postings (e2e)', () => {
 
   it('searches case-insensitively', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/api/v1/postings?threadId=${THREAD_ID}&q=northwind`)
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&q=northwind`)
       .set('Cookie', cookie)
       .expect(200);
 
@@ -123,7 +123,7 @@ describe('Postings (e2e)', () => {
 
   it('paginates', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/api/v1/postings?threadId=${THREAD_ID}&pageSize=1&page=2`)
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&pageSize=1&page=2`)
       .set('Cookie', cookie)
       .expect(200);
 
@@ -134,7 +134,7 @@ describe('Postings (e2e)', () => {
 
   it('returns a posting detail with rawText but not rawHtml', async () => {
     const list = await request(app.getHttpServer())
-      .get(`/api/v1/postings?threadId=${THREAD_ID}`)
+      .get(`/api/v1/postings?boardId=${THREAD_ID}`)
       .set('Cookie', cookie)
       .expect(200);
 
@@ -152,5 +152,53 @@ describe('Postings (e2e)', () => {
       .get('/api/v1/postings/does-not-exist')
       .set('Cookie', cookie)
       .expect(404);
+  });
+
+  it('filters by source', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&source=HN`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(res.body.total).toBe(3);
+
+    const none = await request(app.getHttpServer())
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&source=REMOTIVE`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(none.body.total).toBe(0);
+  });
+
+  it('filters by stack keyword', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/postings?boardId=${THREAD_ID}&stack=Go`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(res.body.total).toBe(1);
+    expect(res.body.items[0].company).toBe('Contoso');
+  });
+
+  it('rejects an unknown source', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/postings?source=LINKEDIN')
+      .set('Cookie', cookie)
+      .expect(400);
+  });
+
+  it('GET /postings/stats groups by source and remote', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/postings/stats')
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(res.body.total).toBeGreaterThanOrEqual(3);
+    const hn = res.body.bySource.find(
+      (row: { source: string }) => row.source === 'HN',
+    );
+    expect(hn.count).toBeGreaterThanOrEqual(3);
+    expect(hn.latestPostedAt).toEqual(expect.any(String));
+    const remote = res.body.byRemote.find(
+      (row: { remote: string }) => row.remote === 'REMOTE',
+    );
+    expect(remote.count).toBeGreaterThanOrEqual(2);
   });
 });

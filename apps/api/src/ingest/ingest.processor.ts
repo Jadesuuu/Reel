@@ -1,18 +1,29 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import type { Job } from 'bullmq';
-import { HnClient } from '../hn/hn.client.js';
-import { parseComment } from '../hn/hn.parser.js';
+import { Queue, type Job } from 'bullmq';
 import { MatchingService } from '../matching/matching.service.js';
 import { PostingsService } from '../postings/postings.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { INGEST_QUEUE } from './ingest.constants.js';
+import { normalizePosting } from '../sources/normalize.js';
+import { SOURCE_META } from '../sources/source-meta.js';
+import { SourceRegistry } from '../sources/source-registry.js';
+import { SourcesService } from '../sources/sources.service.js';
+import {
+  INGEST_ALL_JOB,
+  INGEST_JOB_OPTIONS,
+  INGEST_QUEUE,
+  INGEST_SOURCE_JOB,
+  ingestStamp,
+} from './ingest.constants.js';
 import type { IngestJobData } from './ingest.service.js';
 
-export type IngestJobResult = {
+export type FanOutResult = { enqueued: number };
+
+export type IngestSourceResult = {
   runId: string;
-  threadId: string;
-  commentsSeen: number;
+  source: string;
+  boardId: string;
+  itemsSeen: number;
   created: number;
   updated: number;
 };
@@ -22,7 +33,9 @@ export class IngestProcessor extends WorkerHost {
   private readonly logger = new Logger(IngestProcessor.name);
 
   constructor(
-    private readonly hn: HnClient,
+    @InjectQueue(INGEST_QUEUE) private readonly queue: Queue<IngestJobData>,
+    private readonly registry: SourceRegistry,
+    private readonly sources: SourcesService,
     private readonly postings: PostingsService,
     private readonly matching: MatchingService,
     private readonly prisma: PrismaService,
@@ -30,58 +43,92 @@ export class IngestProcessor extends WorkerHost {
     super();
   }
 
-  async process(job: Job<IngestJobData>): Promise<IngestJobResult> {
-    const threadId =
-      job.data.threadId ?? (await this.hn.findLatestWhoIsHiringThread()).id;
+  async process(
+    job: Job<IngestJobData>,
+  ): Promise<FanOutResult | IngestSourceResult> {
+    if (job.name === INGEST_ALL_JOB) {
+      return this.fanOut();
+    }
+    if (job.name === INGEST_SOURCE_JOB) {
+      return this.ingestSource(job.data);
+    }
+    throw new Error(`Unknown ingest job ${job.name}`);
+  }
+
+  private async fanOut(): Promise<FanOutResult> {
+    const targets = await this.sources.enabledTargets();
+    const stamp = ingestStamp();
+
+    await this.queue.addBulk(
+      targets.map((target) => ({
+        name: INGEST_SOURCE_JOB,
+        data: target,
+        opts: {
+          ...INGEST_JOB_OPTIONS,
+          jobId: `cycle-${target.source}-${target.boardId ?? 'latest'}-${stamp}`,
+        },
+      })),
+    );
+
+    this.logger.log(`Fan-out enqueued ${targets.length} source jobs`);
+    return { enqueued: targets.length };
+  }
+
+  private async ingestSource(data: IngestJobData): Promise<IngestSourceResult> {
+    if (!data.source) {
+      throw new Error('ingest-source job needs a source');
+    }
+    const source = data.source;
+    const adapter = this.registry.get(source);
+    const requestedBoard =
+      data.boardId ?? SOURCE_META[source].defaultBoardId ?? 'latest';
 
     const run = await this.prisma.ingestRun.create({
-      data: { source: 'HN', externalThreadId: threadId },
+      data: { source, boardId: requestedBoard },
     });
 
     try {
-      const items = await this.hn.fetchTopLevelComments(threadId);
-      const parsed = items.map((item) => ({
-        item,
-        parsed: parseComment(item),
-      }));
+      const { boardId, items } = await adapter.fetch(data.boardId);
+      const normalized = items.map(normalizePosting);
       const { created, updated } = await this.postings.upsertMany(
-        threadId,
-        parsed,
+        source,
+        boardId,
+        normalized,
       );
       await this.matching.rescoreAllUsers();
 
       await this.prisma.ingestRun.update({
         where: { id: run.id },
         data: {
+          boardId,
           status: 'SUCCEEDED',
           finishedAt: new Date(),
-          commentsSeen: items.length,
+          itemsSeen: items.length,
           postingsCreated: created,
           postingsUpdated: updated,
         },
       });
 
       this.logger.log(
-        `Ingested thread ${threadId}: ${items.length} comments, ${created} created, ${updated} updated`,
+        `Ingested ${source}/${boardId}: ${items.length} items, ${created} created, ${updated} updated`,
       );
 
       return {
         runId: run.id,
-        threadId,
-        commentsSeen: items.length,
+        source,
+        boardId,
+        itemsSeen: items.length,
         created,
         updated,
       };
     } catch (err) {
       await this.prisma.ingestRun.update({
         where: { id: run.id },
-        data: {
-          status: 'FAILED',
-          finishedAt: new Date(),
-          error: String(err),
-        },
+        data: { status: 'FAILED', finishedAt: new Date(), error: String(err) },
       });
-      this.logger.error(`Ingest of thread ${threadId} failed: ${String(err)}`);
+      this.logger.error(
+        `Ingest of ${source}/${requestedBoard} failed: ${String(err)}`,
+      );
       throw err;
     }
   }

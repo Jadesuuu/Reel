@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss">
+  <channel>
+    <title>We Work Remotely: Remote jobs in design, programming, marketing and more</title>
+    <link>https://weworkremotely.com/categories/remote-programming-jobs.rss</link>
+    <description>We Work Remotely: Remote jobs in design, programming, marketing and more</description>
+    <language>en-US</language>
+    <ttl>60</ttl>
+    <item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0171/6398/logo.gif" type="image/png"/>
+      <title>Lemon.io: Senior .NET Full-stack Developer</title>
+      <region>Anywhere in the World</region>
+      <category>Full-Stack Programming</category>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0171/6398/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; New York, NY
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="https://lemon.io"&gt;https://lemon.io&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Are you a talented Senior Developer looking for a remote job that lets you show your skills and get decent compensation? Look no further than &lt;a href="https://lemon.io/for-developers/?utm_source=weworkremotely&amp;amp;utm_medium=job_ad&amp;amp;utm_campaign=supply_en_fullstack_react/.net_sep_2026_job_ad"&gt;Lemon.io&lt;/a&gt;  …</description>
+      <pubDate>Tue, 08 Sep 2026 13:49:13 +0000</pubDate>
+      <guid>https://weworkremotely.com/remote-jobs/lemon-io-senior-net-full-stack-developer-1</guid>
+      <link>https://weworkremotely.com/remote-jobs/lemon-io-senior-net-full-stack-developer-1</link>
+    </item>
+<item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0171/5766/logo.gif" type="image/png"/>
+      <title>Wonderdog: Full-Stack Product Engineer - Agentic First</title>
+      <region>Anywhere in the World</region>
+      <category>Full-Stack Programming</category>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0171/5766/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Los Angeles
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="https://wonderdoghealth.com/"&gt;https://wonderdoghealth.com/&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p class="font-claude-response-body break-words whitespace-normal"&gt;Wonder Dog is a preventative health platform for dogs. We send licensed vet techs to your home for a blood draw, run a 40+ biomarker panel through a national lab, and turn the results into something owners can actually act on. We're a small te …</description>
+      <pubDate>Thu, 09 Jul 2026 17:03:38 +0000</pubDate>
+      <guid>https://weworkremotely.com/remote-jobs/wonderdog-full-stack-product-engineer-agentic-first</guid>
+      <link>https://weworkremotely.com/remote-jobs/wonderdog-full-stack-product-engineer-agentic-first</link>
+    </item>
+  </channel>
+</rss>

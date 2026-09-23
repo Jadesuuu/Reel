@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
+import type { Source } from '../sources/source.types.js';
 import { MATCH_THRESHOLD, score, type CriteriaForScoring } from './scorer.js';
 
 const RESCORE_WINDOW_DAYS = 45;
@@ -15,6 +16,8 @@ const DEFAULT_CRITERIA: CriteriaForScoring = {
 
 const POSTING_SUMMARY_SELECT = {
   id: true,
+  source: true,
+  url: true,
   company: true,
   role: true,
   location: true,
@@ -96,11 +99,18 @@ export class MatchingService {
 
   async list(
     userId: string,
-    dismissed: boolean,
+    options: { dismissed: boolean; source?: Source; minScore?: number },
     page: number,
     pageSize: number,
   ): Promise<Paginated<Record<string, unknown>>> {
-    const where = { userId, dismissed };
+    const where = {
+      userId,
+      dismissed: options.dismissed,
+      ...(options.minScore !== undefined
+        ? { score: { gte: options.minScore } }
+        : {}),
+      ...(options.source ? { posting: { source: options.source } } : {}),
+    };
 
     const [items, total] = await Promise.all([
       this.prisma.match.findMany({

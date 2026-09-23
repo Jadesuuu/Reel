@@ -51,7 +51,8 @@ job emails you to follow up.
 
 ### Non-goals for v1 (do not build these, even if tempted)
 
-- Any job source other than HN "Who is hiring?".
+- ~~Any job source other than HN "Who is hiring?".~~ Lifted on 23 Sep 2026 — see Section 11. Public
+  JSON/RSS job APIs and company boards are in; anything that needs scraping or an API key stays out.
 - Browser extension, scraping of arbitrary sites, LinkedIn/Wellfound integrations.
 - AI/LLM-based matching or summarization.
 - Teams, sharing, multi-user collaboration. (Multiple accounts can exist; they never see each other.)
@@ -328,7 +329,7 @@ model Reminder {
   dueAt         DateTime     @map("due_at")
   sentAt        DateTime?    @map("sent_at")
   cancelledAt   DateTime?    @map("cancelled_at")
-  jobId         String       @unique @map("job_id")   // BullMQ jobId, e.g. "stale:<applicationId>"
+  jobId         String       @unique @map("job_id")   // BullMQ jobId, e.g. "stale-<applicationId>"
   createdAt     DateTime     @default(now()) @map("created_at")
 
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
@@ -345,7 +346,7 @@ model Reminder {
 3. `Match (userId, postingId)` is unique. Rescoring **upserts** score and reasons; never duplicates.
 4. Every Application has at least one StageEvent (the creation event, `fromStage = null`).
 5. Changing `Application.stage` always: writes a StageEvent, updates `stageChangedAt`, cancels any pending Reminder, and schedules a new Reminder if the new stage is `APPLIED`.
-6. A Reminder's `jobId` is deterministic: `stale:<applicationId>`. Cancelling = remove BullMQ job by that id + set `cancelledAt`.
+6. A Reminder's `jobId` is deterministic: `stale-<applicationId>`. Cancelling = remove BullMQ job by that id + set `cancelledAt`.
 7. `Reminder` is only ever sent if, at send time, the Application is **still** in `APPLIED` and `stageChangedAt` is unchanged since scheduling. The worker re-reads the DB; it never trusts the job payload alone.
 8. Users only ever read/write their own Criteria, Matches, Applications. Every query in those services filters by `userId` from the JWT. Postings are global and read-only via the API.
 
@@ -456,7 +457,7 @@ src/
 | Queue | Job name | Producer | Payload | jobId | Options |
 |---|---|---|---|---|---|
 | `ingest` | `ingest-hn-thread` | Repeatable schedule registered by worker on boot: cron `0 */6 * * *` (every 6h). Also `POST /ingest/run` (manual). | `{ threadId?: string }` (omit → find latest) | Repeatable: BullMQ manages. Manual: `manual:<ISO timestamp minute>` | `attempts: 3`, `backoff: { type: 'exponential', delay: 30_000 }`, `removeOnComplete: 50`, `removeOnFail: 100` |
-| `reminders` | `send-stale-reminder` | `RemindersService.schedule()` on stage → `APPLIED` | `{ applicationId, stageChangedAt: ISO }` | `stale:<applicationId>` | `delay: 10 days in ms` (env `STALE_AFTER_DAYS`, default 10; set to minutes in dev), `attempts: 3`, `backoff` same |
+| `reminders` | `send-stale-reminder` | `RemindersService.schedule()` on stage → `APPLIED` | `{ applicationId, stageChangedAt: ISO }` | `stale-<applicationId>` (BullMQ rejects `:` in custom ids) | `delay: 10 days in ms` (env `STALE_AFTER_DAYS`, default 10; set to minutes in dev), `attempts: 3`, `backoff` same |
 
 **Idempotency rules**
 
@@ -1179,6 +1180,443 @@ Mocking Prisma: don't use a full mock library. Create `test/prisma.mock.ts` retu
 - **Service container (GitHub Actions)** — a sidecar DB/Redis for CI, reachable at `localhost`.
 - **Offset pagination** — `skip/take`; simple, fine under ~100k rows.
 - **CORS + credentials** — browser sends cookies cross-origin only if the server allows that exact origin and `credentials: true`.
+
+---
+
+---
+
+## 11. v2 — Sources, application tracking, UI overhaul, demo mode (added 23 Sep 2026)
+
+**Why this section exists.** v1 shipped end to end on 16 Sep. On 23 Sep Jade asked for four
+things: every free job source, not just HN; application tracking that stands on its own without
+a posting behind it; an industry-standard UI; and a version that can be hosted for free and put
+on a resume. Sections 1–10 stay as the v1 record. Where this section contradicts them, this
+section wins, and the contradiction is called out inline rather than silently.
+
+**Non-goals amended.** "Any job source other than HN" is lifted. Still out: scraping arbitrary
+sites, anything that needs an API key (LinkedIn, Indeed, Adzuna, The Muse), AI matching, teams,
+realtime, OAuth, mobile apps.
+
+### 11.1 Fixed decisions (additions)
+
+| Area | Decision | Why |
+|---|---|---|
+| Job sources | Public JSON/RSS endpoints only, no keys, no browser: **HN** (Who is hiring), **Remotive**, **Remote OK**, **Arbeitnow**, **Himalayas**, **Jobicy**, **We Work Remotely** (RSS); plus company boards on **Greenhouse**, **Lever**, **Ashby** through a watchlist of board slugs | Every one answers structured data without auth (verified live 23 Sep 2026). Remote OK and Arbeitnow ask for a link back, so every posting shows its source and links to the original. |
+| Source adapters | One `@Injectable` per source implementing `SourceAdapter`; a **pure** `normalizePosting()` turns each adapter's `RawPosting` into the fields `Posting` stores | Adapters do I/O only. Parsing stays pure and fixture-tested exactly like the HN parser in Step 6. |
+| Ingest fan-out | One repeatable `ingest-all` job (cron `0 */6 * * *`) enqueues one `ingest-source` job per enabled source and per watched board | One `IngestRun` per source per cycle. A source that is down fails alone and retries alone. |
+| Source settings | Global, not per user: `SourceSetting` rows toggle a source on or off; `WatchedBoard` rows list company boards | Postings are global already (Section 3.1). Per-user toggles over a global table would mean ingesting for everyone anyway. |
+| RSS parsing | Regex item extraction + `he.decode` | Same rule as HTML → text: no DOM parser. |
+| Board validation | `POST /sources/boards` fetches the board once before saving; unknown slug → `400` | The one place the API talks to a third party synchronously. It is a user-initiated check with a 10s timeout, not an ingest. |
+| Job ids | `-` separators only (`stale-<id>`, `followup-<id>`, `manual-<source>-<board>-<minute>`) | BullMQ 5 throws on `:` in a custom id. v1's `stale:<id>` was already shipped as `stale-<id>`; Sections 3.3 and 4.3 are corrected above. |
+| Frontend libraries | `motion`, `@dnd-kit/core` + `@dnd-kit/sortable`, `radix-ui`, `cmdk`, `sonner`, `lucide-react`, `recharts`, `next-themes`, `class-variance-authority`, `clsx`, `tailwind-merge` | The shadcn/ui stack from Section 2 made concrete, plus motion and drag-and-drop. Nothing that fetches or owns server state — TanStack Query still does that. |
+| Demo mode | `NEXT_PUBLIC_DEMO_MODE=true` at build time swaps `apiFetch` for an in-browser implementation of the same Section 5 + 11.3 contract, seeded with realistic data and persisted to `localStorage` | Free to host on Vercel, no cold start, nothing to keep alive. The real backend still deploys per Step 14 when Jade wants it live. The demo is the resume link; the repo is the proof. |
+
+### 11.2 Schema deltas
+
+Two migrations, one per step. Column renames are hand-written `ALTER TABLE … RENAME COLUMN` so
+existing rows survive — `prisma migrate dev --create-only`, edit, then `migrate dev`.
+
+```prisma
+// Step 16 — migration v2_sources
+enum Source {
+  HN
+  REMOTIVE
+  REMOTEOK
+  ARBEITNOW
+  HIMALAYAS
+  JOBICY
+  WEWORKREMOTELY
+  GREENHOUSE
+  LEVER
+  ASHBY
+}
+
+model Posting {
+  // renamed: threadId → boardId. HN story id, company board slug, or feed key ("software-dev").
+  boardId  String  @map("board_id")
+  // new: canonical page for the posting. HN: the comment permalink. Others: the job page.
+  url      String?
+  // everything else unchanged; @@index([boardId]) replaces @@index([threadId])
+}
+
+model IngestRun {
+  boardId   String @map("board_id")                // renamed: externalThreadId → boardId
+  itemsSeen Int    @default(0) @map("items_seen")  // renamed: commentsSeen → itemsSeen
+}
+
+model SourceSetting {
+  source    Source   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("source_settings")
+}
+
+model WatchedBoard {
+  id        String   @id @default(cuid())
+  provider  Source                      // GREENHOUSE | LEVER | ASHBY, enforced in the service
+  slug      String
+  company   String                      // display name, fetched from the board on create
+  createdAt DateTime @default(now()) @map("created_at")
+  @@unique([provider, slug])
+  @@map("watched_boards")
+}
+
+// Step 17 — migration v2_applications
+enum EventKind {
+  STAGE_CHANGE
+  NOTE
+}
+
+enum ReminderKind {
+  STALE_APPLICATION
+  FOLLOW_UP
+}
+
+model Application {
+  location     String?
+  salaryText   String?   @map("salary_text")
+  via          String?                          // where it was found: "Hacker News", "LinkedIn", "Referral"
+  appliedAt    DateTime? @map("applied_at")     // set on first move to APPLIED; editable
+  nextStepAt   DateTime? @map("next_step_at")   // interview or follow-up the user is waiting on
+  contactName  String?   @map("contact_name")
+  contactEmail String?   @map("contact_email")
+}
+
+model StageEvent {
+  kind EventKind @default(STAGE_CHANGE)         // NOTE events have fromStage === toStage
+}
+```
+
+Invariant additions:
+
+9. `StageEvent.kind = NOTE` rows never change `Application.stage`; `fromStage === toStage` on them.
+10. At most one pending `FOLLOW_UP` reminder per application: `jobId = followup-<applicationId>`.
+    Scheduling again replaces it (remove job, upsert row).
+11. `SourceSetting` has one row per `Source` value, created lazily on first read with `enabled: true`.
+12. `WatchedBoard.provider` is one of `GREENHOUSE | LEVER | ASHBY`; the service rejects anything else.
+
+### 11.3 API additions
+
+All under `/api/v1`, all authenticated. Existing routes keep their shapes except where a rename is
+noted.
+
+**Sources**
+
+| Method | Path | Body | Response |
+|---|---|---|---|
+| GET | `/sources` | — | `200 { items: SourceInfo[] }` where `SourceInfo = { source, label, kind: 'feed' or 'board', homepage, attribution: string or null, enabled, postings: number, lastRun: IngestRun or null }` |
+| PATCH | `/sources/:source` | `{ enabled: boolean }` | `200 SourceInfo`. Unknown source → `404`. |
+| GET | `/sources/boards` | — | `200 { items: WatchedBoard[] }` |
+| POST | `/sources/boards` | `{ provider: 'GREENHOUSE' or 'LEVER' or 'ASHBY', slug: string }` | `201 WatchedBoard`. Fetches the board to confirm it exists and read the company name; unknown → `400 "Board not found"`. Duplicate → `409`. |
+| DELETE | `/sources/boards/:id` | — | `204` |
+
+**Ingest**
+
+| Method | Path | Body | Response |
+|---|---|---|---|
+| POST | `/ingest/run` | `{ source?: Source, boardId?: string }` | `202 { jobId }`. With `source`: one `ingest-source` job. Without: one `ingest-all` job that fans out. `threadId` is gone. |
+| GET | `/ingest/runs` | `?source&page&pageSize` | unchanged shape; items now carry `boardId` and `itemsSeen` |
+
+**Postings**
+
+| Method | Path | Query | Response |
+|---|---|---|---|
+| GET | `/postings` | `q`, `remote`, `source?: Source`, `boardId?` (replaces `threadId`), `stack?: string` (has keyword), `page`, `pageSize` | unchanged shape; items include `url` |
+| GET | `/postings/stats` | — | `200 { total, bySource: [{ source, count, latestPostedAt }], byRemote: [{ remote, count }] }` |
+
+**Matches**
+
+| Method | Path | Query | Response |
+|---|---|---|---|
+| GET | `/matches` | adds `source?: Source`, `minScore?: number` | unchanged shape; `posting` summary includes `source` and `url` |
+
+**Applications**
+
+| Method | Path | Body | Response |
+|---|---|---|---|
+| POST | `/applications` | adds `location?, salaryText?, via?, nextStepAt?, contactName?, contactEmail?`. From a posting, `via` defaults to the source label and `location`/`salaryText` copy across. | `201` |
+| GET | `/applications` | adds `q?` (company or role contains) | unchanged |
+| PATCH | `/applications/:id` | adds the same optional fields plus `appliedAt?` | `200` |
+| POST | `/applications/:id/notes` | `{ note: string }` | `201 StageEvent` with `kind: 'NOTE'` |
+| POST | `/applications/:id/reminders` | `{ dueAt: ISO }` (must be in the future) | `201 Reminder` with `kind: 'FOLLOW_UP'`; replaces any pending follow-up |
+| DELETE | `/applications/:id/reminders/:reminderId` | — | `204`, cancels job and sets `cancelledAt` |
+| GET | `/applications/stats` | — | `200 ApplicationStats` (below) |
+
+```ts
+type ApplicationStats = {
+  total: number;
+  active: number;                          // SAVED + APPLIED + INTERVIEWING + OFFER
+  byStage: Record<Stage, number>;
+  appliedThisWeek: number;                 // STAGE_CHANGE events to APPLIED in the last 7 days
+  responseRate: number | null;             // (ever reached INTERVIEWING or OFFER) / (ever reached APPLIED), null if none applied
+  medianDaysToResponse: number | null;     // APPLIED → INTERVIEWING, over applications that have both
+  upcoming: Array<{ applicationId, company, role, stage, at: ISO, kind: 'REMINDER' | 'NEXT_STEP' }>; // next 14 days, soonest first
+  weekly: Array<{ weekStart: ISO, applied, interviewing, offer, rejected }>;   // last 8 weeks, oldest first
+};
+```
+
+`changeStage` to `APPLIED` sets `appliedAt` when it is null. The stage machine in Section 5.7 is
+unchanged — the UI drags cards between columns, the server still says no to illegal moves, and
+the UI shows the server's message.
+
+**Queues (Section 4.3 amended)**
+
+| Queue | Job | Producer | Payload | jobId |
+|---|---|---|---|---|
+| `ingest` | `ingest-all` | Repeatable, cron `0 */6 * * *`, registered by the worker on boot; also `POST /ingest/run` without `source` | `{}` | scheduler-managed; manual `manual-all-<yyyymmddHHmm>` |
+| `ingest` | `ingest-source` | `ingest-all` fan-out; `POST /ingest/run` with `source` | `{ source, boardId? }` | `cycle-<source>-<board or latest>-<yyyymmddHHmm>` / `manual-<source>-<board or latest>-<yyyymmddHHmm>` |
+| `reminders` | `send-stale-reminder` | unchanged | unchanged | `stale-<applicationId>` |
+| `reminders` | `send-follow-up` | `RemindersService.scheduleFollowUp()` | `{ applicationId, reminderId }` | `followup-<applicationId>` |
+
+The follow-up processor re-reads the `Reminder` row and sends only if `cancelledAt` and `sentAt`
+are both null and the application still exists. Same rule as Section 4.3: never trust the payload.
+
+### 11.4 Normalization rules (pure, fixture-tested)
+
+```ts
+type RawPosting = {
+  source: Source; externalId: string; boardId: string;
+  author: string;                  // company or feed name when the source has no author
+  postedAt: Date;
+  url: string | null; applyUrl: string | null;
+  company: string | null; role: string | null; location: string | null;
+  remote: RemoteType | null;       // a hint from structured data; null = detect from text
+  salaryText: string | null; salaryMinUsd: number | null; salaryMaxUsd: number | null;
+  tags: string[];                  // source-provided categories, lowercased by the adapter
+  html: string;                    // description HTML (entity-decoded once by the adapter if the source double-escapes)
+};
+```
+
+`normalizePosting(raw): NormalizedPosting`, in order:
+
+1. `rawText = htmlToText(raw.html)` (Step 6 helper, reused).
+2. `headline`: HN keeps the comment's first line. Every other source **composes** one in the HN
+   convention so the scorer and the UI treat all sources alike:
+   `[company, role, location, remote === 'REMOTE' ? 'Remote' : null, salaryText].filter(Boolean).join(' | ')`, max 300 chars.
+3. `remote = raw.remote ?? detectRemote(headline + ' ' + location)`. Remote-only feeds
+   (Remotive, Remote OK, Himalayas, Jobicy, We Work Remotely) hint `REMOTE`.
+4. Salary: if the adapter supplied USD numbers, keep them and compose `salaryText` as
+   `$120k–$160k`. Otherwise `parseSalary(raw.salaryText ?? headline)` (Step 6 helper; `€`/`£`
+   keep the text, drop the numbers).
+5. `stackKeywords = extractStackKeywords(headline + rawText + tags)`.
+6. `applyUrl = raw.applyUrl ?? raw.url`; `url = raw.url`.
+7. `fingerprint = fingerprintFor(company, role, source + '-' + externalId)`.
+
+The HN adapter wraps `HnClient` + `parseComment` and maps the result into a `RawPosting` whose
+`html` is the comment text and whose `url` is `https://news.ycombinator.com/item?id=<id>`; for HN,
+`normalizePosting` keeps `parseComment`'s headline and fields rather than recomposing.
+
+**Adapters and what each reads** (field names verified against live responses on 23 Sep 2026):
+
+| Source | Endpoint | `boardId` | Fields used |
+|---|---|---|---|
+| HN | Algolia + Firebase (Section 6) | story id | as Step 6 |
+| Remotive | `GET https://remotive.com/api/remote-jobs?category=software-dev` | `software-dev` | `jobs[].id, url, title, company_name, tags, publication_date, candidate_required_location, salary, description` |
+| Remote OK | `GET https://remoteok.com/api` (first element is the legal notice — skip it) | `all` | `id, url, apply_url, position, company, tags, date, location, salary_min, salary_max, description` |
+| Arbeitnow | `GET https://www.arbeitnow.com/api/job-board-api` (first page only) | `all` | `data[].slug, url, title, company_name, remote, tags, location, created_at, description` |
+| Himalayas | `GET https://himalayas.app/jobs/api?limit=100` | `all` | `jobs[].guid, applicationLink, title, companyName, categories, pubDate, locationRestrictions, minSalary, maxSalary, currency, description` |
+| Jobicy | `GET https://jobicy.com/api/v2/remote-jobs?count=100&tag=developer` | `developer` | `jobs[].id, url, jobTitle, companyName, jobIndustry, jobType, jobGeo, jobLevel, pubDate, salaryMin, salaryMax, salaryCurrency, salaryPeriod, jobDescription` |
+| We Work Remotely | `GET https://weworkremotely.com/categories/remote-programming-jobs.rss` | `remote-programming-jobs` | `<item>`: `title` ("Company: Role"), `link`, `guid`, `pubDate`, `region`, `category`, `description` |
+| Greenhouse | `GET https://boards-api.greenhouse.io/v1/boards/<slug>/jobs?content=true` and `/v1/boards/<slug>` for the name | slug | `jobs[].id, absolute_url, title, location.name, first_published, updated_at, content` (HTML-escaped once — decode before `htmlToText`) |
+| Lever | `GET https://api.lever.co/v0/postings/<slug>?mode=json` | slug | `id, hostedUrl, applyUrl, text, categories.location, workplaceType, createdAt, description, additional` |
+| Ashby | `GET https://api.ashbyhq.com/posting-api/job-board/<slug>?includeCompensation=true` | slug | `jobs[].id, jobUrl, applyUrl, title, location, isRemote, publishedAt, descriptionHtml, compensation.scrapeableCompensationSalarySummary` |
+
+Every adapter: `User-Agent: Reel/1.0 (+https://github.com/Jadesuuu/reel)`, `AbortSignal.timeout(15_000)`,
+one request per feed (or per board), items mapped defensively — a missing field becomes `null`,
+never a throw. Company boards keep every job; feeds keep every item (the scorer filters, not the
+adapter). Anything with no title is skipped.
+
+### 11.5 Steps
+
+Steps 16–19 stack on `docs/case-study`, one branch each, same gate as before.
+
+---
+
+### Step 16 — Sources
+
+**Branch:** `feat/sources`
+**Commit:** `feat(sources): pluggable job sources with fan-out ingest, source settings, and company board watchlist`
+
+**Learn first (for the reviewer to teach):** the adapter pattern and why one interface with ten
+implementations beats ten ifs; a coordinator job that enqueues children; Prisma enum migrations
+(`ALTER TYPE … ADD VALUE`) and why renames are hand-edited; `Promise.allSettled` for "fetch every
+board, fail individually"; `groupBy` for stats.
+
+**Files:**
+
+```
+sources/
+├── sources.module.ts
+├── sources.controller.ts        # Section 11.3 Sources routes
+├── sources.service.ts           # list, setEnabled, boards CRUD (validates by fetching)
+├── source-registry.ts           # SOURCE_META: label, kind, homepage, attribution per Source; adapter lookup
+├── source.types.ts              # RawPosting, NormalizedPosting, SourceAdapter, FetchResult
+├── normalize.ts                 # PURE: normalizePosting, composeHeadline
+├── normalize.spec.ts
+├── http.ts                      # fetchJson / fetchText with UA + timeout (one place)
+├── rss.ts                       # PURE: parseRssItems(xml) → { title, link, guid, pubDate, description, extra }
+├── rss.spec.ts
+├── adapters/
+│   ├── hn.adapter.ts            # wraps HnClient + parseComment
+│   ├── remotive.adapter.ts
+│   ├── remoteok.adapter.ts
+│   ├── arbeitnow.adapter.ts
+│   ├── himalayas.adapter.ts
+│   ├── jobicy.adapter.ts
+│   ├── weworkremotely.adapter.ts
+│   ├── greenhouse.adapter.ts    # board adapter: fetch(slug)
+│   ├── lever.adapter.ts
+│   ├── ashby.adapter.ts
+│   └── adapters.spec.ts         # one fixture per source → expected RawPosting[]
+├── __fixtures__/                # trimmed real responses, one per source
+└── dto/update-source.dto.ts, add-board.dto.ts
+```
+
+- `ingest.constants.ts`: `INGEST_ALL_JOB = 'ingest-all'`, `INGEST_SOURCE_JOB = 'ingest-source'`.
+- `ingest.processor.ts`: `process(job)` switches on `job.name`. `ingest-all` → enabled sources
+  and watched boards → `queue.addBulk(...)`. `ingest-source` → adapter → normalize →
+  `postings.upsertMany(source, boardId, items)` → `matching.rescoreAllUsers()` → run row.
+- `postings.service.ts`: `upsertMany(source, boardId, items: NormalizedPosting[])`; `list` gains
+  `source`, `boardId`, `stack`; `stats()`.
+- `matching.service.ts`: `list` gains `source`, `minScore`; posting summary includes `source`, `url`.
+- `worker.ts`: scheduler now registers `ingest-all`.
+- Seed: the seed also enables every feed source and adds no boards.
+
+**Tests:** `normalize.spec.ts` (headline composition, remote hint precedence, USD vs € salary,
+fingerprint uses source); `rss.spec.ts`; `adapters.spec.ts` (fixture → RawPosting for all ten;
+Remote OK skips the legal notice; Greenhouse decodes double-escaped content; WWR splits
+"Company: Role"); `ingest.processor.spec.ts` rewritten for fan-out and per-source runs; e2e
+`sources.e2e-spec.ts` (list has ten items, PATCH toggles, POST board with a mocked fetch → 201,
+unknown → 400, duplicate → 409, DELETE → 204), `postings.e2e-spec.ts` updated for `boardId`,
+`source` filter and `/postings/stats`.
+
+**Done when:** `POST /ingest/run` with no body produces one `IngestRun` per enabled source in the
+worker log; `GET /postings/stats` shows more than one source; gate green including e2e.
+
+---
+
+### Step 17 — Application tracking v2
+
+**Branch:** `feat/applications-v2`
+**Commit:** `feat(applications): richer tracking fields, notes timeline, custom follow-up reminders, and stats`
+
+**Learn first:** why notes reuse `StageEvent` with a `kind` instead of a new table (one timeline,
+one query); computing a median; grouping events into ISO weeks in code rather than SQL (small
+data, testable); replacing a delayed job idempotently.
+
+**Files:**
+
+- `applications/dto/*`: new optional fields with `@IsISO8601()` for dates, `@IsEmail()` for
+  `contactEmail`; `add-note.dto.ts`; `schedule-reminder.dto.ts`.
+- `applications/applications.service.ts`: `addNote`, `scheduleFollowUp`, `cancelReminder`,
+  `stats`; `create` copies `location`/`salaryText`/`via` from the posting; `changeStage` sets
+  `appliedAt`.
+- `applications/stats.ts`: PURE `summarize({ applications, events, reminders, now })` →
+  `ApplicationStats`. Unit tested with hand-computed expectations.
+- `reminders/reminders.service.ts`: `scheduleFollowUp(applicationId, dueAt)`,
+  `cancelFollowUp(applicationId)`; `cancel(applicationId)` now cancels both kinds.
+- `reminders/reminders.processor.ts`: branches on `job.name`.
+
+**Tests:** `stats.spec.ts`; `reminders.service.spec.ts` + `reminders.processor.spec.ts` extended
+for follow-ups; e2e `applications.e2e-spec.ts` extended: note → 201 and appears in `events`;
+follow-up → 201 with `kind: FOLLOW_UP`, second one replaces the first, DELETE cancels; stats
+shape after the existing SAVED→APPLIED→INTERVIEWING→OFFER walk.
+
+**Done when:** Section 11.3 Applications exact; gate green including e2e.
+
+---
+
+### Step 18 — Web overhaul
+
+**Branch:** `feat/web-overhaul`
+**Commit:** `feat(web): redesigned app with dashboard, kanban pipeline, command palette, source filters, and motion`
+
+Skills allowed, as in Step 13. The contract is Sections 5 and 11.3; the web app still never
+imports from `apps/api`.
+
+**Direction.** Still "ink and brass": dark by default, near-black surfaces, brass accent; a light
+theme is added and both are tokens on `:root`. This is a tool: density over hero sections, but
+every state (loading, empty, error, success) is designed, every mutation gives feedback, and
+motion is used to explain change (a card moving columns, a number updating), never to decorate.
+`prefers-reduced-motion` turns transitions into instant swaps.
+
+**Structure:**
+
+```
+src/
+├── app/
+│   ├── (app)/layout.tsx          # sidebar + topbar shell, auth gate, command palette, toaster
+│   ├── (app)/dashboard/page.tsx  # stats tiles, stage funnel, weekly activity, upcoming, source health
+│   ├── (app)/inbox/page.tsx      # scored matches with filters, keyboard nav, optimistic dismiss + undo
+│   ├── (app)/postings/page.tsx   # search, source/remote/stack filters, detail sheet
+│   ├── (app)/pipeline/page.tsx   # dnd-kit kanban, filters, detail sheet, add dialog
+│   ├── (app)/settings/…          # criteria · sources · ingest runs · account
+│   ├── login, register           # split layout, product preview panel
+├── components/ui/*               # button, input, badge, dialog, sheet, dropdown, tooltip, select, switch, tabs, skeleton, empty-state, toast
+├── components/…                  # app-sidebar, command-palette, score-ring, source-badge, stage-badge, application-card, application-sheet, posting-sheet, add-application-dialog, tag-input, theme-toggle
+├── lib/api.ts, types.ts, queries.ts, session.ts, stages.ts, sources.ts, format.ts, clock.ts, cn.ts, motion.ts
+```
+
+- `/` redirects to `/dashboard`. Nav: Dashboard · Inbox · Postings · Pipeline · Settings.
+- Pipeline drag-and-drop is **required** this time (dnd-kit). Dropping on an illegal column
+  snaps back and toasts the server's message.
+- Command palette (`⌘K` / `Ctrl+K`): navigate, add application, run ingest, rescore, jump to an
+  application by company.
+- Every list has a designed empty state that says what to do next.
+- Mobile: sidebar collapses to a bottom tab bar; kanban scrolls horizontally with snap; sheets
+  become full-height.
+
+**Done when:** every route works at 390px and 1440px in both themes; keyboard-only use of the
+inbox and pipeline works; `pnpm --filter web build` is clean; you would show it to a hiring
+manager without a caveat.
+
+---
+
+### Step 19 — Demo mode
+
+**Branch:** `feat/web-demo`
+**Commit:** `feat(web): demo mode with an in-browser API and seeded data for free hosting`
+
+**Learn first:** why the demo intercepts at `apiFetch` (one seam, the rest of the app is
+unchanged and unaware); `localStorage` as a persistence layer with a version key; a routing table
+that matches `METHOD /path/:param` to handlers; simulating latency so skeletons are exercised.
+
+**Files:**
+
+```
+src/demo/
+├── index.ts          # isDemoMode(), demoFetch(path, init)
+├── router.ts         # route table → handlers; throws ApiError with the same statuses the API would
+├── store.ts          # load/save/reset state in localStorage under "reel-demo:v1"
+├── seed.ts           # deterministic generator: ~90 postings across all ten sources, criteria, 14 applications with history and reminders, ingest runs
+├── scoring.ts        # copy of Section 6.5 rules (pure) so rescore is real
+├── clock.ts          # demo clock offset for "fast-forward 10 days"
+└── handlers/*.ts     # auth, criteria, sources, ingest, postings, matches, applications
+```
+
+- `lib/api.ts`: `if (isDemoMode()) return demoFetch(path, init)` at the top of `apiFetch`.
+- Shell shows a demo banner: "Demo — data lives in this browser · Reset · Fast-forward 10 days".
+  Fast-forward moves the demo clock so pending reminders fire and an email preview appears in
+  Settings → Ingest & reminders.
+- `/login` in demo shows "Continue as demo user" and signs in instantly; register also works.
+- "Run ingest" in demo creates a RUNNING run, completes it after ~2s with a handful of new
+  postings from a reserve pool, and rescores.
+- Vercel: a second project (or the same one) built with `NEXT_PUBLIC_DEMO_MODE=true`; documented
+  in `docs/DEPLOY.md` under "Demo".
+
+**Done when:** `NEXT_PUBLIC_DEMO_MODE=true pnpm --filter web dev` gives the full app with no API
+running; refresh keeps state; Reset restores the seed; the production build is clean.
+
+---
+
+### 11.6 Environment variables (additions)
+
+| Var | Required | Default | Used by |
+|---|---|---|---|
+| `NEXT_PUBLIC_DEMO_MODE` | no | `false` | web — build-time; `true` enables demo mode |
+
+No new API variables: every source endpoint is a constant in its adapter. If a source ever needs
+an override, add `<SOURCE>_BASE` to the zod schema like `HN_ALGOLIA_BASE`.
 
 ---
 

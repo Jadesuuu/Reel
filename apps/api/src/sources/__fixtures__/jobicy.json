@@ -1,0 +1,37 @@
+{
+  "jobCount": 2,
+  "jobs": [
+    {
+      "id": 151412,
+      "url": "https://jobicy.com/jobs/151412-developer-advocate",
+      "jobSlug": "151412-developer-advocate",
+      "jobTitle": "Developer Advocate",
+      "companyName": "Roboflow",
+      "jobIndustry": ["Software Engineering"],
+      "jobType": ["Full-Time"],
+      "jobGeo": "USA",
+      "jobLevel": "Senior",
+      "jobExcerpt": "Who We Are Our mission is to make the world programmable. Sight is one of the key ways we understand the world, and soon this will be true for the software we use, too. We’re building the tools, community, and resources needed to make the world programmable with artificial intelligence. Roboflow simplifies building and using&hellip;",
+      "jobDescription": "<h3><strong>Who We Are</strong></h3>\n<p>Our mission is to make the world programmable. Sight is one of the key ways we understand the world, and soon this will be true for the software we use, too.</p>\n<p>We’re building the tools, community, and resources needed to make the world programmable with artificial intelligence. <a href=\"https://jobicy.com/company/roboflow\" target=\"_blank\" rel=\"noopener\">Roboflow</a> simpli …",
+      "pubDate": "2026-09-22T03:39:27+00:00"
+    },
+    {
+      "id": 151357,
+      "url": "https://jobicy.com/jobs/151357-senior-developer-success-engineer-west",
+      "jobSlug": "151357-senior-developer-success-engineer-west",
+      "jobTitle": "Senior Developer Success Engineer - West",
+      "companyName": "Temporal Technologies",
+      "jobIndustry": ["Technical Support"],
+      "jobType": ["Full-Time"],
+      "jobGeo": "USA",
+      "jobLevel": "Senior",
+      "jobExcerpt": "Summary The Senior Developer Success Engineer - West will be the frontline technical expert for our developer community. You will help users deploy and scale Temporal in cloud-native environments. You will also troubleshoot complex infrastructure issues, optimize performance, and develop automation solutions. This role is ideal for someone who thrives on solving distributed systems challenges&hellip;",
+      "jobDescription": "<h3><strong>Summary</strong></h3>\r\n<p>The <strong>Senior Developer Success Engineer</strong> - <strong>West</strong> will be the frontline technical expert for our developer community. You will help users deploy and scale Temporal in cloud-native environments. You will also troubleshoot complex infrastructure issues, optimize performance, and develop automation solutions. This role is ideal for someone who thrives on …",
+      "pubDate": "2026-09-22T03:30:20+00:00",
+      "salaryMin": 140000,
+      "salaryMax": 180000,
+      "salaryCurrency": "USD",
+      "salaryPeriod": "yearly"
+    }
+  ]
+}

@@ -37,12 +37,12 @@ describe('Applications (e2e)', () => {
     cookie = await register(email);
     otherCookie = await register(otherEmail);
 
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     const posting = await prisma.posting.create({
       data: {
         source: 'HN',
         externalId: `${THREAD_ID}-1`,
-        threadId: THREAD_ID,
+        boardId: THREAD_ID,
         author: 'alice',
         postedAt: new Date(),
         company: 'Northwind Labs',
@@ -61,7 +61,7 @@ describe('Applications (e2e)', () => {
 
   afterAll(async () => {
     await reminders.obliterate({ force: true });
-    await prisma.posting.deleteMany({ where: { threadId: THREAD_ID } });
+    await prisma.posting.deleteMany({ where: { boardId: THREAD_ID } });
     await prisma.user.deleteMany({
       where: { email: { in: [email, otherEmail] } },
     });

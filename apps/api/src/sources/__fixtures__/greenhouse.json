@@ -1,0 +1,41 @@
+{
+  "jobs": [
+    {
+      "id": 8172503,
+      "absolute_url": "https://stripe.com/jobs/search?gh_jid=8172503",
+      "title": "Abuse Research Engineer",
+      "location": {
+        "name": "Remote from the US"
+      },
+      "first_published": "2026-09-09T10:52:09-04:00",
+      "updated_at": "2026-09-10T13:11:58-04:00",
+      "company_name": "Stripe",
+      "content": "&lt;h2&gt;Who we are&lt;/h2&gt;\n&lt;h3&gt;About Stripe&lt;/h3&gt;\n&lt;p&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;Stripe is a financial infrastructure platform for businesses. Millions of companies—from the world’s largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you have an unprecede …",
+      "departments": [
+        {
+          "name": "8611 Security Analytics"
+        }
+      ]
+    },
+    {
+      "id": 8044460,
+      "absolute_url": "https://stripe.com/jobs/search?gh_jid=8044460",
+      "title": "AI Engineer",
+      "location": {
+        "name": "Chicago"
+      },
+      "first_published": "2026-07-03T08:01:02-04:00",
+      "updated_at": "2026-09-14T10:31:25-04:00",
+      "company_name": "Stripe",
+      "content": "&lt;h2&gt;&lt;strong&gt;Who We Are&lt;/strong&gt;&lt;/h2&gt;\n&lt;h3&gt;&lt;strong&gt;About Stripe&lt;/strong&gt;&lt;/h3&gt;\n&lt;p&gt;Stripe is a financial infrastructure platform for businesses. Millions of companies—from the world&#39;s largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you hav …",
+      "departments": [
+        {
+          "name": "1150 Solutions Architecture"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 683
+  }
+}

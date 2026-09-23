@@ -27,7 +27,11 @@ export class MatchingController {
   ) {
     return this.matching.list(
       user.userId,
-      query.dismissed,
+      {
+        dismissed: query.dismissed,
+        source: query.source,
+        minScore: query.minScore,
+      },
       query.page,
       query.pageSize,
     );

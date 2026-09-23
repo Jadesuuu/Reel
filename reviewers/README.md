@@ -21,6 +21,7 @@ Read them in order. Each one follows the same shape:
 | 11   | [Reminders and mailer](step-11-reminders.md)       | `feat/reminders`    |
 | 12   | [Hardening and Dockerfile](step-12-hardening.md)   | `chore/hardening`   |
 | 13   | [Frontend](step-13-frontend.md)                    | `feat/web-*`        |
+| 16   | [Sources](step-16-sources.md)                      | `feat/sources`      |
 
 Steps 1–6 were built in an earlier pass and have no reviewer yet. The repairs document covers
 what was wrong with them; the code itself is small enough to read directly, starting at

@@ -9,6 +9,15 @@ datasource db {
 
 enum Source {
   HN
+  REMOTIVE
+  REMOTEOK
+  ARBEITNOW
+  HIMALAYAS
+  JOBICY
+  WEWORKREMOTELY
+  GREENHOUSE
+  LEVER
+  ASHBY
 }
 
 enum RunStatus {
@@ -70,11 +79,11 @@ model Criteria {
 model IngestRun {
   id               String    @id @default(cuid())
   source           Source
-  externalThreadId String    @map("external_thread_id")
+  boardId          String    @map("board_id")
   status           RunStatus @default(RUNNING)
   startedAt        DateTime  @default(now()) @map("started_at")
   finishedAt       DateTime? @map("finished_at")
-  commentsSeen     Int       @default(0) @map("comments_seen")
+  itemsSeen        Int       @default(0) @map("items_seen")
   postingsCreated  Int       @default(0) @map("postings_created")
   postingsUpdated  Int       @default(0) @map("postings_updated")
   error            String?
@@ -87,7 +96,7 @@ model Posting {
   id            String     @id @default(cuid())
   source        Source
   externalId    String     @map("external_id")
-  threadId      String     @map("thread_id")
+  boardId       String     @map("board_id")
   author        String
   postedAt      DateTime   @map("posted_at")
 
@@ -100,6 +109,7 @@ model Posting {
   salaryMaxUsd  Int?       @map("salary_max_usd")
   stackKeywords String[]   @default([]) @map("stack_keywords")
   applyUrl      String?    @map("apply_url")
+  url           String?
 
   rawHtml       String     @map("raw_html")
   rawText       String     @map("raw_text")
@@ -116,8 +126,27 @@ model Posting {
   @@unique([source, externalId])
   @@index([fingerprint])
   @@index([postedAt])
-  @@index([threadId])
+  @@index([boardId])
   @@map("postings")
+}
+
+model SourceSetting {
+  source    Source   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("source_settings")
+}
+
+model WatchedBoard {
+  id        String   @id @default(cuid())
+  provider  Source
+  slug      String
+  company   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([provider, slug])
+  @@map("watched_boards")
 }
 
 model Match {

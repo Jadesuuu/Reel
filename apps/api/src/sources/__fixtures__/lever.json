@@ -1,0 +1,43 @@
+[
+  {
+    "id": "681fbc53-1e34-4a46-8677-3a78118674eb",
+    "text": "Approved Professional 3",
+    "categories": {
+      "location": "Baltimore, MD",
+      "team": "Operations",
+      "allLocations": ["Baltimore, MD"]
+    },
+    "createdAt": 1565990241800,
+    "workplaceType": "remote",
+    "country": "US",
+    "hostedUrl": "https://jobs.lever.co/leverdemo/681fbc53-1e34-4a46-8677-3a78118674eb",
+    "applyUrl": "https://jobs.lever.co/leverdemo/681fbc53-1e34-4a46-8677-3a78118674eb/apply",
+    "description": "<div>Welcome to the <b>Demo Job Listing</b> for Lever! This is a fictional job created solely for demonstration purposes and is <b>not an actual open position</b>. We’ve crafted this listing to showcase the functionality of our ATS platform, including job descriptions, application processes, and more.</div><div><br></div><div>While you can explore the application process and features here, please note that <b>applica …",
+    "additional": "<div>Lever builds modern recruiting software for teams to source, interview, and hire top talent. Our team strives to set a new bar for enterprise software with modern, well-designed, real-time apps. We participated in Y Combinator in summer 2012, and since then have raised $73 million. As the applicant tracking system of choice for Netflix, Eventbrite, ClearSlide, change.org, and thousands more leading companies, Le …",
+    "lists": []
+  },
+  {
+    "id": "ad208490-4052-4f91-a57e-433f2d1e484b",
+    "text": "Customer Success Manager",
+    "categories": {
+      "commitment": "Regular Full Time (Salary)",
+      "department": "Customer Success",
+      "location": "Atlanta, Georgia",
+      "team": "Customer Success Team",
+      "allLocations": ["Atlanta, Georgia"]
+    },
+    "createdAt": 1788199939703,
+    "workplaceType": "hybrid",
+    "country": "US",
+    "hostedUrl": "https://jobs.lever.co/leverdemo/ad208490-4052-4f91-a57e-433f2d1e484b",
+    "applyUrl": "https://jobs.lever.co/leverdemo/ad208490-4052-4f91-a57e-433f2d1e484b/apply",
+    "description": "<div>This is a test job - created by Alex Haugan, for testing candidate insights.</div>\n<div>&nbsp;</div>\n<div><span style=\"font-size: 16px;\">Join a scaling, tight-knit team that’s working directly with innovative talent acquisition teams and thought leaders across various industries and geographies to make hiring a strategic advantage for their organizations. You'll serve as an advisor to our customers and take a co …",
+    "additional": "",
+    "lists": [
+      {
+        "text": "Skill Set:",
+        "content": "\n<li>3+ years of customer relationship or account management experience working in software as a service (SaaS)</li>\n<li>Solutions and results-oriented mindset</li>\n<li>Experienced in customer-facing roles, including analyzing customer accounts, identifying churn signals and account growth opportunities</li>\n<li>Highly organized with strong project management and time management skills</li>\n<li>Hands-on experience with product training to external customers</li>\n<li>Proven experience delivering value-based communications</li>\n<li>Strong ability to facilitate meetings with customers and users of various levels of seniority</li>\n<li>Empathy for customers</li>\n<li>Experience with opportunity identification for account expansion and revenue growth</li>\n<li>Passion and drive to work in a quickly growing startup where you will help shape a new function and the ways we add value with our customers</li>\n"
+      }
+    ]
+  }
+]

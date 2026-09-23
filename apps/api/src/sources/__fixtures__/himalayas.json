@@ -1,0 +1,71 @@
+{
+  "totalCount": 102564,
+  "jobs": [
+    {
+      "title": "(Pflicht-)Praktikum/Umschulung: Produktmanagement & Onlineshop Betreuung - E-Com",
+      "excerpt": "Emma Grün ist eine aufstrebende E-Commerce-Firma, die sich auf nachhaltige Reinigungs- und Pflegeprodukte für den Haushalt konzentriert.",
+      "companyName": "Emma Grün",
+      "companySlug": "emma-grun",
+      "employmentType": "Intern",
+      "minSalary": null,
+      "maxSalary": null,
+      "salaryPeriod": "annual",
+      "seniority": ["Entry-level"],
+      "currency": null,
+      "locationRestrictions": ["Germany"],
+      "timezoneRestrictions": [1],
+      "categories": [
+        "Ecommerce",
+        "Online-Marketing",
+        "Produktmanagement",
+        "Praktikum",
+        "Digital-Marketing",
+        "Werkstudent-In-E-Commerce-Management",
+        "Praktikant-Im-Produktmanagement",
+        "D2C-Produktmanagement",
+        "E-Commerce-Vertrieb",
+        "E-Commerce-Projektmanagement"
+      ],
+      "parentCategories": [],
+      "description": "<p><a href=\"https://himalayas.app/companies/emma-grun\">Emma Grün</a> ist eine aufstrebende E-Commerce-Firma, die sich auf nachhaltige Reinigungs- und Pflegeprodukte für den Haushalt konzentriert. Unsere Produkte, von Spezialreinigern über Reinigungskonzentraten bis zu ätherischen Bio-Ölen, setzen neue Standards in Sachen Nachhaltigkeit und Wirksamkeit. Gemeinsam mit dir wollen wir einen nachhaltigen Wandel im Alltag  …",
+      "pubDate": 1790165402,
+      "expiryDate": 1795349401,
+      "applicationLink": "https://himalayas.app/companies/emma-grun/jobs/pflicht-praktikum-umschulung-produktmanagement-onlineshop-betreuung-e-com-905824993",
+      "guid": "https://himalayas.app/companies/emma-grun/jobs/pflicht-praktikum-umschulung-produktmanagement-onlineshop-betreuung-e-com-905824993"
+    },
+    {
+      "title": "Director of Business Development – SaaS - Clinical Trial Experience Platform​​",
+      "excerpt": "Role OverviewThis is a senior, quota-carrying role focused on selling ProofPilot’s solutions to pharmaceutical and biotechnology sponsors.",
+      "companyName": "ProofPilot",
+      "companySlug": "proofpilot",
+      "employmentType": "Full Time",
+      "minSalary": null,
+      "maxSalary": null,
+      "salaryPeriod": "annual",
+      "seniority": ["Director"],
+      "currency": null,
+      "locationRestrictions": ["United States"],
+      "timezoneRestrictions": [-10, -9, -8, -7, -6, -5, 14],
+      "categories": [
+        "Business-Development",
+        "SaaS-Sales",
+        "Enterprise-Sales",
+        "Clinical-Research-Sales",
+        "Pharmaceutical-Sales",
+        "Clinical-Business-Development-Director",
+        "Clinical-Technology-Business-Development-Director",
+        "Clinical-Trials-Business-Development",
+        "Director-Of-Clinical-Business-Development-Europe",
+        "Director-Of-SaaS-Sales",
+        "Director-of-Business-Development",
+        "Director-Business-Development"
+      ],
+      "parentCategories": ["Sales"],
+      "description": "<div class=\"description\">\n<h3>Role Overview</h3>\n<p>This is a senior, quota-carrying role focused on selling <a href=\"https://himalayas.app/companies/proofpilot\">ProofPilot</a>’s solutions to pharmaceutical and biotechnology sponsors. The Director of Business Development will own the full sales cycle and be expected to build and deepen strategic client relationships in a fast-paced startup environment.​</p>\n<h3>What  …",
+      "pubDate": 1790165346,
+      "expiryDate": 1795349344,
+      "applicationLink": "https://himalayas.app/companies/proofpilot/jobs/director-of-business-development-saas-clinical-trial-experience-platform-4055108680",
+      "guid": "https://himalayas.app/companies/proofpilot/jobs/director-of-business-development-saas-clinical-trial-experience-platform-4055108680"
+    }
+  ]
+}
