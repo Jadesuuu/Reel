@@ -1,206 +1,211 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { KanbanSquare, Plus, Search, X } from 'lucide-react';
+import { toast } from 'sonner';
+import { AddApplicationDialog } from '../../../components/add-application-dialog';
 import { ApplicationSheet } from '../../../components/application-sheet';
+import { PipelineBoard } from '../../../components/pipeline-board';
 import { Button } from '../../../components/ui/button';
-import { Input, Label, Textarea } from '../../../components/ui/input';
-import { EmptyState, ErrorState, PageHeader, RowsSkeleton } from '../../../components/ui/states';
-import { daysSince } from '../../../lib/format';
-import { useApplications, useCreateApplication } from '../../../lib/queries';
-import { ACTIVE_STAGES, CLOSED_STAGES, STAGE_ACCENT, STAGE_LABEL } from '../../../lib/stages';
-import type { Application, Stage } from '../../../lib/types';
+import { EmptyState } from '../../../components/ui/empty-state';
+import { Input } from '../../../components/ui/input';
+import { Kbd } from '../../../components/ui/kbd';
+import { Segmented } from '../../../components/ui/segmented';
+import { Skeleton } from '../../../components/ui/skeleton';
+import { ErrorState, PageHeader } from '../../../components/ui/states';
+import { ApiError } from '../../../lib/api';
+import { useHotkeys } from '../../../lib/keyboard';
+import { useApplications, useChangeStage } from '../../../lib/queries';
+import { ALLOWED, STAGE_LABEL, canTransition, isClosed } from '../../../lib/stages';
+import type { Stage } from '../../../lib/types';
 
-function AddDialog({ onClose }: { onClose: () => void }) {
-  const create = useCreateApplication();
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [url, setUrl] = useState('');
-  const [notes, setNotes] = useState('');
-
-  return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center px-4">
-      <button
-        type="button"
-        aria-label="Cancel"
-        className="absolute inset-0 bg-ink-950/70"
-        onClick={onClose}
-      />
-      <form
-        className="relative w-full max-w-md rounded border border-ink-700 bg-ink-900 p-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          create.mutate(
-            {
-              company,
-              role,
-              ...(url.trim() ? { url: url.trim() } : {}),
-              ...(notes.trim() ? { notes: notes.trim() } : {}),
-            },
-            { onSuccess: onClose },
-          );
-        }}
-      >
-        <h2 className="mb-4 text-sm font-medium text-text-100">Add an application</h2>
-
-        <div className="mb-3">
-          <Label htmlFor="company">Company</Label>
-          <Input
-            id="company"
-            required
-            value={company}
-            onChange={(event) => setCompany(event.target.value)}
-          />
-        </div>
-
-        <div className="mb-3">
-          <Label htmlFor="role">Role</Label>
-          <Input
-            id="role"
-            required
-            value={role}
-            onChange={(event) => setRole(event.target.value)}
-          />
-        </div>
-
-        <div className="mb-3">
-          <Label htmlFor="add-url">Link</Label>
-          <Input
-            id="add-url"
-            placeholder="https://"
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <Label htmlFor="add-notes">Notes</Label>
-          <Textarea
-            id="add-notes"
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-          />
-        </div>
-
-        {create.isError ? <p className="mb-3 text-xs text-danger">Could not save that.</p> : null}
-
-        <div className="flex justify-end gap-2">
-          <Button type="button" size="sm" variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" size="sm" variant="primary" disabled={create.isPending}>
-            {create.isPending ? 'Adding…' : 'Add'}
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function Column({
-  stage,
-  applications,
-  onSelect,
-}: {
-  stage: Stage;
-  applications: Application[];
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <section className="flex min-w-60 flex-1 flex-col rounded border border-ink-700 bg-ink-900/60">
-      <header className="flex items-center justify-between border-b border-ink-700 px-3 py-2">
-        <span className={`font-mono text-xs uppercase ${STAGE_ACCENT[stage]}`}>
-          {STAGE_LABEL[stage]}
-        </span>
-        <span className="font-mono text-xs text-text-500">{applications.length}</span>
-      </header>
-
-      <ul className="flex-1 space-y-2 p-2">
-        {applications.map((application) => (
-          <li key={application.id}>
-            <button
-              type="button"
-              onClick={() => onSelect(application.id)}
-              className="w-full rounded border border-ink-700 bg-ink-850 p-2.5 text-left transition-colors hover:border-ink-600"
-            >
-              <p className="truncate text-sm text-text-100">{application.company}</p>
-              <p className="truncate text-xs text-text-500">{application.role}</p>
-              <p className="mt-1.5 font-mono text-[11px] text-text-500">
-                {daysSince(application.stageChangedAt)}d in stage
-              </p>
-            </button>
-          </li>
-        ))}
-
-        {applications.length === 0 ? (
-          <li className="px-1 py-6 text-center text-xs text-text-500">Nothing here</li>
-        ) : null}
-      </ul>
-    </section>
-  );
-}
-
-export default function PipelinePage() {
+function PipelineInner() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const [search, setSearch] = useState('');
   const [showClosed, setShowClosed] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
+
+  const openId = params.get('open');
+  const adding = params.get('new') === '1';
+
   const applications = useApplications();
+  const changeStage = useChangeStage();
 
-  const columns = showClosed ? [...ACTIVE_STAGES, ...CLOSED_STAGES] : ACTIVE_STAGES;
+  const setParam = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(params.toString());
+      if (value === null) next.delete(key);
+      else next.set(key, value);
+      const text = next.toString();
+      router.replace(text ? `${pathname}?${text}` : pathname, { scroll: false });
+    },
+    [params, pathname, router],
+  );
 
-  const byStage = (stage: Stage) =>
-    (applications.data?.items ?? []).filter((item) => item.stage === stage);
+  useHotkeys(
+    useMemo(() => [{ key: 'n', handler: () => setParam('new', '1') }], [setParam]),
+    !openId && !adding,
+  );
+
+  const items = useMemo(() => {
+    const all = applications.data?.items ?? [];
+    const needle = search.trim().toLowerCase();
+    if (!needle) return all;
+    return all.filter(
+      (item) =>
+        item.company.toLowerCase().includes(needle) ||
+        item.role.toLowerCase().includes(needle) ||
+        (item.via ?? '').toLowerCase().includes(needle),
+    );
+  }, [applications.data, search]);
+
+  const closedCount = items.filter((item) => isClosed(item.stage)).length;
+
+  useEffect(() => {
+    const stage = params.get('stage');
+    if (stage && isClosed(stage as Stage)) setShowClosed(true);
+  }, [params]);
+
+  function move(id: string, from: Stage, to: Stage) {
+    if (!canTransition(from, to)) {
+      const allowed = ALLOWED[from];
+      toast.error(`Can't move ${STAGE_LABEL[from]} to ${STAGE_LABEL[to]}`, {
+        description:
+          allowed.length === 0
+            ? `${STAGE_LABEL[from]} is final.`
+            : `From ${STAGE_LABEL[from]} you can go to ${allowed.map((stage) => STAGE_LABEL[stage]).join(', ')}.`,
+      });
+      return;
+    }
+    const application = items.find((item) => item.id === id);
+    changeStage.mutate(
+      { id, to },
+      {
+        onSuccess: () =>
+          toast.success(`${application?.company ?? 'Application'} → ${STAGE_LABEL[to]}`, {
+            description:
+              to === 'APPLIED' ? 'Follow-up reminder set for ten days from now.' : undefined,
+            action: { label: 'Open', onClick: () => setParam('open', id) },
+          }),
+        onError: (error) =>
+          toast.error('The server refused that move', {
+            description: error instanceof ApiError ? error.message : undefined,
+          }),
+      },
+    );
+  }
+
+  const total = applications.data?.items.length ?? 0;
 
   return (
     <>
       <PageHeader
         title="Pipeline"
-        subtitle="Everything you are pursuing, by stage"
+        lede="Drag a card to move it. The server checks every move, so an illegal one snaps back."
         actions={
           <>
-            <Button
-              size="sm"
-              variant={showClosed ? 'secondary' : 'ghost'}
-              onClick={() => setShowClosed((value) => !value)}
-            >
-              {showClosed ? 'Hide closed' : 'Show closed'}
-            </Button>
-            <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
-              Add application
+            <Segmented
+              ariaLabel="Closed stages"
+              value={showClosed ? 'all' : 'open'}
+              onValueChange={(value) => setShowClosed(value === 'all')}
+              options={[
+                { value: 'open', label: 'Open' },
+                { value: 'all', label: 'With closed', count: closedCount },
+              ]}
+            />
+            <Button size="sm" variant="primary" onClick={() => setParam('new', '1')}>
+              <Plus className="size-3.5" /> Add application{' '}
+              <Kbd className="ml-1 border-accent-fg/30 bg-transparent text-accent-fg/80">N</Kbd>
             </Button>
           </>
         }
       />
 
-      {applications.isPending ? <RowsSkeleton rows={3} /> : null}
-      {applications.isError ? <ErrorState message="Could not load your pipeline." /> : null}
+      {total > 0 ? (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <div className="relative min-w-56 sm:max-w-xs">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-faint" />
+            <Input
+              className="h-8 pl-8 text-[13px]"
+              placeholder="Filter by company, role, or source"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Filter applications"
+            />
+            {search ? (
+              <button
+                type="button"
+                aria-label="Clear filter"
+                onClick={() => setSearch('')}
+                className="absolute top-1/2 right-2 -translate-y-1/2 text-faint hover:text-fg"
+              >
+                <X className="size-3.5" />
+              </button>
+            ) : null}
+          </div>
+          <span className="tabular text-xs text-faint">
+            {items.length === total ? `${total} applications` : `${items.length} of ${total}`}
+          </span>
+        </div>
+      ) : null}
 
-      {applications.data && applications.data.items.length === 0 ? (
+      {applications.isPending ? (
+        <div className="flex gap-3 overflow-hidden">
+          {Array.from({ length: 4 }, (_, index) => (
+            <Skeleton key={index} className="h-72 w-72 shrink-0" />
+          ))}
+        </div>
+      ) : null}
+      {applications.isError ? (
+        <ErrorState
+          message="Could not load your pipeline."
+          onRetry={() => applications.refetch()}
+        />
+      ) : null}
+
+      {applications.data && total === 0 ? (
         <EmptyState
-          title="Nothing in the pipeline yet."
-          hint="Save a match from the Inbox, or add one by hand."
+          icon={KanbanSquare}
+          title="Nothing in the pipeline yet"
+          hint="Save a match from the inbox, or add one by hand for a job you found elsewhere. Every stage change is kept as history."
           action={
-            <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
-              Add application
-            </Button>
+            <>
+              <Button size="sm" variant="primary" onClick={() => setParam('new', '1')}>
+                <Plus className="size-3.5" /> Add application
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <a href="/inbox">Open inbox</a>
+              </Button>
+            </>
           }
         />
       ) : null}
 
-      {applications.data && applications.data.items.length > 0 ? (
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {columns.map((stage) => (
-            <Column
-              key={stage}
-              stage={stage}
-              applications={byStage(stage)}
-              onSelect={setSelected}
-            />
-          ))}
-        </div>
+      {applications.data && total > 0 ? (
+        <PipelineBoard
+          items={items}
+          showClosed={showClosed}
+          onOpen={(id) => setParam('open', id)}
+          onMove={move}
+        />
       ) : null}
 
-      {selected ? <ApplicationSheet id={selected} onClose={() => setSelected(null)} /> : null}
-      {adding ? <AddDialog onClose={() => setAdding(false)} /> : null}
+      <ApplicationSheet id={openId} onClose={() => setParam('open', null)} />
+      <AddApplicationDialog
+        open={adding}
+        onOpenChange={(open) => setParam('new', open ? '1' : null)}
+        onCreated={(id) => setParam('open', id)}
+      />
     </>
+  );
+}
+
+export default function PipelinePage() {
+  return (
+    <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <PipelineInner />
+    </Suspense>
   );
 }

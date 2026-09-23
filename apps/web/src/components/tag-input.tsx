@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { cn } from '../lib/cn';
 import { Label } from './ui/input';
 
 export function TagInput({
@@ -8,49 +11,79 @@ export function TagInput({
   hint,
   values,
   onChange,
+  placeholder = 'type and press Enter',
+  suggestions = [],
+  max = 50,
 }: {
   label: string;
   hint?: string;
   values: string[];
   onChange: (values: string[]) => void;
+  placeholder?: string;
+  suggestions?: string[];
+  max?: number;
 }) {
   const [draft, setDraft] = useState('');
+  const id = useId();
 
-  function commit() {
-    const entry = draft.trim().toLowerCase();
-    if (entry.length > 0 && !values.includes(entry)) {
+  function commit(raw = draft) {
+    const entry = raw.trim().toLowerCase();
+    if (entry.length > 0 && !values.includes(entry) && values.length < max) {
       onChange([...values, entry]);
     }
     setDraft('');
   }
 
+  const remaining = suggestions.filter((item) => !values.includes(item)).slice(0, 8);
+
   return (
     <div>
-      <Label>{label}</Label>
-      <div className="flex flex-wrap items-center gap-1.5 rounded border border-ink-700 bg-ink-900 p-1.5">
-        {values.map((value) => (
-          <span
-            key={value}
-            className="inline-flex items-center gap-1 rounded-sm border border-ink-600 bg-ink-850 py-0.5 pr-1 pl-1.5 font-mono text-[11px] text-text-300"
-          >
-            {value}
-            <button
-              type="button"
-              aria-label={`Remove ${value}`}
-              className="text-text-500 hover:text-danger"
-              onClick={() => onChange(values.filter((item) => item !== value))}
+      <Label htmlFor={id} hint={hint}>
+        {label}
+      </Label>
+      <div
+        className={cn(
+          'flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border border-line bg-surface p-1.5 transition-[border-color,box-shadow] duration-150',
+          'focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/25 hover:border-line-strong',
+        )}
+        onClick={(event) => {
+          (event.currentTarget.querySelector('input') as HTMLInputElement | null)?.focus();
+        }}
+      >
+        <AnimatePresence initial={false}>
+          {values.map((value) => (
+            <motion.span
+              key={value}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.14, ease: [0.23, 1, 0.32, 1] }}
+              className="inline-flex h-6 items-center gap-1 rounded-sm border border-line bg-surface-2 pr-1 pl-2 font-mono text-[11px] text-fg"
             >
-              ×
-            </button>
-          </span>
-        ))}
+              {value}
+              <button
+                type="button"
+                aria-label={`Remove ${value}`}
+                className="flex size-4 items-center justify-center rounded-sm text-faint hover:bg-surface-3 hover:text-danger"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onChange(values.filter((item) => item !== value));
+                }}
+              >
+                <X className="size-3" />
+              </button>
+            </motion.span>
+          ))}
+        </AnimatePresence>
 
         <input
-          className="h-6 min-w-32 flex-1 bg-transparent px-1 text-sm text-text-100 outline-none placeholder:text-text-500"
-          placeholder={values.length === 0 ? 'type and press Enter' : ''}
+          id={id}
+          className="h-6 min-w-32 flex-1 bg-transparent px-1 text-sm text-fg outline-none placeholder:text-faint"
+          placeholder={values.length === 0 ? placeholder : ''}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          onBlur={commit}
+          onBlur={() => commit()}
           onKeyDown={(event) => {
             if (event.key === 'Enter' || event.key === ',') {
               event.preventDefault();
@@ -62,7 +95,21 @@ export function TagInput({
           }}
         />
       </div>
-      {hint ? <p className="mt-1 text-xs text-text-500">{hint}</p> : null}
+      {remaining.length > 0 ? (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1">
+          <span className="text-[11px] text-faint">Add:</span>
+          {remaining.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className="rounded-sm border border-dashed border-line px-1.5 py-0.5 font-mono text-[11px] text-muted hover:border-line-strong hover:text-fg"
+              onClick={() => commit(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T00:00:00Z",
+  "title": "Design System: Reel",
+  "extensions": {
+    "themes": {
+      "default": "dark",
+      "attribute": "data-theme",
+      "note": "Frontmatter colors are the dark (default) theme. Light values apply under [data-theme='light']; every role is preserved.",
+      "light": {
+        "canvas": "#f3f0e9",
+        "surface": "#faf8f3",
+        "surface-2": "#f0ece3",
+        "surface-3": "#e7e2d7",
+        "line": "#d9d3c6",
+        "line-strong": "#c2baa9",
+        "fg": "#1b1a17",
+        "fg-muted": "#4f4b44",
+        "fg-faint": "#76716a",
+        "accent": "#8a6a36",
+        "accent-strong": "#6f542a",
+        "accent-soft": "rgba(138, 106, 54, 0.12)",
+        "accent-fg": "#faf8f3",
+        "danger": "#a8443c",
+        "danger-soft": "rgba(168, 68, 60, 0.12)",
+        "success": "#3f7a3d",
+        "success-soft": "rgba(63, 122, 61, 0.12)",
+        "info": "#35618a",
+        "info-soft": "rgba(53, 97, 138, 0.12)",
+        "warning": "#9a6a1f",
+        "stage-saved": "#4f4b44",
+        "stage-applied": "#8a6a36",
+        "stage-interviewing": "#35618a",
+        "stage-offer": "#3f7a3d",
+        "stage-rejected": "#a8443c",
+        "stage-withdrawn": "#76716a"
+      }
+    },
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(13.5% 0.005 286)",
+        "light": "#f3f0e9",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#212124",
+          "#3a3a3d",
+          "#555558",
+          "#717174",
+          "#8f8f92",
+          "#bdbdc1",
+          "#eeeef1"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "oklch(15.6% 0.006 286)",
+        "light": "#faf8f3",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#212125",
+          "#3a3a3e",
+          "#555559",
+          "#717175",
+          "#8f8f93",
+          "#bdbdc2",
+          "#eeeef3"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Page, raised",
+        "canonical": "oklch(18.4% 0.008 286)",
+        "light": "#f0ece3",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#212125",
+          "#3a3a3f",
+          "#55555a",
+          "#717176",
+          "#8e8e94",
+          "#bdbdc3",
+          "#eeeef4"
+        ]
+      },
+      "surface-3": {
+        "role": "neutral",
+        "displayName": "Page, current",
+        "canonical": "oklch(21.1% 0.010 286)",
+        "light": "#e7e2d7",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#212126",
+          "#3a3a40",
+          "#54555b",
+          "#717177",
+          "#8e8e95",
+          "#bdbdc4",
+          "#eeeef5"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(25.5% 0.015 285)",
+        "light": "#d9d3c6",
+        "tonalRamp": [
+          "#0a0a11",
+          "#212129",
+          "#393a42",
+          "#54545d",
+          "#70707a",
+          "#8e8e98",
+          "#bcbdc7",
+          "#ededf8"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Hairline, hover",
+        "canonical": "oklch(32.5% 0.018 285)",
+        "light": "#c2baa9",
+        "tonalRamp": [
+          "#0a0a12",
+          "#21212a",
+          "#393944",
+          "#54545f",
+          "#70707c",
+          "#8e8e9a",
+          "#bcbcc9",
+          "#ededfa"
+        ]
+      },
+      "fg": {
+        "role": "neutral",
+        "displayName": "Chalk",
+        "canonical": "oklch(93.5% 0.007 81)",
+        "light": "#1b1a17",
+        "tonalRamp": [
+          "#0d0b08",
+          "#23211e",
+          "#3c3a36",
+          "#575551",
+          "#74716d",
+          "#918f8a",
+          "#c0bdb8",
+          "#f1eee9"
+        ]
+      },
+      "fg-muted": {
+        "role": "neutral",
+        "displayName": "Chalk, muted",
+        "canonical": "oklch(75.0% 0.014 78)",
+        "light": "#4f4b44",
+        "tonalRamp": [
+          "#0f0a05",
+          "#25211a",
+          "#3f3a32",
+          "#5a544c",
+          "#767168",
+          "#948e86",
+          "#c3bdb4",
+          "#f4eee4"
+        ]
+      },
+      "fg-faint": {
+        "role": "neutral",
+        "displayName": "Chalk, faint",
+        "canonical": "oklch(60.2% 0.011 73)",
+        "light": "#76716a",
+        "tonalRamp": [
+          "#0e0a07",
+          "#25211c",
+          "#3e3a34",
+          "#59544f",
+          "#76716b",
+          "#938e88",
+          "#c2bdb6",
+          "#f3ede7"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Brass",
+        "canonical": "oklch(74.2% 0.084 78)",
+        "light": "#8a6a36",
+        "tonalRamp": [
+          "#1d0300",
+          "#371a00",
+          "#523300",
+          "#6f4e15",
+          "#8d6b35",
+          "#ac8952",
+          "#dcb780",
+          "#ffe8af"
+        ]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Brass, polished",
+        "canonical": "oklch(82.0% 0.083 81)",
+        "light": "#6f542a",
+        "tonalRamp": [
+          "#1c0400",
+          "#351b00",
+          "#503500",
+          "#6d5015",
+          "#8a6c35",
+          "#a98a52",
+          "#d9b980",
+          "#ffe9af"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Brass tint",
+        "canonical": "rgba(201, 165, 110, 0.14)",
+        "light": "rgba(138, 106, 54, 0.12)"
+      },
+      "accent-fg": {
+        "role": "primary",
+        "displayName": "Ink on brass",
+        "canonical": "oklch(15.6% 0.006 286)",
+        "light": "#faf8f3"
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Red pencil",
+        "canonical": "oklch(66.1% 0.116 26)",
+        "light": "#a8443c",
+        "tonalRamp": [
+          "#2c0000",
+          "#4b0000",
+          "#6a1817",
+          "#8a3632",
+          "#ab544d",
+          "#cc726a",
+          "#ffa097",
+          "#ffd0c6"
+        ]
+      },
+      "danger-soft": {
+        "role": "semantic",
+        "displayName": "Red pencil tint",
+        "canonical": "rgba(208, 117, 109, 0.14)",
+        "light": "rgba(168, 68, 60, 0.12)"
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Moss",
+        "canonical": "oklch(71.3% 0.096 142)",
+        "light": "#3f7a3d",
+        "tonalRamp": [
+          "#001300",
+          "#002c00",
+          "#164613",
+          "#32622f",
+          "#4f804a",
+          "#6c9e67",
+          "#9ace95",
+          "#caffc4"
+        ]
+      },
+      "success-soft": {
+        "role": "semantic",
+        "displayName": "Moss tint",
+        "canonical": "rgba(127, 178, 122, 0.14)",
+        "light": "rgba(63, 122, 61, 0.12)"
+      },
+      "info": {
+        "role": "semantic",
+        "displayName": "Slate blue",
+        "canonical": "oklch(75.3% 0.069 245)",
+        "light": "#35618a",
+        "tonalRamp": [
+          "#000b25",
+          "#002440",
+          "#163e5c",
+          "#325979",
+          "#4e7697",
+          "#6b94b7",
+          "#99c3e8",
+          "#c8f4ff"
+        ]
+      },
+      "info-soft": {
+        "role": "semantic",
+        "displayName": "Slate blue tint",
+        "canonical": "rgba(138, 180, 216, 0.14)",
+        "light": "rgba(53, 97, 138, 0.12)"
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Amber",
+        "canonical": "oklch(76.4% 0.096 71)",
+        "light": "#9a6a1f",
+        "tonalRamp": [
+          "#210000",
+          "#3c1500",
+          "#592f00",
+          "#764b01",
+          "#95672a",
+          "#b48549",
+          "#e5b377",
+          "#ffe4a7"
+        ]
+      },
+      "stage-saved": {
+        "role": "stage",
+        "displayName": "Saved",
+        "aliasOf": "fg-muted",
+        "canonical": "oklch(75.0% 0.014 78)",
+        "light": "#4f4b44"
+      },
+      "stage-applied": {
+        "role": "stage",
+        "displayName": "Applied",
+        "aliasOf": "accent",
+        "canonical": "oklch(74.2% 0.084 78)",
+        "light": "#8a6a36"
+      },
+      "stage-interviewing": {
+        "role": "stage",
+        "displayName": "Interviewing",
+        "aliasOf": "info",
+        "canonical": "oklch(75.3% 0.069 245)",
+        "light": "#35618a"
+      },
+      "stage-offer": {
+        "role": "stage",
+        "displayName": "Offer",
+        "aliasOf": "success",
+        "canonical": "oklch(71.3% 0.096 142)",
+        "light": "#3f7a3d"
+      },
+      "stage-rejected": {
+        "role": "stage",
+        "displayName": "Rejected",
+        "aliasOf": "danger",
+        "canonical": "oklch(66.1% 0.116 26)",
+        "light": "#a8443c"
+      },
+      "stage-withdrawn": {
+        "role": "stage",
+        "displayName": "Withdrawn",
+        "aliasOf": "fg-faint",
+        "canonical": "oklch(60.2% 0.011 73)",
+        "light": "#76716a"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The auth panel's product sentence; the only 34px text in the app."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles and the dashboard today sentence (an h1 with brass inline links, max 40ch)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet headers for an application or posting."
+      },
+      "title-sm": { "displayName": "Title, small", "purpose": "Dialog titles." },
+      "section": {
+        "displayName": "Section",
+        "purpose": "SectionTitle inside a Panel, with a 12px faint aside."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base text; 500 weight for company names and inbox headlines."
+      },
+      "body-sm": {
+        "displayName": "Body, small",
+        "purpose": "Sidebar nav, settings tabs, menu, select and command palette rows."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Roles, labels (500, muted), hints, pagination."
+      },
+      "fine": {
+        "displayName": "Fine print",
+        "purpose": "Timestamps, day counts, funnel labels, chart tooltips."
+      },
+      "measure": {
+        "displayName": "Measure",
+        "purpose": "Scores and funnel counts; mono, tabular."
+      },
+      "measure-sm": {
+        "displayName": "Measure, small",
+        "purpose": "Badge text, column counts, day counts, shortcuts; mono, tabular."
+      },
+      "stamp": {
+        "displayName": "Stamp",
+        "purpose": "The .stamp utility: stage stamps, column headers, group labels, source badges, kbd."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "REEL in brass, 0.32em, sidebar and auth panel."
+      }
+    },
+    "fontFeatures": {
+      "global": "'kern', 'liga', 'ss01'",
+      "tabular": "font-variant-numeric: tabular-nums (.tabular)"
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 2px rgba(0, 0, 0, 0.5)",
+        "light": "0 1px 2px rgba(40, 30, 10, 0.12)",
+        "purpose": "Rest: cards, the primary button, the on segment, the switch thumb."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 8px 24px -8px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.35)",
+        "light": "0 8px 24px -8px rgba(40, 30, 10, 0.22), 0 2px 6px rgba(40, 30, 10, 0.08)",
+        "purpose": "Lift: hovered cards, menus, selects, tooltips."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 24px 48px -16px rgba(0, 0, 0, 0.75), 0 4px 12px rgba(0, 0, 0, 0.4)",
+        "light": "0 24px 48px -16px rgba(40, 30, 10, 0.28), 0 4px 12px rgba(40, 30, 10, 0.1)",
+        "purpose": "Float: dialogs, sheets, the drag overlay."
+      }
+    ],
+    "focus": [
+      {
+        "name": "focus-outline",
+        "value": "outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px",
+        "purpose": "Global :focus-visible; buttons, nav, switch, stamps."
+      },
+      {
+        "name": "focus-field",
+        "value": "border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent)",
+        "purpose": "Inputs, textareas and select triggers on :focus."
+      }
+    ],
+    "overlays": [
+      {
+        "name": "overlay-dialog",
+        "value": "background: color-mix(in srgb, var(--canvas) 70%, transparent); backdrop-filter: blur(2px)"
+      },
+      {
+        "name": "overlay-sheet",
+        "value": "background: color-mix(in srgb, var(--canvas) 60%, transparent); backdrop-filter: blur(1.5px)"
+      },
+      {
+        "name": "header-glass",
+        "value": "background: color-mix(in srgb, var(--canvas) 85%, transparent); backdrop-filter: blur(12px)"
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Default easing for every entrance and state change."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "Declared; available for sharper entrances."
+      },
+      {
+        "name": "ease-in-out-quart",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "Position moves (motion 'move' preset, 260ms)."
+      },
+      {
+        "name": "duration-state",
+        "value": "150ms",
+        "purpose": "Hover and pressed transitions on buttons, inputs, cards, nav."
+      },
+      {
+        "name": "duration-quick",
+        "value": "160ms",
+        "purpose": "Popover pop-in; list-row exits; dialog exit."
+      },
+      {
+        "name": "duration-standard",
+        "value": "220ms",
+        "purpose": "Dialog enter; .enter fade-up; list rows (stagger 30ms, delay 20ms)."
+      },
+      {
+        "name": "duration-move",
+        "value": "260ms",
+        "purpose": "Sheet slide-in (24px right, 32px bottom); exits 180ms."
+      },
+      {
+        "name": "shimmer",
+        "value": "reel-shimmer 1.6s linear infinite",
+        "purpose": "Skeleton loading strip between surface-2 and surface-3."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration: 0.01ms; transition-duration: 0.01ms; .skeleton { animation: none }",
+        "purpose": "prefers-reduced-motion: reduce removes all motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px",
+        "purpose": "Sheets move from bottom to right; pipeline columns widen to 288px."
+      },
+      {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Sidebar appears; bottom tab bar disappears; gutters 24px."
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "purpose": "Two-column dashboard; settings side nav; gutters 32px; page hints in header."
+      },
+      { "name": "xl", "value": "1280px", "purpose": "Occasional wider grids." }
+    ],
+    "layout": {
+      "sidebarWidth": "240px",
+      "headerHeight": "56px",
+      "contentMaxWidth": "1200px",
+      "gutters": { "base": "16px", "md": "24px", "lg": "32px" },
+      "pipelineColumn": { "base": "256px", "sm": "288px", "collapsed": "40px" },
+      "sheetWidth": { "md": "512px", "lg": "672px" },
+      "controlHeight": "36px",
+      "cardPadding": "12px",
+      "panelPadding": "16px",
+      "accentRail": "2px, rounded right edge"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one brass action on a view. Small size shown as the dashboard uses it.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/></svg>Open inbox</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--radius-md, 6px); border: 1px solid transparent; font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); font-size: 12px; font-weight: 500; line-height: 1; white-space: nowrap; cursor: pointer; user-select: none; transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out; } .ds-btn:active { transform: scale(0.98); } .ds-btn:disabled { opacity: 0.5; pointer-events: none; } .ds-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-btn-primary { background: var(--accent); color: var(--accent-fg); box-shadow: var(--shadow-sm); } .ds-btn-primary:hover { background: var(--accent-strong); } .ds-btn-primary:active { box-shadow: none; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The default button: raised page tone with a hairline that darkens on hover.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Add application</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--radius-md, 6px); border: 1px solid transparent; font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; cursor: pointer; user-select: none; transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; } .ds-btn:active { transform: scale(0.98); } .ds-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-btn-secondary { background: var(--surface-2); color: var(--fg); border-color: var(--line); } .ds-btn-secondary:hover { background: var(--surface-3); border-color: var(--line-strong); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary and icon actions; muted at rest, ink on the current tone when hovered.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/><path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/></svg>Ingest runs</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--radius-md, 6px); border: 1px solid transparent; font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); font-size: 12px; font-weight: 500; line-height: 1; white-space: nowrap; cursor: pointer; user-select: none; transition: background-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; } .ds-btn:active { transform: scale(0.98); } .ds-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-btn-ghost { background: transparent; color: var(--fg-muted); } .ds-btn-ghost:hover { background: var(--surface-3); color: var(--fg); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label, hint and a hairline field that turns brass with a 25% ring on focus.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-password\"><span>Password</span><span class=\"ds-hint\">at least 10 characters</span></label><input class=\"ds-input\" id=\"ds-password\" type=\"text\" placeholder=\"••••••••••\"></div>",
+      "css": ".ds-field { min-width: 0; max-width: 320px; font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); } .ds-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 12px; font-weight: 500; color: var(--fg-muted); } .ds-hint { font-weight: 400; color: var(--fg-faint); } .ds-input { width: 100%; height: 36px; padding: 0 10px; border-radius: var(--radius-md, 6px); border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; font-size: 14px; transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-input::placeholder { color: var(--fg-faint); } .ds-input:hover { border-color: var(--line-strong); } .ds-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); } .ds-input[aria-invalid='true'] { border-color: var(--danger); } .ds-input[aria-invalid='true']:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 25%, transparent); }"
+    },
+    {
+      "name": "Stage Stamp",
+      "kind": "chip",
+      "refersTo": "stage-stamp",
+      "description": "An outlined, letterspaced mono stamp in the stage tone. Never filled.",
+      "html": "<span class=\"ds-stamps\"><span class=\"ds-stamp\" style=\"--tone: var(--stage-saved)\">Saved</span><span class=\"ds-stamp\" style=\"--tone: var(--stage-applied)\">Applied</span><span class=\"ds-stamp\" style=\"--tone: var(--stage-interviewing)\">Interviewing</span><span class=\"ds-stamp\" style=\"--tone: var(--stage-offer)\">Offer</span><span class=\"ds-stamp\" style=\"--tone: var(--stage-rejected)\">Rejected</span><span class=\"ds-stamp\" style=\"--tone: var(--stage-withdrawn)\">Withdrawn</span></span>",
+      "css": ".ds-stamps { display: inline-flex; flex-wrap: wrap; gap: 6px; } .ds-stamp { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: 3px; border: 1px solid color-mix(in srgb, var(--tone) 60%, transparent); background: transparent; color: var(--tone); font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1; }"
+    },
+    {
+      "name": "Score Badge",
+      "kind": "chip",
+      "refersTo": "score-badge-high",
+      "description": "The match score in mono tabular figures; solid brass at 80+, brass tint at 60+, muted below.",
+      "html": "<span class=\"ds-scores\"><span class=\"ds-score ds-score-high\" title=\"Score 110 of 110\">110</span><span class=\"ds-score ds-score-mid\" title=\"Score 70 of 110\">70</span><span class=\"ds-score ds-score-low\" title=\"Score 45 of 110\">45</span></span>",
+      "css": ".ds-scores { display: inline-flex; gap: 8px; } .ds-score { display: inline-flex; align-items: center; justify-content: center; height: 28px; min-width: 40px; padding: 0 6px; border-radius: var(--radius-sm, 4px); border: 1px solid; font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; } .ds-score-high { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); } .ds-score-mid { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent); } .ds-score-low { background: var(--surface-2); border-color: var(--line); color: var(--fg-muted); }"
+    },
+    {
+      "name": "Reason Chips",
+      "kind": "chip",
+      "refersTo": "badge-neutral",
+      "description": "The reasons that add up to a score; a role match is brass, everything else neutral, overflow outlined.",
+      "html": "<span class=\"ds-chips\"><span class=\"ds-chip ds-chip-neutral\">remote</span><span class=\"ds-chip ds-chip-accent\">role · full stack</span><span class=\"ds-chip ds-chip-neutral\">typescript</span><span class=\"ds-chip ds-chip-neutral\">node</span><span class=\"ds-chip ds-chip-outline\">+4</span></span>",
+      "css": ".ds-chips { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; } .ds-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: var(--radius-sm, 4px); border: 1px solid var(--line); font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 11px; line-height: 1; white-space: nowrap; cursor: help; } .ds-chip-neutral { background: var(--surface-2); color: var(--fg-muted); } .ds-chip-outline { background: transparent; color: var(--fg-muted); } .ds-chip-accent { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); }"
+    },
+    {
+      "name": "Application Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "An index card on the pipeline wall: company, role, location, then a hairline and mono measurements.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><p class=\"ds-card-company\">Northwind Labs</p><span class=\"ds-source\">Hacker News</span></div><p class=\"ds-card-role\">Full Stack Engineer</p><div class=\"ds-card-meta\"><span><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Remote, US</span><span class=\"ds-tabular\">$150k–$180k</span></div><div class=\"ds-card-foot\"><span class=\"ds-days\">3d</span><span class=\"ds-next\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h5\"/><path d=\"M17.5 17.5 16 16.25V14\"/><path d=\"M22 16a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z\"/></svg>Sep 25</span></div></div>",
+      "css": ".ds-card { width: 256px; padding: 12px; border-radius: var(--radius-md, 6px); border: 1px solid var(--line); background: var(--surface); color: var(--fg); box-shadow: var(--shadow-sm); font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); text-align: left; cursor: grab; transition: border-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out; } .ds-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); } .ds-card:active { cursor: grabbing; } .ds-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; } .ds-card-company { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; } .ds-card-role { margin: 2px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--fg-muted); } .ds-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; font-size: 11px; color: var(--fg-faint); } .ds-card-meta span { display: inline-flex; align-items: center; gap: 4px; } .ds-tabular { font-variant-numeric: tabular-nums; } .ds-card-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11px; } .ds-days { font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--fg-faint); } .ds-next { display: inline-flex; align-items: center; gap: 4px; color: var(--info); } .ds-source { display: inline-flex; align-items: center; flex-shrink: 0; height: 20px; padding: 0 6px; border-radius: var(--radius-sm, 4px); border: 1px solid var(--line); background: var(--surface-2); font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 10.5px; letter-spacing: 0.025em; text-transform: uppercase; color: var(--fg-muted); }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Notebook dividers: 36px rows, the current one on the raised tone with a brass icon and a 2px brass rail.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary\"><a class=\"ds-nav-brand\" href=\"#\">Reel</a><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\" aria-current=\"page\"><span class=\"ds-nav-rail\"></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Dashboard</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-rail\"></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/></svg>Inbox</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-rail\"></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M8 7v7\"/><path d=\"M12 7v4\"/><path d=\"M16 7v9\"/></svg>Pipeline</a><div class=\"ds-nav-foot\"><button class=\"ds-nav-search\" type=\"button\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><span class=\"ds-nav-search-label\">Search or jump…</span><kbd class=\"ds-kbd\">Ctrl</kbd><kbd class=\"ds-kbd\">K</kbd></button></div></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 240px; padding: 0 12px 12px; border-right: 1px solid var(--line); background: var(--surface); font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); } .ds-nav-brand { display: flex; align-items: center; height: 56px; padding: 0 8px; margin-bottom: 2px; font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--accent); text-decoration: none; } .ds-nav-item { position: relative; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: var(--radius-md, 6px); font-size: 13px; color: var(--fg-muted); text-decoration: none; transition: background-color 150ms, color 150ms; } .ds-nav-item svg { color: var(--fg-faint); } .ds-nav-item:hover { background: var(--surface-2); color: var(--fg); } .ds-nav-item:hover svg { color: var(--fg-muted); } .ds-nav-item-active, .ds-nav-item-active:hover { background: var(--surface-3); color: var(--fg); } .ds-nav-item-active svg { color: var(--accent); } .ds-nav-rail { position: absolute; top: 8px; bottom: 8px; left: -12px; width: 2px; border-radius: 0 2px 2px 0; background: var(--accent); transform: scaleY(0); transition: transform 200ms ease-out; } .ds-nav-item-active .ds-nav-rail { transform: scaleY(1); } .ds-nav-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-nav-foot { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); } .ds-nav-search { display: flex; align-items: center; gap: 8px; width: 100%; height: 36px; padding: 0 10px; border-radius: var(--radius-md, 6px); border: 1px solid var(--line); background: var(--surface-2); color: var(--fg-muted); font: inherit; font-size: 12px; text-align: left; cursor: pointer; transition: border-color 150ms, color 150ms; } .ds-nav-search:hover { border-color: var(--line-strong); color: var(--fg); } .ds-nav-search-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-kbd { display: inline-flex; align-items: center; justify-content: center; height: 20px; min-width: 20px; padding: 0 4px; border-radius: var(--radius-sm, 4px); border: 1px solid var(--line); background: var(--surface-2); font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 10.5px; color: var(--fg-faint); }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "custom",
+      "refersTo": "popover",
+      "description": "A hairline tray of options; the chosen one lifts to the page tone with a rest shadow and a mono count.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Show\"><button class=\"ds-seg-item\" type=\"button\" data-state=\"on\">Open</button><button class=\"ds-seg-item\" type=\"button\">With closed <span class=\"ds-seg-count\">2</span></button></div>",
+      "css": ".ds-seg { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: var(--radius-md, 6px); border: 1px solid var(--line); background: var(--surface-2); font-family: var(--font-sans, 'Schibsted Grotesk', system-ui, sans-serif); } .ds-seg-item { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 0; border-radius: 4px; background: transparent; color: var(--fg-muted); font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease-out, color 150ms ease-out, box-shadow 150ms ease-out; } .ds-seg-item:hover { color: var(--fg); } .ds-seg-item[data-state='on'] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow-sm); } .ds-seg-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; } .ds-seg-count { font-family: var(--font-mono, 'Fragment Mono', ui-monospace, monospace); font-size: 10.5px; font-variant-numeric: tabular-nums; color: var(--fg-faint); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Notebook",
+    "overview": "Reel is a record you keep, not a dashboard you glance at. Every screen is a page of a working notebook: the pipeline is a wall of index cards each carrying a stage stamp, history is a dated log, the inbox is a triage desk where one item is in focus and the next is one keystroke away. The grounds are ink (near-black by default, warm paper in the light theme), the writing is one workhorse grotesk, and everything that is a measurement — a score, a count, a date, a keyboard hint, the wordmark — is set in a monospace face so the eye can tell a number from a sentence before it reads either.\n\nBrass is the only accent and it is spent carefully: the current selection, the primary action, the focus ring, the caret, the text selection, the stamps and the wordmark. Everything else separates by space and by a hairline rule; boxes appear only when a group of things needs a name (a panel, a card). Colour beyond brass is semantic and reused: the six stage tones are the same four semantic tones plus two greys, so a stamp, a funnel bar and a status dot all agree.\n\nThe build refuses the category's arrangement of metric tiles over a grid of identical cards. It also refuses decorative motion: transitions are short (150–260ms), ease out, and vanish entirely under prefers-reduced-motion.",
+    "keyCharacteristics": [
+      "Ink grounds in four steps (canvas, surface, surface-2, surface-3) with two hairline tones; dark is the default and the light theme swaps the same tokens.",
+      "One brass accent, one purpose at a time: selection, primary action, focus, stamps, wordmark.",
+      "Hairline rules and dividers before borders; borders before shadows; shadows only for lift (hover, popover, dialog, drag).",
+      "Two faces with strict jobs: Schibsted Grotesk for words, Fragment Mono for measurements and stamps.",
+      "Stage stamps are outlined, letterspaced monospace caps in the stage's tone; never solid-filled.",
+      "Density of a tool used in flow: 14px body, 36px controls, 12px card padding, 16px panel padding."
+    ],
+    "rules": [
+      {
+        "name": "The One Brass Rule",
+        "body": "Brass marks exactly one thing per view as current or primary: the active nav item, the focused row, the primary button. It never fills a card, a panel or a chart background. If two things are brass, one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stage Tone Rule",
+        "body": "Stage colours are aliases of the semantic ramp, not new hues. A new status colour must map to one of the six existing tones.",
+        "section": "colors"
+      },
+      {
+        "name": "The Soft-Tint Rule",
+        "body": "Tints are the tone at 14% alpha (12% in light) and are always paired with a border of the same tone at 40–60% alpha. A tint is never used alone as a fill without its border, and a border tone never appears without its meaning (accent = selected or legal, danger = error or illegal).",
+        "section": "colors"
+      },
+      {
+        "name": "The Measurement Rule",
+        "body": "If it is a number, a date, a count, a keyboard key, a source name or the wordmark, it is set in Fragment Mono with tabular numerals. If it is a sentence, it is never in mono. Tooltip point values (+30) are mono inside a sans sentence for this reason.",
+        "section": "typography"
+      },
+      {
+        "name": "The Stamp Rule",
+        "body": "Any small uppercase label uses .stamp exactly: 10.5px mono, 0.14em tracking, line-height 1. There is no second small-caps style.",
+        "section": "typography"
+      },
+      {
+        "name": "The Three Weights Rule",
+        "body": "400, 500, 600. Nothing bolder, nothing lighter; 500 marks a name (company, current page), 600 marks a heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline-First Rule",
+        "body": "Separate with a line rule or divide-y before drawing a border; draw a border before casting a shadow. A list of rows is never a stack of cards.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Lift-Only Rule",
+        "body": "shadow-md and shadow-lg appear only on something that is above the page (hover, popover, dialog, drag). Nothing at rest exceeds shadow-sm.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set every number, date, count, shortcut and source name in Fragment Mono with .tabular; keep Schibsted Grotesk for words.",
+      "Do mark the current item with the 2px brass rail (rounded-r) and a one-step lighter surface, as the sidebar and the inbox do.",
+      "Do separate rows with divide-y divide-line inside one Panel or one bordered list; reserve cards for things that move (pipeline applications).",
+      "Do keep stamps as outlines in the stage tone (border at 50–60%, text at 100%) with .stamp type and 3px corners.",
+      "Do use a dashed line border to mean \"nothing here yet\" or \"entered by hand\", and a toned border only together with its 14% tint.",
+      "Do stay at 400 / 500 / 600 and the recorded ramp (34, 22, 17, 15, 14, 13, 12, 11, 10.5); 36px controls and 12px card / 16px panel padding.",
+      "Do end every animation under 300ms with ease-out-quint, and let prefers-reduced-motion remove it."
+    ],
+    "donts": [
+      "Don't put brass on more than one element per view as a fill; brass text is for the current link, the wordmark and the stamp, never for body copy.",
+      "Don't introduce a hue outside brass, danger, success, info and warning; a new status must alias one of the six stage tones.",
+      "Don't fill a stamp, chip or column with a solid tone. Solid brass belongs to the primary button and the 80+ score badge only; solid ink belongs to the solid badge.",
+      "Don't cast shadow-md or shadow-lg on anything at rest; lift is for hover, popovers, dialogs and drag.",
+      "Don't arrange the page as metric tiles over a card grid, and don't use gradients outside .surface-noise on the auth panel.",
+      "Don't set prose in the mono face or use it above 13px except the 12px wordmark; don't add a second small-caps style beside .stamp.",
+      "Don't exceed 10px corners or make anything pill-shaped except the switch, status dots and the avatar disc."
+    ]
+  }
+}

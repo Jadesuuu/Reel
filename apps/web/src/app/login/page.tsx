@@ -8,15 +8,9 @@ export default function LoginPage() {
 
   return (
     <AuthForm
-      title="Sign in"
-      submitLabel="Sign in"
+      mode="login"
       pending={login.isPending}
       error={login.error}
-      footer={{
-        prompt: 'No account?',
-        href: '/register',
-        label: 'Create one',
-      }}
       onSubmit={(credentials) => login.mutate(credentials)}
     />
   );

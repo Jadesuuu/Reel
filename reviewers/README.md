@@ -23,6 +23,7 @@ Read them in order. Each one follows the same shape:
 | 13   | [Frontend](step-13-frontend.md)                       | `feat/web-*`           |
 | 16   | [Sources](step-16-sources.md)                         | `feat/sources`         |
 | 17   | [Application tracking v2](step-17-applications-v2.md) | `feat/applications-v2` |
+| 18   | [Web overhaul](step-18-web-overhaul.md)               | `feat/web-overhaul`    |
 
 Steps 1–6 were built in an earlier pass and have no reviewer yet. The repairs document covers
 what was wrong with them; the code itself is small enough to read directly, starting at

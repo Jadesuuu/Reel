@@ -1,0 +1,379 @@
+'use client';
+
+import Link from 'next/link';
+import { ArrowRight, CalendarClock, Inbox, Plus, RefreshCw } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Bar, BarChart, ResponsiveContainer, Tooltip as ChartTooltip, XAxis } from 'recharts';
+import { SourceBadge } from '../../../components/source-badge';
+import { StageDot, StageStamp } from '../../../components/stage-stamp';
+import { Button } from '../../../components/ui/button';
+import { EmptyState } from '../../../components/ui/empty-state';
+import { RowsSkeleton, Skeleton } from '../../../components/ui/skeleton';
+import { ErrorState, Panel, SectionTitle } from '../../../components/ui/states';
+import { Tip } from '../../../components/ui/tooltip';
+import { cn } from '../../../lib/cn';
+import { dueLabel, longDate, percent, plural, relativeTime, shortDate } from '../../../lib/format';
+import { listItem, listStagger } from '../../../lib/motion';
+import { useApplicationStats, useMatches, usePostingStats, useSources } from '../../../lib/queries';
+import { useSession } from '../../../lib/session';
+import { ACTIVE_STAGES, STAGE_LABEL } from '../../../lib/stages';
+import type { ApplicationStats, UpcomingItem, WeeklyBucket } from '../../../lib/types';
+
+function Today({
+  stats,
+  newMatches,
+}: {
+  stats: ApplicationStats | undefined;
+  newMatches: number | undefined;
+}) {
+  const dueSoon =
+    stats?.upcoming.filter((item) => new Date(item.at).getTime() - Date.now() < 3 * 86_400_000) ??
+    [];
+  return (
+    <div className="mb-8">
+      <h1 className="max-w-[40ch] text-[22px] leading-snug font-semibold tracking-tight text-fg">
+        {newMatches === undefined || stats === undefined ? (
+          <span className="inline-block h-7 w-80 align-middle">
+            <Skeleton className="h-6 w-full" />
+          </span>
+        ) : (
+          <>
+            {newMatches > 0 ? (
+              <>
+                <Link href="/inbox" className="text-accent underline-offset-4 hover:underline">
+                  {plural(newMatches, 'new match', 'new matches')}
+                </Link>{' '}
+                waiting in your inbox
+              </>
+            ) : (
+              'Your inbox is clear'
+            )}
+            {stats.active > 0 ? (
+              <>
+                , {plural(stats.active, 'application')} in motion
+                {dueSoon.length > 0 ? (
+                  <>
+                    , and{' '}
+                    <Link
+                      href="#coming-up"
+                      className="text-accent underline-offset-4 hover:underline"
+                    >
+                      {plural(dueSoon.length, 'thing', 'things')} due
+                    </Link>{' '}
+                    in the next three days.
+                  </>
+                ) : (
+                  '.'
+                )}
+              </>
+            ) : (
+              '. Save a match or add an application to start the pipeline.'
+            )}
+          </>
+        )}
+      </h1>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Button asChild variant="primary" size="sm">
+          <Link href="/inbox">
+            <Inbox className="size-3.5" /> Open inbox
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/pipeline?new=1">
+            <Plus className="size-3.5" /> Add application
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/settings/ingest">
+            <RefreshCw className="size-3.5" /> Ingest runs
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Funnel({ stats, upcoming }: { stats: ApplicationStats; upcoming: UpcomingItem[] }) {
+  const max = Math.max(1, ...ACTIVE_STAGES.map((stage) => stats.byStage[stage]));
+  const dueStages = new Set(upcoming.map((item) => item.stage));
+  const median =
+    stats.medianDaysToResponse === null
+      ? null
+      : stats.medianDaysToResponse < 1
+        ? '<1'
+        : String(Math.round(stats.medianDaysToResponse));
+
+  return (
+    <Panel>
+      <SectionTitle
+        aside={
+          <Link href="/pipeline" className="inline-flex items-center gap-1 hover:text-fg">
+            Pipeline <ArrowRight className="size-3" />
+          </Link>
+        }
+      >
+        Where things stand
+      </SectionTitle>
+      <ol className="divide-y divide-line">
+        {ACTIVE_STAGES.map((stage, index) => {
+          const count = stats.byStage[stage];
+          const width = count === 0 ? 0 : Math.max(6, Math.round((count / max) * 100));
+          const due = dueStages.has(stage);
+          return (
+            <li key={stage}>
+              <Link
+                href={`/pipeline?stage=${stage}`}
+                className="group -mx-2 grid grid-cols-[7.5rem_1fr_2.5rem] items-center gap-3 rounded-md px-2 py-2.5 hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <StageStamp stage={stage} />
+                <span className="relative block h-px w-full bg-line">
+                  <motion.span
+                    initial={{ width: 0 }}
+                    animate={{ width: `${width}%` }}
+                    transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: index * 0.05 }}
+                    className={cn(
+                      'absolute top-1/2 left-0 h-[3px] -translate-y-1/2 rounded-full',
+                      due ? 'bg-accent' : 'bg-fg/70',
+                    )}
+                  />
+                </span>
+                <span className="tabular text-right font-mono text-[13px] text-fg">{count}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="tabular mt-3 border-t border-line pt-3 font-mono text-[11px] text-muted">
+        {stats.appliedThisWeek} applied this week · {percent(stats.responseRate)} reply rate ·{' '}
+        {median === null ? 'no replies yet' : `median ${median}d to first reply`}
+      </p>
+    </Panel>
+  );
+}
+
+const WEEKLY_SERIES: Array<{ key: keyof Omit<WeeklyBucket, 'weekStart'>; label: string }> = [
+  { key: 'applied', label: 'Applied' },
+  { key: 'interviewing', label: 'Interviews' },
+  { key: 'offer', label: 'Offers' },
+  { key: 'rejected', label: 'Rejections' },
+];
+
+function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
+  const total = weekly.reduce(
+    (sum, week) => sum + week.applied + week.interviewing + week.offer + week.rejected,
+    0,
+  );
+  return (
+    <Panel>
+      <SectionTitle aside="last 8 weeks">Activity</SectionTitle>
+      {total === 0 ? (
+        <p className="py-6 text-center text-xs text-faint">
+          Stage changes will show up here week by week.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {WEEKLY_SERIES.map((series) => {
+            const sum = weekly.reduce((acc, week) => acc + week[series.key], 0);
+            return (
+              <div key={series.key}>
+                <div className="mb-1 flex items-baseline justify-between">
+                  <span className="text-xs text-muted">{series.label}</span>
+                  <span className="tabular font-mono text-xs text-fg">{sum}</span>
+                </div>
+                <div className="h-14 border-b border-line">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={weekly}
+                      margin={{ top: 2, right: 0, left: 0, bottom: 0 }}
+                      barCategoryGap={2}
+                    >
+                      <XAxis dataKey="weekStart" hide />
+                      <ChartTooltip
+                        cursor={{ fill: 'var(--surface-3)' }}
+                        content={({ active, payload }) => {
+                          if (!active || !payload?.length) return null;
+                          const week = payload[0]!.payload as WeeklyBucket;
+                          return (
+                            <div className="rounded-md border border-line bg-surface-2 px-2 py-1 text-[11px] text-fg shadow-md">
+                              Week of {shortDate(week.weekStart)}:{' '}
+                              <span className="tabular font-mono">{week[series.key]}</span>
+                            </div>
+                          );
+                        }}
+                      />
+                      <Bar
+                        dataKey={series.key}
+                        fill="var(--accent)"
+                        radius={[3, 3, 0, 0]}
+                        minPointSize={0}
+                        isAnimationActive
+                        animationDuration={500}
+                        animationEasing="ease-out"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-1 flex justify-between font-mono text-[10px] text-faint">
+                  <span>{shortDate(weekly[0]!.weekStart)}</span>
+                  <span className="text-accent">this week</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+function Upcoming({ items }: { items: UpcomingItem[] }) {
+  return (
+    <Panel className="scroll-mt-20">
+      <div id="coming-up" />
+      <SectionTitle aside="next 14 days">Coming up</SectionTitle>
+      {items.length === 0 ? (
+        <EmptyState
+          compact
+          icon={CalendarClock}
+          title="Nothing scheduled"
+          hint="Follow-up reminders and next steps you set on an application appear here."
+        />
+      ) : (
+        <motion.ol
+          variants={listStagger}
+          initial="hidden"
+          animate="visible"
+          className="divide-y divide-line"
+        >
+          {items.map((item) => (
+            <motion.li key={`${item.applicationId}-${item.kind}-${item.at}`} variants={listItem}>
+              <Link
+                href={`/pipeline?open=${item.applicationId}`}
+                className="-mx-2 flex items-center gap-3 rounded-md px-2 py-2.5 hover:bg-surface-2"
+              >
+                <div className="w-14 shrink-0">
+                  <div className="tabular font-mono text-xs text-fg">{shortDate(item.at)}</div>
+                  <div className="text-[10.5px] text-faint">{dueLabel(item.at)}</div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm text-fg">{item.company}</p>
+                  <p className="truncate text-xs text-muted">
+                    {item.kind === 'REMINDER' ? 'Follow-up reminder' : 'Next step'} · {item.role}
+                  </p>
+                </div>
+                <span className="flex items-center gap-1.5 text-[11px] text-faint">
+                  <StageDot stage={item.stage} /> {STAGE_LABEL[item.stage]}
+                </span>
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ol>
+      )}
+    </Panel>
+  );
+}
+
+function SourceHealth() {
+  const sources = useSources();
+  const postings = usePostingStats();
+
+  if (sources.isPending) return <RowsSkeleton rows={4} height="h-8" />;
+  if (sources.isError)
+    return <ErrorState message="Could not load sources." onRetry={() => sources.refetch()} />;
+
+  const enabled = sources.data.items.filter(
+    (item) => item.enabled && (item.kind === 'feed' || item.postings > 0),
+  );
+
+  return (
+    <Panel>
+      <SectionTitle
+        aside={
+          <Link href="/settings/sources" className="inline-flex items-center gap-1 hover:text-fg">
+            Sources <ArrowRight className="size-3" />
+          </Link>
+        }
+      >
+        Sources
+        {postings.data ? (
+          <span className="tabular ml-2 font-mono text-xs font-normal text-faint">
+            {postings.data.total.toLocaleString()} postings
+          </span>
+        ) : null}
+      </SectionTitle>
+      <ul className="divide-y divide-line">
+        {enabled.map((item) => {
+          const run = item.lastRun;
+          const tone =
+            run === null
+              ? 'bg-line-strong'
+              : run.status === 'FAILED'
+                ? 'bg-danger'
+                : run.status === 'RUNNING'
+                  ? 'bg-info'
+                  : 'bg-success';
+          return (
+            <li key={item.source} className="flex items-center gap-3 py-2 text-xs">
+              <Tip
+                content={
+                  run
+                    ? `${run.status.toLowerCase()} · ${run.itemsSeen} seen, ${run.postingsCreated} new · ${relativeTime(run.startedAt)}`
+                    : 'Never run'
+                }
+              >
+                <span className={`size-1.5 rounded-full ${tone}`} aria-hidden />
+              </Tip>
+              <SourceBadge source={item.source} full />
+              <span className="tabular ml-auto font-mono text-faint">
+                {item.postings.toLocaleString()}
+              </span>
+              <span className="hidden w-20 text-right text-faint sm:inline">
+                {run ? relativeTime(run.startedAt) : '—'}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
+  );
+}
+
+export default function DashboardPage() {
+  const stats = useApplicationStats();
+  const matches = useMatches({ dismissed: false, page: 1, pageSize: 1 });
+  const session = useSession();
+
+  return (
+    <>
+      <Today stats={stats.data} newMatches={matches.data?.total} />
+
+      {stats.isError ? (
+        <ErrorState
+          message="Could not load your pipeline summary."
+          onRetry={() => stats.refetch()}
+          className="mb-6"
+        />
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+        <div className="space-y-4">
+          {stats.data ? (
+            <Funnel stats={stats.data} upcoming={stats.data.upcoming} />
+          ) : (
+            <Skeleton className="h-52" />
+          )}
+          {stats.data ? <Weekly weekly={stats.data.weekly} /> : <Skeleton className="h-40" />}
+        </div>
+        <div className="space-y-4">
+          {stats.data ? <Upcoming items={stats.data.upcoming} /> : <Skeleton className="h-52" />}
+          <SourceHealth />
+        </div>
+      </div>
+
+      <p className="mt-8 text-[11px] text-faint">
+        {session.data ? `${session.data.email} · ` : null}
+        {longDate(new Date().toISOString())}
+      </p>
+    </>
+  );
+}

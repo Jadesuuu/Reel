@@ -7,11 +7,14 @@ import type { User } from './types';
 
 export const SESSION_KEY = ['auth', 'me'] as const;
 
+export const HOME = '/dashboard';
+
 export function useSession() {
   return useQuery({
     queryKey: SESSION_KEY,
     queryFn: () => apiFetch<User>('/auth/me'),
     retry: false,
+    staleTime: 5 * 60_000,
   });
 }
 
@@ -24,7 +27,7 @@ export function useLogin() {
       apiPost<User>('/auth/login', credentials),
     onSuccess: (user) => {
       queryClient.setQueryData(SESSION_KEY, user);
-      router.push('/inbox');
+      router.push(HOME);
     },
   });
 }
@@ -38,7 +41,7 @@ export function useRegister() {
       apiPost<User>('/auth/register', credentials),
     onSuccess: (user) => {
       queryClient.setQueryData(SESSION_KEY, user);
-      router.push('/inbox');
+      router.push(HOME);
     },
   });
 }
