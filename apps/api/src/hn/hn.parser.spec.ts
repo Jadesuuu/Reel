@@ -118,6 +118,13 @@ describe('extractApplyUrl', () => {
       'mailto:jobs@acme.com',
     );
   });
+  it('decodes entity-encoded hrefs the way HN serves them', () => {
+    expect(
+      extractApplyUrl(
+        '<a href="https:&#x2F;&#x2F;acme.com&#x2F;jobs?src=hn&amp;ref=1">jobs</a>',
+      ),
+    ).toBe('https://acme.com/jobs?src=hn&ref=1');
+  });
   it('ignores news.ycombinator.com links', () => {
     expect(
       extractApplyUrl('<a href="https://news.ycombinator.com/user?id=x">x</a>'),

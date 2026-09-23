@@ -167,8 +167,8 @@ export function extractStackKeywords(rawText: string): string[] {
 }
 
 export function extractApplyUrl(html: string): string | null {
-  const hrefs = Array.from(html.matchAll(/href="([^"]+)"/gi)).map(
-    (m) => m[1] ?? '',
+  const hrefs = Array.from(html.matchAll(/href="([^"]+)"/gi)).map((m) =>
+    he.decode(m[1] ?? ''),
   );
   const external = hrefs.find(
     (href) =>
