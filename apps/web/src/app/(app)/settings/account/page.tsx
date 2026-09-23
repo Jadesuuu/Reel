@@ -9,6 +9,11 @@ import { Panel, SectionTitle } from '../../../../components/ui/states';
 import { longDate } from '../../../../lib/format';
 import { modKey } from '../../../../lib/keyboard';
 import { useLogout, useSession } from '../../../../lib/session';
+import { isDemoMode } from '../../../../demo';
+import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '../../../../lib/api';
+import { Mail } from 'lucide-react';
+import { dateTime } from '../../../../lib/format';
 
 const SHORTCUTS = [
   { keys: [`${modKey()}`, 'K'], does: 'Open the command palette' },
@@ -22,6 +27,47 @@ const SHORTCUTS = [
   { keys: ['a'], does: 'Open the apply link' },
   { keys: ['n'], does: 'Add an application (pipeline)' },
 ];
+
+type DemoMail = { id: string; to: string; subject: string; text: string; sentAt: string };
+
+function Outbox() {
+  const mail = useQuery({
+    queryKey: ['demo', 'mail'],
+    queryFn: () => apiFetch<{ items: DemoMail[] }>('/demo/mail'),
+    refetchInterval: 5_000,
+  });
+  const items = mail.data?.items ?? [];
+  return (
+    <Panel className="xl:col-span-2">
+      <SectionTitle aside="what the worker would have emailed">Reminder emails</SectionTitle>
+      {items.length === 0 ? (
+        <p className="text-xs text-faint">
+          None yet. Move an application to Applied, then use “Fast-forward 10 days” in the demo bar
+          and the stale-application email lands here.
+        </p>
+      ) : (
+        <ul className="divide-y divide-line">
+          {items.map((message) => (
+            <li key={message.id} className="py-3">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="inline-flex items-center gap-2 text-sm text-fg">
+                  <Mail className="size-3.5 text-accent" /> {message.subject}
+                </p>
+                <span className="tabular font-mono text-[11px] text-faint">
+                  {dateTime(message.sentAt)}
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] text-faint">to {message.to}</p>
+              <pre className="mt-2 max-w-[72ch] font-sans text-xs leading-relaxed whitespace-pre-wrap text-muted">
+                {message.text}
+              </pre>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Panel>
+  );
+}
 
 export default function AccountPage() {
   const session = useSession();
@@ -106,6 +152,7 @@ export default function AccountPage() {
           ))}
         </ul>
       </Panel>
+      {isDemoMode() ? <Outbox /> : null}
     </div>
   );
 }

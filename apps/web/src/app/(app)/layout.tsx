@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '../../components/app-shell';
+import { DemoBanner } from '../../components/demo-banner';
+import { isDemoMode } from '../../demo';
 import { useHotkeys } from '../../lib/keyboard';
 import { useSession } from '../../lib/session';
 
@@ -65,5 +67,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <AppShell email={session.data.email}>{children}</AppShell>;
+  return (
+    <AppShell email={session.data.email} banner={isDemoMode() ? <DemoBanner /> : undefined}>
+      {children}
+    </AppShell>
+  );
 }
