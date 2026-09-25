@@ -12,9 +12,15 @@ export type Source =
   | 'WEWORKREMOTELY'
   | 'GREENHOUSE'
   | 'LEVER'
-  | 'ASHBY';
+  | 'ASHBY'
+  | 'WORKINGNOMADS'
+  | 'LANDINGJOBS'
+  | 'THEMUSE'
+  | 'JOBSPRESSO'
+  | 'WORKABLE'
+  | 'SMARTRECRUITERS';
 
-export type BoardProvider = 'GREENHOUSE' | 'LEVER' | 'ASHBY';
+export type BoardProvider = 'GREENHOUSE' | 'LEVER' | 'ASHBY' | 'WORKABLE' | 'SMARTRECRUITERS';
 
 export type User = {
   id: string;

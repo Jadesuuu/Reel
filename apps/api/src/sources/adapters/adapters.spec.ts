@@ -12,7 +12,24 @@ import { mapJobicy } from './jobicy.adapter.js';
 import { mapLever, titleCaseSlug } from './lever.adapter.js';
 import { mapRemoteOk } from './remoteok.adapter.js';
 import { mapRemotive } from './remotive.adapter.js';
-import { mapWeWorkRemotely, splitWwrTitle } from './weworkremotely.adapter.js';
+import {
+  mapWeWorkRemotely,
+  splitWwrTitle,
+  weWorkRemotelyUrl,
+} from './weworkremotely.adapter.js';
+import {
+  mapWorkingNomads,
+  stripCompanyPrefix,
+} from './workingnomads.adapter.js';
+import {
+  companyFromLandingUrl,
+  landingSalary,
+  mapLandingJobs,
+} from './landingjobs.adapter.js';
+import { mapTheMuse } from './themuse.adapter.js';
+import { creatorCompany, mapJobspresso } from './jobspresso.adapter.js';
+import { mapWorkable } from './workable.adapter.js';
+import { mapSmartRecruiters, sectionsHtml } from './smartrecruiters.adapter.js';
 
 const FIXTURES = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -348,5 +365,212 @@ describe('Ashby adapter', () => {
         'acme',
       ),
     ).toEqual([]);
+  });
+});
+
+describe('We Work Remotely category boards', () => {
+  const items = mapWeWorkRemotely(
+    fixtureText('weworkremotely-fullstack.xml'),
+    'remote-full-stack-programming-jobs',
+  );
+
+  it('tags every item with the category board it came from', () => {
+    expectWellFormed(items, 'WEWORKREMOTELY');
+    expect(
+      items.every(
+        (item) => item.boardId === 'remote-full-stack-programming-jobs',
+      ),
+    ).toBe(true);
+  });
+
+  it('builds the feed url from the board id', () => {
+    expect(weWorkRemotelyUrl('remote-devops-sysadmin-jobs')).toBe(
+      'https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss',
+    );
+  });
+});
+
+describe('Working Nomads adapter', () => {
+  const items = mapWorkingNomads(fixture('workingnomads.json'));
+
+  it('keeps development jobs only and reads the id from the url', () => {
+    expectWellFormed(items, 'WORKINGNOMADS');
+    expect(items).toHaveLength(3);
+    for (const item of items) {
+      expect(item.externalId).toMatch(/^\d+$/);
+      expect(item.remote).toBe('REMOTE');
+      expect(item.boardId).toBe('development');
+    }
+  });
+
+  it('strips a leading company prefix from the title', () => {
+    expect(stripCompanyPrefix('Acme - Backend Engineer', 'Acme')).toBe(
+      'Backend Engineer',
+    );
+    expect(stripCompanyPrefix('Backend Engineer', 'Acme')).toBe(
+      'Backend Engineer',
+    );
+    expect(stripCompanyPrefix('Acme - Backend Engineer', null)).toBe(
+      'Acme - Backend Engineer',
+    );
+  });
+});
+
+describe('Landing.jobs adapter', () => {
+  const items = mapLandingJobs(fixture('landingjobs.json'));
+
+  it('maps jobs with the company taken from the url', () => {
+    expectWellFormed(items, 'LANDINGJOBS');
+    expect(items[0]).toMatchObject({
+      externalId: '19066',
+      boardId: 'all',
+      company: 'Inscale',
+      role: 'Senior Java Software Developer',
+      location: 'Lisbon, PT',
+      salaryText: '€50k–€67k',
+      salaryMinUsd: null,
+    });
+    expect(items[0]?.html).toContain('<h4>Requirements</h4>');
+  });
+
+  it('keeps USD numbers and drops the rest', () => {
+    expect(
+      landingSalary({
+        currency_code: 'USD',
+        gross_salary_low: 90000,
+        gross_salary_high: 120000,
+      }),
+    ).toEqual({
+      salaryText: '$90k–$120k',
+      salaryMinUsd: 90000,
+      salaryMaxUsd: 120000,
+    });
+    expect(
+      landingSalary({ currency_code: 'GBP', gross_salary_low: 60000 }),
+    ).toEqual({
+      salaryText: '£60k',
+      salaryMinUsd: null,
+      salaryMaxUsd: null,
+    });
+    expect(
+      companyFromLandingUrl('https://landing.jobs/at/acme-labs/role-1'),
+    ).toBe('Acme Labs');
+  });
+});
+
+describe('The Muse adapter', () => {
+  const items = mapTheMuse(fixture('themuse.json'));
+
+  it('maps results with company, locations and landing page', () => {
+    expectWellFormed(items, 'THEMUSE');
+    expect(items[0]).toMatchObject({
+      externalId: '22167029',
+      boardId: 'software-engineering',
+      company: 'SpaceX',
+      role: 'Lead Production Test Development Engineer, Customer Hardware (Starlink)',
+      location: 'Lockhart, TX',
+      url: 'https://www.themuse.com/jobs/spacex/lead-production-test-development-engineer-customer-hardware-starlink',
+    });
+    expect(items[0]?.tags).toContain('software engineering');
+  });
+
+  it('marks flexible or remote locations as remote', () => {
+    const [item] = mapTheMuse({
+      results: [
+        {
+          id: 1,
+          name: 'Engineer',
+          locations: [{ name: 'Flexible / Remote' }],
+          refs: { landing_page: 'https://www.themuse.com/jobs/acme/engineer' },
+          company: { name: 'Acme' },
+        },
+      ],
+    });
+    expect(item?.remote).toBe('REMOTE');
+  });
+});
+
+describe('Jobspresso adapter', () => {
+  const items = mapJobspresso(fixtureText('jobspresso.xml'));
+
+  it('keeps technical job types and reads the namespaced fields', () => {
+    expectWellFormed(items, 'JOBSPRESSO');
+    expect(items.length).toBeGreaterThanOrEqual(1);
+    for (const item of items) {
+      expect(item.company).toBeTruthy();
+      expect(item.remote).toBe('REMOTE');
+      expect(item.url).toMatch(/^https:\/\/jobspresso\.co\/job\//);
+    }
+  });
+
+  it('falls back to the creator line for the company', () => {
+    expect(creatorCompany('Hopper<br>⚲&nbsp;Various US States')).toBe('Hopper');
+    expect(creatorCompany(undefined)).toBeNull();
+  });
+});
+
+describe('Workable adapter', () => {
+  const list = fixture<{ results: unknown[] }>('workable.json');
+  const detail = fixture<{ shortcode: string }>('workable-detail.json');
+  const items = mapWorkable(
+    list as never,
+    { [detail.shortcode]: detail as never },
+    'epignosis',
+    'Epignosis',
+  );
+
+  it('maps jobs with the account slug and detail html when present', () => {
+    expectWellFormed(items, 'WORKABLE');
+    expect(items[0]).toMatchObject({
+      externalId: '2F9375BEB9',
+      boardId: 'epignosis',
+      company: 'Epignosis',
+      role: 'Generalist, Product-Minded Software Engineer (Junior - Mid level)',
+      location: 'Athens, Greece',
+      remote: 'HYBRID',
+      url: 'https://apply.workable.com/epignosis/j/2F9375BEB9/',
+      applyUrl: 'https://apply.workable.com/epignosis/j/2F9375BEB9/apply/',
+    });
+    expect(items[0]?.html).toContain('<h4>Requirements</h4>');
+    expect(items[1]?.html).toBe('');
+  });
+});
+
+describe('SmartRecruiters adapter', () => {
+  const list = fixture<{ content: Array<{ id: string }> }>(
+    'smartrecruiters.json',
+  );
+  const detail = fixture<{ id: string }>('smartrecruiters-posting.json');
+  const items = mapSmartRecruiters(
+    list as never,
+    { [detail.id]: detail as never },
+    'boschgroup',
+  );
+
+  it('maps postings with the company name from the payload', () => {
+    expectWellFormed(items, 'SMARTRECRUITERS');
+    expect(items[0]).toMatchObject({
+      externalId: '744000151928744',
+      boardId: 'boschgroup',
+      company: 'Bosch Group',
+      role: 'Design Engineer',
+      location: 'Pleasanton, CA, United States',
+    });
+    expect(items[0]?.html).toContain('<h4>');
+    expect(items[0]?.url).toMatch(/^https:\/\//);
+  });
+
+  it('renders job ad sections as headed html', () => {
+    expect(
+      sectionsHtml({
+        jobAd: {
+          sections: {
+            a: { title: 'About', text: '<p>Hi</p>' },
+            b: { text: '' },
+          },
+        },
+      }),
+    ).toBe('<h4>About</h4><p>Hi</p>');
+    expect(sectionsHtml(undefined)).toBe('');
   });
 });

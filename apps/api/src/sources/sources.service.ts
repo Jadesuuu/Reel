@@ -137,7 +137,14 @@ export class SourcesService {
         continue;
       }
       if (SOURCE_META[source].kind === 'feed') {
-        targets.push({ source });
+        const feedBoards = SOURCE_META[source].feedBoards;
+        if (feedBoards && feedBoards.length > 0) {
+          for (const boardId of feedBoards) {
+            targets.push({ source, boardId });
+          }
+        } else {
+          targets.push({ source });
+        }
         continue;
       }
       for (const board of boards) {

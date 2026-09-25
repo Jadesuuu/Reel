@@ -9,6 +9,12 @@ import { LeverAdapter } from './adapters/lever.adapter.js';
 import { RemoteOkAdapter } from './adapters/remoteok.adapter.js';
 import { RemotiveAdapter } from './adapters/remotive.adapter.js';
 import { WeWorkRemotelyAdapter } from './adapters/weworkremotely.adapter.js';
+import { WorkingNomadsAdapter } from './adapters/workingnomads.adapter.js';
+import { LandingJobsAdapter } from './adapters/landingjobs.adapter.js';
+import { TheMuseAdapter } from './adapters/themuse.adapter.js';
+import { JobspressoAdapter } from './adapters/jobspresso.adapter.js';
+import { WorkableAdapter } from './adapters/workable.adapter.js';
+import { SmartRecruitersAdapter } from './adapters/smartrecruiters.adapter.js';
 import type {
   BoardAdapter,
   BoardProvider,
@@ -27,6 +33,12 @@ export const ADAPTERS = [
   GreenhouseAdapter,
   LeverAdapter,
   AshbyAdapter,
+  WorkingNomadsAdapter,
+  LandingJobsAdapter,
+  TheMuseAdapter,
+  JobspressoAdapter,
+  WorkableAdapter,
+  SmartRecruitersAdapter,
 ];
 
 @Injectable()
@@ -44,6 +56,12 @@ export class SourceRegistry {
     greenhouse: GreenhouseAdapter,
     lever: LeverAdapter,
     ashby: AshbyAdapter,
+    workingNomads: WorkingNomadsAdapter,
+    landingJobs: LandingJobsAdapter,
+    theMuse: TheMuseAdapter,
+    jobspresso: JobspressoAdapter,
+    workable: WorkableAdapter,
+    smartRecruiters: SmartRecruitersAdapter,
   ) {
     const all: SourceAdapter[] = [
       hn,
@@ -56,6 +74,12 @@ export class SourceRegistry {
       greenhouse,
       lever,
       ashby,
+      workingNomads,
+      landingJobs,
+      theMuse,
+      jobspresso,
+      workable,
+      smartRecruiters,
     ];
     this.adapters = new Map(all.map((adapter) => [adapter.source, adapter]));
   }

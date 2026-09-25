@@ -53,7 +53,7 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
             Reel
           </span>
           <h2 className="mt-10 max-w-md text-headline-lg font-semibold tracking-tight text-fg xl:text-display">
-            Ten job sources read for you. Every posting scored. Nothing forgotten.
+            Sixteen job sources read for you. Every posting scored. Nothing forgotten.
           </h2>
           <p className="mt-5 max-w-md text-body leading-relaxed text-muted">
             The monthly Hacker News thread, six remote boards, and any company careers page you

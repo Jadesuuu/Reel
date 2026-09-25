@@ -8,9 +8,13 @@ import type {
   SourceAdapter,
 } from '../source.types.js';
 
-export const WEWORKREMOTELY_URL =
-  'https://weworkremotely.com/categories/remote-programming-jobs.rss';
 export const WEWORKREMOTELY_BOARD = 'remote-programming-jobs';
+
+export function weWorkRemotelyUrl(boardId: string): string {
+  return `https://weworkremotely.com/categories/${boardId}.rss`;
+}
+
+export const WEWORKREMOTELY_URL = weWorkRemotelyUrl(WEWORKREMOTELY_BOARD);
 
 export function splitWwrTitle(title: string): {
   company: string | null;
@@ -27,7 +31,10 @@ export function splitWwrTitle(title: string): {
     : { company: null, role: title.trim() };
 }
 
-export function mapWeWorkRemotely(xml: string): RawPosting[] {
+export function mapWeWorkRemotely(
+  xml: string,
+  boardId: string = WEWORKREMOTELY_BOARD,
+): RawPosting[] {
   const items: RawPosting[] = [];
 
   for (const item of parseRssItems(xml)) {
@@ -40,7 +47,7 @@ export function mapWeWorkRemotely(xml: string): RawPosting[] {
     items.push({
       source: 'WEWORKREMOTELY',
       externalId: guid,
-      boardId: WEWORKREMOTELY_BOARD,
+      boardId,
       author: company ?? 'We Work Remotely',
       postedAt: toDate(item.pubDate),
       url: text(item.link) ?? guid,
@@ -65,8 +72,9 @@ export function mapWeWorkRemotely(xml: string): RawPosting[] {
 export class WeWorkRemotelyAdapter implements SourceAdapter {
   readonly source = 'WEWORKREMOTELY' as const;
 
-  async fetch(): Promise<FetchResult> {
-    const xml = await fetchText(WEWORKREMOTELY_URL);
-    return { boardId: WEWORKREMOTELY_BOARD, items: mapWeWorkRemotely(xml) };
+  async fetch(boardId?: string): Promise<FetchResult> {
+    const board = boardId ?? WEWORKREMOTELY_BOARD;
+    const xml = await fetchText(weWorkRemotelyUrl(board));
+    return { boardId: board, items: mapWeWorkRemotely(xml, board) };
   }
 }

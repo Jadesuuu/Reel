@@ -1,0 +1,98 @@
+{
+  "total": 9,
+  "results": [
+    {
+      "id": 6150164,
+      "shortcode": "2F9375BEB9",
+      "title": "Generalist, Product-Minded Software Engineer (Junior - Mid level)",
+      "remote": false,
+      "location": {
+        "country": "Greece",
+        "countryCode": "GR",
+        "city": "Athens",
+        "region": "Attica"
+      },
+      "locations": [
+        {
+          "country": "Greece",
+          "countryCode": "GR",
+          "city": "Athens",
+          "region": "Attica",
+          "hidden": false
+        }
+      ],
+      "state": "published",
+      "isInternal": false,
+      "code": "",
+      "published": "2026-09-25T00:00:00.000Z",
+      "type": "full",
+      "language": "en",
+      "department": ["Research"],
+      "accountUid": "133a970a-71c9-4d5f-beff-6264094c07be",
+      "approvalStatus": "approved",
+      "workplace": "hybrid"
+    },
+    {
+      "id": 6062250,
+      "shortcode": "76991535C6",
+      "title": "Senior QA Automation Engineer",
+      "remote": false,
+      "location": {
+        "country": "Greece",
+        "countryCode": "GR",
+        "city": "Athens",
+        "region": "Attica"
+      },
+      "locations": [
+        {
+          "country": "Greece",
+          "countryCode": "GR",
+          "city": "Athens",
+          "region": "Attica",
+          "hidden": false
+        }
+      ],
+      "state": "published",
+      "isInternal": false,
+      "code": "",
+      "published": "2026-09-24T00:00:00.000Z",
+      "type": "full",
+      "language": "en",
+      "department": ["Engineering"],
+      "accountUid": "133a970a-71c9-4d5f-beff-6264094c07be",
+      "approvalStatus": "approved",
+      "workplace": "hybrid"
+    },
+    {
+      "id": 6144132,
+      "shortcode": "5A2534F279",
+      "title": "Customer Success Manager",
+      "remote": false,
+      "location": {
+        "country": "Greece",
+        "countryCode": "GR",
+        "city": "Athens",
+        "region": "Attica"
+      },
+      "locations": [
+        {
+          "country": "Greece",
+          "countryCode": "GR",
+          "city": "Athens",
+          "region": "Attica",
+          "hidden": false
+        }
+      ],
+      "state": "published",
+      "isInternal": false,
+      "code": "",
+      "published": "2026-09-24T00:00:00.000Z",
+      "type": "full",
+      "language": "en",
+      "department": ["Customer Success"],
+      "accountUid": "133a970a-71c9-4d5f-beff-6264094c07be",
+      "approvalStatus": "approved",
+      "workplace": "hybrid"
+    }
+  ]
+}

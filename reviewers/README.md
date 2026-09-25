@@ -27,6 +27,7 @@ Read them in order. Each one follows the same shape:
 | 19   | [Demo mode](step-19-demo.md)                          | `feat/web-demo`        |
 | 20   | [Readability pass](step-20-readability.md)            | `feat/web-readability` |
 | 21   | [Where you can work](step-21-regions.md)              | `feat/regions`         |
+| 22   | [More sources](step-22-more-sources.md)               | `feat/more-sources`    |
 
 Steps 1–6 were built in an earlier pass and have no reviewer yet. The repairs document covers
 what was wrong with them; the code itself is small enough to read directly, starting at

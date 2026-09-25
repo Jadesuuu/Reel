@@ -18,7 +18,8 @@ const mono = Fragment_Mono({
 
 export const metadata: Metadata = {
   title: { default: 'Reel', template: '%s · Reel' },
-  description: 'A job-hunt tracker that reads ten sources, scores every posting, and chases you.',
+  description:
+    'A job-hunt tracker that reads sixteen sources, scores every posting, and chases you.',
 };
 
 export const viewport: Viewport = {
