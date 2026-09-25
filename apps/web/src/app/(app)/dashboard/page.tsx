@@ -336,7 +336,7 @@ function SourceHealth() {
                   ? 'bg-info'
                   : 'bg-success';
           return (
-            <li key={item.source} className="flex items-center gap-3 py-2.5 text-body-sm">
+            <li key={item.source} className="flex items-center gap-3 py-2 text-body-sm">
               <Tip
                 content={
                   run
@@ -386,11 +386,12 @@ export default function DashboardPage() {
             <Skeleton className="h-52" />
           )}
           {stats.data ? <Weekly weekly={stats.data.weekly} /> : <Skeleton className="h-40" />}
-
-          <SourceHealth />
         </div>
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0">
           {stats.data ? <Upcoming items={stats.data.upcoming} /> : <Skeleton className="h-52" />}
+        </div>
+        <div className="min-w-0 lg:col-start-1">
+          <SourceHealth />
         </div>
       </div>
 
