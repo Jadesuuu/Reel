@@ -4,8 +4,8 @@
 a schedule, scores every posting against criteria you set, and tracks each application from saved
 to offer with reminders that only fire when something has gone quiet.
 
-> **Live demo:** _link pending — see [Demo](#demo)_ · **Stack:** NestJS 12 · Prisma 7 · Postgres ·
-> Redis / BullMQ · Next.js 16 · TanStack Query
+> **Live demo:** [reel.jadebonifacio.dev](https://reel.jadebonifacio.dev) · **Stack:** NestJS 12 ·
+> Prisma 7 · Postgres · Redis / BullMQ · Next.js 16 · TanStack Query
 
 ![Dashboard](docs/screenshots/dashboard-desktop.png)
 
@@ -113,9 +113,10 @@ unit → e2e on every push with Postgres and Redis service containers.
 
 ## Demo
 
-The interface can run with no backend at all. Built with `NEXT_PUBLIC_DEMO_MODE=true`, the web
-app answers its own API calls in the browser from seeded, synthetic data (fifty-four postings
-across all ten sources, fourteen applications with histories, two ingest cycles), persisted in
+The live demo at [reel.jadebonifacio.dev](https://reel.jadebonifacio.dev) is this build. The
+interface can run with no backend at all. Built with `NEXT_PUBLIC_DEMO_MODE=true`, the web app
+answers its own API calls in the browser from seeded, synthetic data (fifty-four postings across
+all ten sources, fourteen applications with histories, two ingest cycles), persisted in
 `localStorage`. The demo banner can reset the data or fast-forward the clock ten days so pending
 reminders fire and their emails appear under Settings → Account. Everything in the demo is
 invented; nothing names a real employer.
