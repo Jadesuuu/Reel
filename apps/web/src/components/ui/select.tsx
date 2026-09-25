@@ -39,13 +39,13 @@ export function Select<T extends string>({
           'inline-flex items-center justify-between gap-2 rounded-md border border-line bg-surface text-fg outline-none',
           'transition-[border-color,box-shadow] duration-150 ease-out hover:border-line-strong focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/25',
           'data-[placeholder]:text-faint disabled:opacity-50',
-          size === 'sm' ? 'h-7 px-2 text-xs' : 'h-9 px-2.5 text-sm',
+          size === 'sm' ? 'h-9 px-3 text-body-sm' : 'h-10 px-3 text-body',
           className,
         )}
       >
         <RadixSelect.Value placeholder={placeholder} />
         <RadixSelect.Icon>
-          <ChevronDown className="size-3.5 text-faint" />
+          <ChevronDown className="size-4 text-faint" />
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
       <RadixSelect.Portal>
@@ -60,14 +60,14 @@ export function Select<T extends string>({
               <RadixSelect.Item
                 key={option.value || EMPTY}
                 value={option.value === '' ? EMPTY : option.value}
-                className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pr-2 pl-7 text-[13px] text-fg outline-none data-[highlighted]:bg-surface-3 data-[state=checked]:text-accent"
+                className="relative flex cursor-default select-none items-center rounded-sm py-2 pr-2.5 pl-8 text-body-sm text-fg outline-none data-[highlighted]:bg-surface-3 data-[state=checked]:text-accent"
               >
                 <RadixSelect.ItemIndicator className="absolute left-2 inline-flex">
-                  <Check className="size-3.5" />
+                  <Check className="size-4" />
                 </RadixSelect.ItemIndicator>
                 <RadixSelect.ItemText>{option.label}</RadixSelect.ItemText>
                 {option.hint ? (
-                  <span className="ml-auto pl-3 text-xs text-faint">{option.hint}</span>
+                  <span className="ml-auto pl-3 text-caption text-faint">{option.hint}</span>
                 ) : null}
               </RadixSelect.Item>
             ))}

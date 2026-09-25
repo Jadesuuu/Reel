@@ -35,13 +35,13 @@ export function DialogContent({
           className,
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
           <div className="min-w-0">
-            <RadixDialog.Title className="text-[15px] font-semibold tracking-tight text-fg">
+            <RadixDialog.Title className="text-title font-semibold tracking-tight text-fg">
               {title}
             </RadixDialog.Title>
             {description ? (
-              <RadixDialog.Description className="mt-0.5 text-xs text-muted">
+              <RadixDialog.Description className="mt-1 text-body-sm text-muted">
                 {description}
               </RadixDialog.Description>
             ) : (
@@ -50,11 +50,11 @@ export function DialogContent({
           </div>
           <RadixDialog.Close asChild>
             <Button variant="ghost" size="icon-sm" aria-label="Close">
-              <X className="size-4" />
+              <X className="size-5" />
             </Button>
           </RadixDialog.Close>
         </div>
-        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto px-5 py-4">{children}</div>
+        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto px-6 py-5">{children}</div>
       </RadixDialog.Content>
     </RadixDialog.Portal>
   );

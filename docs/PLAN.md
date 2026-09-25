@@ -1609,6 +1609,36 @@ running; refresh keeps state; Reset restores the seed; the production build is c
 
 ---
 
+### Step 20 — Readability pass
+
+**Branch:** `feat/web-readability`
+**Commit:** `feat(web): larger type scale, roomier controls, and higher secondary-text contrast`
+
+**Why.** Step 18 shipped at a 14px base with most secondary text at 10.5–12px in grey on
+near-black. Used for real on 26 Sep it was too small to read comfortably. "Density over hero
+sections" (Steps 13 and 18) still holds, but density is about layout, not about shrinking type;
+this step keeps the ink-and-brass world and the notebook structure and replaces the scale.
+
+**Decisions:**
+
+- Named type tokens replace ad-hoc pixel sizes. Every size in the app is one of `stamp` (12 mono,
+  letterspaced caps), `fine` (13), `caption` (14), `body-sm` (15), `body` (16, the base),
+  `title-sm` (18), `title` (20), `headline` (28, 32 on the dashboard sentence), `display` (40),
+  and the mono `measure` (15) / `measure-sm` (13). No `text-[13px]` anywhere.
+- Controls grow one step: buttons 28 / 32 / 40 / 44, inputs 40, nav rows 44, header 64,
+  sidebar 256, page column 1360. Card padding 16, panel padding 20, list rows 14–16 vertical.
+- Secondary text is lighter, not smaller: `fg-muted` and `fg-faint` move up so both clear
+  WCAG AA on every surface, and metadata that used to be `faint` is now `muted`. `faint` is
+  reserved for genuinely tertiary text (timestamps, hints, kbd).
+- Sentences never use the stamp token. Mono letterspaced caps are for stage names, sources,
+  kbd, group labels and the wordmark; a hint like "Sent, waiting to hear back" is a caption.
+
+**Done when:** no arbitrary `text-[Npx]` utility remains in `apps/web/src`; every page at 1440
+and 390 reads without zooming; the gate is green; `DESIGN.md` and `.impeccable/design.json`
+record the new ramp; README screenshots are retaken from the demo build.
+
+---
+
 ### 11.6 Environment variables (additions)
 
 | Var | Required | Default | Used by |

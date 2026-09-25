@@ -78,11 +78,11 @@ export default function PostingsPage() {
         lede="Everything ingested from every enabled source, newest first. Click a row for the full text."
       />
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative min-w-56 flex-1 sm:max-w-xs">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-faint" />
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-64 flex-1 sm:max-w-sm">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-faint" />
           <Input
-            className="h-8 pl-8 text-[13px]"
+            className="h-10 pl-9 text-body-sm"
             placeholder="Company, role, or headline"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -95,7 +95,7 @@ export default function PostingsPage() {
               onClick={() => setSearch('')}
               className="absolute top-1/2 right-2 -translate-y-1/2 text-faint hover:text-fg"
             >
-              <X className="size-3.5" />
+              <X className="size-4" />
             </button>
           ) : null}
         </div>
@@ -105,7 +105,7 @@ export default function PostingsPage() {
           value={source}
           onValueChange={(value) => setSource(value as Source | '')}
           options={sourceOptions}
-          className="min-w-40"
+          className="min-w-44"
         />
         <Segmented
           ariaLabel="Remote"
@@ -114,16 +114,16 @@ export default function PostingsPage() {
           options={REMOTE_OPTIONS}
         />
         {stack ? (
-          <Badge tone="accent" className="h-7 gap-1.5 px-2 text-xs">
+          <Badge tone="accent" className="h-8 gap-2 px-2 text-caption">
             stack: {stack}
             <button type="button" aria-label="Clear stack filter" onClick={() => setStack('')}>
-              <X className="size-3" />
+              <X className="size-4" />
             </button>
           </Badge>
         ) : null}
       </div>
 
-      {postings.isPending ? <RowsSkeleton rows={8} height="h-14" /> : null}
+      {postings.isPending ? <RowsSkeleton rows={8} height="h-16" /> : null}
       {postings.isError ? (
         <ErrorState message="Could not load postings." onRetry={() => postings.refetch()} />
       ) : null}
@@ -167,7 +167,7 @@ export default function PostingsPage() {
             postings.isPlaceholderData && 'opacity-60',
           )}
         >
-          <div className="hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)_9rem_7rem_8rem] gap-3 border-b border-line bg-surface-2 px-3 py-2 text-[11px] tracking-wide text-faint uppercase md:grid">
+          <div className="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_11rem_7.5rem_8rem] gap-4 border-b border-line bg-surface-2 px-4 py-2.5 text-stamp font-mono text-muted uppercase md:grid">
             <span>Company</span>
             <span>Role</span>
             <span>Where</span>
@@ -192,25 +192,23 @@ export default function PostingsPage() {
                       setSelected(posting);
                     }
                   }}
-                  className="group grid cursor-pointer grid-cols-1 gap-1 px-3 py-2.5 transition-colors hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none md:grid-cols-[minmax(12rem,1.1fr)_minmax(0,1.6fr)_9rem_7rem_8rem] md:items-center md:gap-3"
+                  className="group grid cursor-pointer grid-cols-1 gap-1.5 px-4 py-3.5 transition-colors hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none md:grid-cols-[minmax(14rem,1.2fr)_minmax(0,1.5fr)_11rem_7.5rem_8rem] md:items-center md:gap-4"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <SourceBadge source={posting.source} href={posting.url} />
-                    <span className="truncate text-[14px] font-medium text-fg">
+                    <span className="truncate text-body font-medium text-fg">
                       {posting.company ?? '—'}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] text-fg">
-                      {posting.role ?? posting.headline}
-                    </p>
+                    <p className="truncate text-body text-fg">{posting.role ?? posting.headline}</p>
                     {posting.stackKeywords.length > 0 ? (
-                      <div className="mt-1 hidden flex-wrap gap-1 lg:flex">
-                        {posting.stackKeywords.slice(0, 5).map((keyword) => (
+                      <div className="mt-1 hidden flex-wrap gap-1.5 lg:flex">
+                        {posting.stackKeywords.slice(0, 3).map((keyword) => (
                           <button
                             key={keyword}
                             type="button"
-                            className="rounded-sm border border-line px-1 font-mono text-[10.5px] text-faint hover:border-line-strong hover:text-fg"
+                            className="rounded-sm border border-line px-1.5 py-px font-mono text-measure-sm text-muted hover:border-line-strong hover:text-fg"
                             onClick={(event) => {
                               event.stopPropagation();
                               setStack(keyword);
@@ -219,24 +217,27 @@ export default function PostingsPage() {
                             {keyword}
                           </button>
                         ))}
+                        {posting.stackKeywords.length > 3 ? (
+                          <Badge tone="outline">+{posting.stackKeywords.length - 3}</Badge>
+                        ) : null}
                       </div>
                     ) : null}
                   </div>
-                  <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted">
+                  <div className="flex min-w-0 items-center gap-2 text-body-sm text-muted">
                     {posting.remote !== 'UNKNOWN' ? (
                       <Badge tone={posting.remote === 'REMOTE' ? 'accent' : 'outline'}>
                         {remoteLabel(posting.remote)}
                       </Badge>
                     ) : null}
                     {posting.location ? (
-                      <span className="hidden max-w-32 truncate xl:inline">{posting.location}</span>
+                      <span className="hidden max-w-40 truncate xl:inline">{posting.location}</span>
                     ) : null}
                   </div>
-                  <div className="tabular truncate font-mono text-[11px] text-muted">
+                  <div className="tabular truncate font-mono text-measure-sm text-muted">
                     {posting.salaryText ?? <span className="text-faint">—</span>}
                   </div>
                   <div className="flex items-center justify-between gap-2 md:justify-end">
-                    <span className="text-[11px] whitespace-nowrap text-faint">
+                    <span className="text-caption whitespace-nowrap text-muted">
                       {relativeDays(posting.postedAt)}
                     </span>
                     <Button
@@ -253,7 +254,7 @@ export default function PostingsPage() {
                         });
                       }}
                     >
-                      <Plus className="size-3" /> Save
+                      <Plus className="size-4" /> Save
                     </Button>
                   </div>
                 </div>

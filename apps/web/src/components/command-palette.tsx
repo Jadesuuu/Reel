@@ -78,18 +78,18 @@ export function CommandPalette({
       overlayClassName="reel-overlay fixed inset-0 z-[70] bg-canvas/70 backdrop-blur-[2px]"
       contentClassName="reel-dialog-enter fixed top-[14vh] left-1/2 z-[80] w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-lg border border-line bg-surface shadow-lg"
     >
-      <div className="flex items-center gap-2 border-b border-line px-3">
-        <Sparkles className="size-4 text-accent" aria-hidden />
+      <div className="flex items-center gap-2 border-b border-line px-4">
+        <Sparkles className="size-5 text-accent" aria-hidden />
         <Command.Input
           value={search}
           onValueChange={setSearch}
           placeholder="Jump to a page, an application, or run an action…"
-          className="h-12 flex-1 bg-transparent text-sm text-fg outline-none placeholder:text-faint"
+          className="h-14 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-faint"
         />
         <Kbd>Esc</Kbd>
       </div>
       <Command.List className="max-h-[min(60vh,420px)] overflow-y-auto p-1.5 [&_[cmdk-group-heading]]:stamp [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-faint">
-        <Command.Empty className="px-3 py-8 text-center text-sm text-muted">
+        <Command.Empty className="px-4 py-8 text-center text-body text-muted">
           Nothing matches “{search}”.
         </Command.Empty>
 
@@ -98,9 +98,9 @@ export function CommandPalette({
             const Icon = page.icon;
             return (
               <Item key={page.href} onSelect={() => go(page.href)} keywords={[page.label]}>
-                <Icon className="size-4 text-faint" />
+                <Icon className="size-5 text-faint" />
                 <span className="flex-1">{page.label}</span>
-                <span className="flex gap-1">
+                <span className="flex gap-1.5">
                   {page.keys.split(' ').map((key) => (
                     <Kbd key={key}>{key}</Kbd>
                   ))}
@@ -112,7 +112,7 @@ export function CommandPalette({
 
         <Command.Group heading="Actions">
           <Item onSelect={() => go('/pipeline?new=1')} keywords={['add', 'create', 'application']}>
-            <Plus className="size-4 text-faint" />
+            <Plus className="size-5 text-faint" />
             <span className="flex-1">Add an application</span>
             <Kbd>N</Kbd>
           </Item>
@@ -126,7 +126,7 @@ export function CommandPalette({
             }}
             keywords={['score', 'matches']}
           >
-            <RefreshCw className="size-4 text-faint" />
+            <RefreshCw className="size-5 text-faint" />
             <span className="flex-1">Rescore matches against my criteria</span>
           </Item>
           <Item
@@ -146,7 +146,7 @@ export function CommandPalette({
             }}
             keywords={['fetch', 'sync', 'sources', 'run']}
           >
-            <Newspaper className="size-4 text-faint" />
+            <Newspaper className="size-5 text-faint" />
             <span className="flex-1">Run ingest for every enabled source</span>
           </Item>
           <Item
@@ -157,16 +157,16 @@ export function CommandPalette({
             keywords={['theme', 'dark', 'light']}
           >
             {resolvedTheme === 'light' ? (
-              <Moon className="size-4 text-faint" />
+              <Moon className="size-5 text-faint" />
             ) : (
-              <Sun className="size-4 text-faint" />
+              <Sun className="size-5 text-faint" />
             )}
             <span className="flex-1">
               Switch to {resolvedTheme === 'light' ? 'dark' : 'light'} theme
             </span>
           </Item>
           <Item onSelect={() => logout.mutate()} keywords={['sign out', email]}>
-            <LogOut className="size-4 text-faint" />
+            <LogOut className="size-5 text-faint" />
             <span className="flex-1">Log out</span>
           </Item>
         </Command.Group>
@@ -180,12 +180,12 @@ export function CommandPalette({
                 onSelect={() => go(`/pipeline?open=${application.id}`)}
                 keywords={[application.company, application.role, STAGE_LABEL[application.stage]]}
               >
-                <Briefcase className="size-4 text-faint" />
+                <Briefcase className="size-5 text-faint" />
                 <span className="min-w-0 flex-1 truncate">
                   {application.company}
                   <span className="text-muted"> · {application.role}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-[11px] text-faint">
+                <span className="flex items-center gap-2 text-caption text-muted">
                   <StageDot stage={application.stage} /> {STAGE_LABEL[application.stage]}
                 </span>
               </Item>
@@ -213,7 +213,7 @@ function Item({
       value={value}
       keywords={keywords}
       onSelect={onSelect}
-      className="flex cursor-default items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-fg data-[selected=true]:bg-surface-3"
+      className="flex cursor-default items-center gap-2.5 rounded-md px-3 py-2 text-body-sm text-fg data-[selected=true]:bg-surface-3"
     >
       {children}
     </Command.Item>

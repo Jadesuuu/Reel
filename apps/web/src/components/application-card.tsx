@@ -26,7 +26,7 @@ export const ApplicationCard = forwardRef<HTMLDivElement, Props>(function Applic
     <div
       ref={ref}
       className={cn(
-        'group relative rounded-md border border-line bg-surface p-3 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-150 ease-out',
+        'group relative rounded-md border border-line bg-surface p-4 text-left shadow-sm transition-[border-color,box-shadow,transform] duration-150 ease-out',
         'hover:border-line-strong hover:shadow-md',
         dragging && 'opacity-30',
         overlay && 'rotate-[1.5deg] border-accent/60 shadow-lg',
@@ -35,22 +35,22 @@ export const ApplicationCard = forwardRef<HTMLDivElement, Props>(function Applic
       {...props}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="min-w-0 truncate text-[14px] font-medium text-fg">{application.company}</p>
+        <p className="line-clamp-2 min-w-0 text-body font-medium text-fg">{application.company}</p>
         {application.posting?.source ? (
           <SourceBadge source={application.posting.source} />
         ) : application.via ? (
-          <span className="shrink-0 rounded-sm border border-dashed border-line px-1.5 font-mono text-[10.5px] tracking-wide text-faint uppercase">
+          <span className="shrink-0 rounded-sm border border-dashed border-line px-1.5 font-mono text-stamp tracking-wide text-faint uppercase">
             {application.via}
           </span>
         ) : null}
       </div>
-      <p className="mt-0.5 truncate text-xs text-muted">{application.role}</p>
+      <p className="mt-0.5 truncate text-body-sm text-muted">{application.role}</p>
 
       {application.location || application.salaryText ? (
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-faint">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-caption text-muted">
           {application.location ? (
-            <span className="inline-flex max-w-full items-center gap-1 truncate">
-              <MapPin className="size-3 shrink-0" />{' '}
+            <span className="inline-flex max-w-full items-center gap-1.5 truncate">
+              <MapPin className="size-4 shrink-0" />{' '}
               <span className="truncate">{application.location}</span>
             </span>
           ) : null}
@@ -60,7 +60,7 @@ export const ApplicationCard = forwardRef<HTMLDivElement, Props>(function Applic
         </div>
       ) : null}
 
-      <div className="mt-2.5 flex items-center gap-2 border-t border-line pt-2 text-[11px]">
+      <div className="mt-3 flex items-center gap-3 border-t border-line pt-2.5 text-caption">
         <Tip content={`In this stage since ${shortDate(application.stageChangedAt)}`}>
           <span className={cn('tabular font-mono', stale ? 'text-warning' : 'text-faint')}>
             {days}d
@@ -70,15 +70,15 @@ export const ApplicationCard = forwardRef<HTMLDivElement, Props>(function Applic
           <Tip
             content={`${reminder.kind === 'FOLLOW_UP' ? 'Follow-up' : 'Stale check'} ${dueLabel(reminder.dueAt)}`}
           >
-            <span className="inline-flex items-center gap-1 text-accent">
-              <Bell className="size-3" /> {shortDate(reminder.dueAt)}
+            <span className="inline-flex items-center gap-1.5 text-accent">
+              <Bell className="size-4" /> {shortDate(reminder.dueAt)}
             </span>
           </Tip>
         ) : null}
         {application.nextStepAt ? (
           <Tip content={`Next step ${dueLabel(application.nextStepAt)}`}>
-            <span className="inline-flex items-center gap-1 text-info">
-              <CalendarClock className="size-3" /> {shortDate(application.nextStepAt)}
+            <span className="inline-flex items-center gap-1.5 text-info">
+              <CalendarClock className="size-4" /> {shortDate(application.nextStepAt)}
             </span>
           </Tip>
         ) : null}

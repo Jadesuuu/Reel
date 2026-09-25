@@ -81,7 +81,7 @@ export default function CriteriaPage() {
           What counts as a match
         </SectionTitle>
 
-        {criteria.isPending ? <RowsSkeleton rows={4} height="h-10" /> : null}
+        {criteria.isPending ? <RowsSkeleton rows={4} height="h-11" /> : null}
         {criteria.isError ? (
           <ErrorState message="Could not load your criteria." onRetry={() => criteria.refetch()} />
         ) : null}
@@ -121,8 +121,8 @@ export default function CriteriaPage() {
           >
             <label className="flex items-center justify-between gap-4 border-b border-line pb-4">
               <span>
-                <span className="block text-sm text-fg">Remote only</span>
-                <span className="block text-xs text-muted">
+                <span className="block text-body text-fg">Remote only</span>
+                <span className="block text-caption text-muted">
                   Anything not marked remote scores zero.
                 </span>
               </span>
@@ -159,10 +159,10 @@ export default function CriteriaPage() {
               label="Minimum salary"
               htmlFor="min-salary"
               hint="USD per year, blank for none"
-              className="max-w-48"
+              className="max-w-64"
             >
               <div className="relative">
-                <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-faint">
+                <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-body text-faint">
                   $
                 </span>
                 <Input
@@ -206,9 +206,9 @@ export default function CriteriaPage() {
                   })
                 }
               >
-                <RefreshCw className="size-3.5" /> Rescore now
+                <RefreshCw className="size-4" /> Rescore now
               </Button>
-              {dirty ? <span className="text-xs text-warning">Unsaved changes</span> : null}
+              {dirty ? <span className="text-caption text-warning">Unsaved changes</span> : null}
             </div>
           </form>
         ) : null}
@@ -218,13 +218,13 @@ export default function CriteriaPage() {
         <SectionTitle>How the score adds up</SectionTitle>
         <ol className="space-y-2">
           {RULES.map((item) => (
-            <li key={item.rule} className="flex gap-3 text-xs">
+            <li key={item.rule} className="flex gap-3 text-caption">
               <span className="tabular w-8 shrink-0 font-mono text-accent">{item.points}</span>
               <span className="text-muted">{item.rule}</span>
             </li>
           ))}
         </ol>
-        <p className="mt-4 border-t border-line pt-3 text-xs text-muted">
+        <p className="mt-4 border-t border-line pt-3 text-caption text-muted">
           Maximum 110. A posting becomes a match at <span className="font-mono text-fg">40</span> or
           more. The chips in the{' '}
           <Link href="/inbox" className="text-accent hover:underline">

@@ -58,7 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (session.isPending) {
     return (
       <div className="flex min-h-dvh items-center justify-center" aria-busy>
-        <span className="font-mono text-[12px] tracking-[0.32em] text-accent uppercase">Reel</span>
+        <span className="font-mono text-caption tracking-[0.32em] text-accent uppercase">Reel</span>
       </div>
     );
   }

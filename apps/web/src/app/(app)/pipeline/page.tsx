@@ -116,7 +116,7 @@ function PipelineInner() {
               ]}
             />
             <Button size="sm" variant="primary" onClick={() => setParam('new', '1')}>
-              <Plus className="size-3.5" /> Add application{' '}
+              <Plus className="size-4" /> Add application{' '}
               <Kbd className="ml-1 border-accent-fg/30 bg-transparent text-accent-fg/80">N</Kbd>
             </Button>
           </>
@@ -124,11 +124,11 @@ function PipelineInner() {
       />
 
       {total > 0 ? (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <div className="relative min-w-56 sm:max-w-xs">
-            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-faint" />
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <div className="relative min-w-64 sm:max-w-sm">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-faint" />
             <Input
-              className="h-8 pl-8 text-[13px]"
+              className="h-10 pl-9 text-body-sm"
               placeholder="Filter by company, role, or source"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -141,11 +141,11 @@ function PipelineInner() {
                 onClick={() => setSearch('')}
                 className="absolute top-1/2 right-2 -translate-y-1/2 text-faint hover:text-fg"
               >
-                <X className="size-3.5" />
+                <X className="size-4" />
               </button>
             ) : null}
           </div>
-          <span className="tabular text-xs text-faint">
+          <span className="tabular text-body-sm text-muted">
             {items.length === total ? `${total} applications` : `${items.length} of ${total}`}
           </span>
         </div>
@@ -154,7 +154,7 @@ function PipelineInner() {
       {applications.isPending ? (
         <div className="flex gap-3 overflow-hidden">
           {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-72 w-72 shrink-0" />
+            <Skeleton key={index} className="h-72 w-80 shrink-0" />
           ))}
         </div>
       ) : null}
@@ -173,7 +173,7 @@ function PipelineInner() {
           action={
             <>
               <Button size="sm" variant="primary" onClick={() => setParam('new', '1')}>
-                <Plus className="size-3.5" /> Add application
+                <Plus className="size-4" /> Add application
               </Button>
               <Button asChild size="sm" variant="ghost">
                 <a href="/inbox">Open inbox</a>

@@ -60,7 +60,7 @@ export function ReasonChips({
   const shown = reasons.slice(0, limit);
   const rest = reasons.length - shown.length;
   return (
-    <span className={cn('flex flex-wrap items-center gap-1', className)}>
+    <span className={cn('flex flex-wrap items-center gap-1.5', className)}>
       {shown.map((reason) => {
         const info = explainReason(reason);
         return (

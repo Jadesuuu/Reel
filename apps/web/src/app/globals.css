@@ -10,8 +10,8 @@
   --line: #22222a;
   --line-strong: #33333d;
   --fg: #ece9e4;
-  --fg-muted: #b3ada4;
-  --fg-faint: #85807a;
+  --fg-muted: #c2bcb3;
+  --fg-faint: #9c968d;
   --accent: #c9a56e;
   --accent-strong: #e0bf86;
   --accent-soft: rgba(201, 165, 110, 0.14);
@@ -24,12 +24,12 @@
   --info-soft: rgba(138, 180, 216, 0.14);
   --warning: #d9a86c;
   --warning-soft: rgba(217, 168, 108, 0.14);
-  --stage-saved: #b3ada4;
+  --stage-saved: #c2bcb3;
   --stage-applied: #c9a56e;
   --stage-interviewing: #8ab4d8;
   --stage-offer: #7fb27a;
   --stage-rejected: #d0756d;
-  --stage-withdrawn: #85807a;
+  --stage-withdrawn: #9c968d;
   --shadow-color: 0 0 0;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.35);
@@ -48,11 +48,11 @@
   --line: #d9d3c6;
   --line-strong: #c2baa9;
   --fg: #1b1a17;
-  --fg-muted: #4f4b44;
-  --fg-faint: #76716a;
-  --accent: #8a6a36;
-  --accent-strong: #6f542a;
-  --accent-soft: rgba(138, 106, 54, 0.12);
+  --fg-muted: #4a463f;
+  --fg-faint: #6a655e;
+  --accent: #75582a;
+  --accent-strong: #5c4520;
+  --accent-soft: rgba(117, 88, 42, 0.12);
   --accent-fg: #faf8f3;
   --danger: #a8443c;
   --danger-soft: rgba(168, 68, 60, 0.12);
@@ -62,12 +62,12 @@
   --info-soft: rgba(53, 97, 138, 0.12);
   --warning: #9a6a1f;
   --warning-soft: rgba(154, 106, 31, 0.12);
-  --stage-saved: #4f4b44;
-  --stage-applied: #8a6a36;
+  --stage-saved: #4a463f;
+  --stage-applied: #75582a;
   --stage-interviewing: #35618a;
   --stage-offer: #3f7a3d;
   --stage-rejected: #a8443c;
-  --stage-withdrawn: #76716a;
+  --stage-withdrawn: #6a655e;
   --shadow-sm: 0 1px 2px rgba(40, 30, 10, 0.12);
   --shadow-md: 0 8px 24px -8px rgba(40, 30, 10, 0.22), 0 2px 6px rgba(40, 30, 10, 0.08);
   --shadow-lg: 0 24px 48px -16px rgba(40, 30, 10, 0.28), 0 4px 12px rgba(40, 30, 10, 0.1);
@@ -112,6 +112,36 @@
   --shadow-lg: var(--shadow-lg);
   --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --text-stamp: 12px;
+  --text-stamp--line-height: 1;
+  --text-stamp--letter-spacing: 0.12em;
+  --text-fine: 13px;
+  --text-fine--line-height: 1.4;
+  --text-caption: 14px;
+  --text-caption--line-height: 1.45;
+  --text-body-sm: 15px;
+  --text-body-sm--line-height: 1.5;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-title-sm: 18px;
+  --text-title-sm--line-height: 1.35;
+  --text-title-sm--letter-spacing: -0.015em;
+  --text-title: 20px;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.02em;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--letter-spacing: -0.025em;
+  --text-headline: 28px;
+  --text-headline--line-height: 1.2;
+  --text-headline--letter-spacing: -0.025em;
+  --text-display: 40px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.03em;
+  --text-measure: 15px;
+  --text-measure--line-height: 1.4;
+  --text-measure-sm: 13px;
+  --text-measure-sm--line-height: 1.4;
 }
 
 html {
@@ -124,8 +154,8 @@ body {
   background: var(--canvas);
   color: var(--fg);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'kern', 'liga', 'ss01';
@@ -179,8 +209,8 @@ a {
 
 .stamp {
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 1;
 }
@@ -246,6 +276,22 @@ a {
 
 [data-sonner-toaster] {
   font-family: var(--font-sans);
+  --width: 380px;
+}
+
+[data-sonner-toast] [data-title] {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+[data-sonner-toast] [data-description] {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+[data-sonner-toast] [data-button] {
+  font-size: 13px;
+  height: 28px;
 }
 
 [cmdk-root] {

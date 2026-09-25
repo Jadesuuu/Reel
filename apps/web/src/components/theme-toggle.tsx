@@ -25,14 +25,14 @@ export function ThemeToggle({ size = 'icon-sm' }: { size?: 'icon' | 'icon-sm' })
         aria-label={label}
         onClick={() => setTheme(isDark ? 'light' : 'dark')}
       >
-        <span className="relative block size-4">
+        <span className="relative block size-5">
           <Sun
-            className={`absolute inset-0 size-4 transition-[transform,opacity] duration-200 ease-out ${
+            className={`absolute inset-0 size-5 transition-[transform,opacity] duration-200 ease-out ${
               isDark ? 'scale-50 rotate-90 opacity-0' : 'scale-100 rotate-0 opacity-100'
             }`}
           />
           <Moon
-            className={`absolute inset-0 size-4 transition-[transform,opacity] duration-200 ease-out ${
+            className={`absolute inset-0 size-5 transition-[transform,opacity] duration-200 ease-out ${
               isDark ? 'scale-100 rotate-0 opacity-100' : 'scale-50 -rotate-90 opacity-0'
             }`}
           />

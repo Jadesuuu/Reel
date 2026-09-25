@@ -143,13 +143,13 @@ export function AddApplicationDialog({
                 onChange={(event) => set('via', event.target.value)}
               />
             </Field>
-            <div className="mt-1.5 flex flex-wrap gap-1">
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
               {VIA_SUGGESTIONS.map((item) => (
                 <button
                   key={item}
                   type="button"
                   onClick={() => set('via', item)}
-                  className={`rounded-sm border px-1.5 py-0.5 text-[11px] transition-colors ${
+                  className={`rounded-sm border px-1.5 py-0.5 text-fine transition-colors ${
                     form.via === item
                       ? 'border-accent bg-accent-soft text-accent'
                       : 'border-dashed border-line text-muted hover:border-line-strong hover:text-fg'
@@ -213,7 +213,7 @@ export function AddApplicationDialog({
           ) : (
             <button
               type="button"
-              className="text-xs text-accent hover:underline"
+              className="text-caption text-accent hover:underline"
               onClick={() => setMore(true)}
             >
               Add location, salary, contact, notes…

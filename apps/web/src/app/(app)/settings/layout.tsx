@@ -21,11 +21,8 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
         title="Settings"
         lede="Criteria drive the score. Sources drive what gets scored."
       />
-      <div className="grid gap-6 lg:grid-cols-[180px_1fr]">
-        <nav
-          aria-label="Settings"
-          className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0"
-        >
+      <div className="grid gap-8 lg:grid-cols-[210px_1fr]">
+        <nav aria-label="Settings" className="flex flex-wrap gap-1.5 lg:flex-col">
           {TABS.map((tab) => {
             const active = pathname.startsWith(tab.href);
             return (
@@ -34,12 +31,12 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'shrink-0 rounded-md px-3 py-2 text-[13px] transition-colors',
+                  'shrink-0 rounded-md px-4 py-2.5 text-body transition-colors',
                   active ? 'bg-surface-3 text-fg' : 'text-muted hover:bg-surface-2 hover:text-fg',
                 )}
               >
                 <span className="block">{tab.label}</span>
-                <span className="hidden text-[11px] text-faint lg:block">{tab.hint}</span>
+                <span className="hidden text-caption text-muted lg:block">{tab.hint}</span>
               </Link>
             );
           })}

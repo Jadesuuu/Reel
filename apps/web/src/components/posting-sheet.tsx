@@ -40,12 +40,12 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
         <div className="min-w-0">
           <div className="mb-1.5 flex items-center gap-2">
             <SourceBadge source={data.source} href={data.url} />
-            <span className="text-[11px] text-faint">{longDate(data.postedAt)}</span>
+            <span className="text-fine text-faint">{longDate(data.postedAt)}</span>
           </div>
-          <h2 className="truncate text-[17px] font-semibold tracking-tight text-fg">
+          <h2 className="truncate text-title font-semibold tracking-tight text-fg">
             {data.company ?? 'Unknown company'}
           </h2>
-          <p className="truncate text-sm text-muted">{data.role ?? 'Role not parsed'}</p>
+          <p className="truncate text-body text-muted">{data.role ?? 'Role not parsed'}</p>
         </div>
       }
       footer={
@@ -58,26 +58,26 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
               saver.save({ postingId: data.id, company: data.company, role: data.role })
             }
           >
-            <Plus className="size-4" /> Save to pipeline
+            <Plus className="size-5" /> Save to pipeline
           </Button>
           {applyHref ? (
             <Button asChild variant="outline" size="md">
               <a href={applyHref} target="_blank" rel="noreferrer noopener">
                 {hostOf(applyHref) ? `Apply on ${hostOf(applyHref)}` : 'Open apply link'}{' '}
-                <ExternalLink className="size-3.5" />
+                <ExternalLink className="size-4" />
               </a>
             </Button>
           ) : null}
         </div>
       }
     >
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-2">
         <Badge tone={data.remote === 'REMOTE' ? 'accent' : 'neutral'}>
           {remoteLabel(data.remote)}
         </Badge>
         {data.location ? (
           <Badge tone="outline">
-            <MapPin className="size-3" /> {data.location}
+            <MapPin className="size-4" /> {data.location}
           </Badge>
         ) : null}
         {data.salaryText ? <Badge tone="success">{data.salaryText}</Badge> : null}
@@ -86,7 +86,7 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
       {data.stackKeywords.length > 0 ? (
         <div className="mt-4">
           <div className="stamp mb-2 text-faint">Stack</div>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {data.stackKeywords.map((keyword) => (
               <Badge key={keyword} tone="outline">
                 {keyword}
@@ -98,12 +98,12 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
 
       <div className="mt-5 border-t border-line pt-4">
         <div className="stamp mb-2 text-faint">Posting</div>
-        {detail.isPending ? <RowsSkeleton rows={4} height="h-4" /> : null}
+        {detail.isPending ? <RowsSkeleton rows={4} height="h-5" /> : null}
         {detail.isError ? (
           <ErrorState message="Could not load the full posting." onRetry={() => detail.refetch()} />
         ) : null}
         {detail.data ? (
-          <pre className="max-w-[72ch] font-sans text-[13px] leading-relaxed whitespace-pre-wrap text-muted [&_a]:text-accent">
+          <pre className="max-w-[72ch] font-sans text-body-sm leading-relaxed whitespace-pre-wrap text-muted [&_a]:text-accent">
             {detail.data.rawText ?? detail.data.headline}
           </pre>
         ) : null}

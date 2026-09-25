@@ -36,7 +36,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               toastOptions={{
                 classNames: {
                   toast:
-                    '!bg-surface-2 !border !border-line !text-fg !shadow-lg !rounded-md !text-[13px]',
+                    '!bg-surface-2 !border !border-line !text-fg !shadow-lg !rounded-md !text-body-sm',
                   description: '!text-muted',
                   actionButton: '!bg-accent !text-accent-fg !font-medium',
                   cancelButton: '!bg-surface-3 !text-fg',

@@ -49,13 +49,13 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
       <section className="relative hidden overflow-hidden border-r border-line bg-surface lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="surface-noise pointer-events-none absolute inset-0" aria-hidden />
         <div className="relative">
-          <span className="font-mono text-[12px] tracking-[0.32em] text-accent uppercase">
+          <span className="font-mono text-caption tracking-[0.32em] text-accent uppercase">
             Reel
           </span>
-          <h2 className="mt-10 max-w-md text-[34px] leading-[1.1] font-semibold tracking-tight text-fg">
+          <h2 className="mt-10 max-w-md text-headline-lg font-semibold tracking-tight text-fg xl:text-display">
             Ten job sources read for you. Every posting scored. Nothing forgotten.
           </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
+          <p className="mt-5 max-w-md text-body leading-relaxed text-muted">
             The monthly Hacker News thread, six remote boards, and any company careers page you
             watch — parsed, scored against your criteria, and tracked from saved to offer with
             reminders that only fire when something has gone quiet.
@@ -73,19 +73,19 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
                 className="flex items-center gap-3 rounded-md border border-line bg-canvas/60 px-3.5 py-3"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-fg">{item.company}</p>
-                  <p className="truncate text-xs text-muted">{item.role}</p>
+                  <p className="truncate text-body font-medium text-fg">{item.company}</p>
+                  <p className="truncate text-caption text-muted">{item.role}</p>
                 </div>
-                <span className="tabular font-mono text-[11px] text-faint">{item.days}d</span>
+                <span className="tabular font-mono text-fine text-faint">{item.days}d</span>
                 <StageStamp stage={item.stage} />
               </motion.li>
             ))}
           </ul>
-          <div className="mt-6 flex flex-wrap gap-1.5">
+          <div className="mt-6 flex flex-wrap gap-2">
             {ACTIVE_STAGES.map((stage, index) => (
-              <span key={stage} className="flex items-center gap-1.5 text-[11px] text-faint">
+              <span key={stage} className="flex items-center gap-2 text-fine text-faint">
                 {STAGE_LABEL[stage]}
-                {index < ACTIVE_STAGES.length - 1 ? <ArrowRight className="size-3" /> : null}
+                {index < ACTIVE_STAGES.length - 1 ? <ArrowRight className="size-4" /> : null}
               </span>
             ))}
           </div>
@@ -94,7 +94,7 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
 
       <section className="flex flex-col px-5 py-8 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between lg:justify-end">
-          <span className="font-mono text-[12px] tracking-[0.32em] text-accent uppercase lg:hidden">
+          <span className="font-mono text-caption tracking-[0.32em] text-accent uppercase lg:hidden">
             Reel
           </span>
           <ThemeToggle />
@@ -102,10 +102,10 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
 
         <div className="flex flex-1 items-center">
           <div className="w-full max-w-sm">
-            <h1 className="text-[22px] font-semibold tracking-tight text-fg">
+            <h1 className="text-headline font-semibold tracking-tight text-fg">
               {isRegister ? 'Create your account' : 'Welcome back'}
             </h1>
-            <p className="mt-1 text-sm text-muted">
+            <p className="mt-1 text-body text-muted">
               {isRegister
                 ? 'One account, one pipeline. Your data never leaves your database.'
                 : 'Sign in to pick up where you left off.'}
@@ -150,7 +150,7 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
               {message ? (
                 <p
                   role="alert"
-                  className="rounded-md border border-danger/40 bg-danger-soft px-3 py-2 text-xs text-fg"
+                  className="rounded-md border border-danger/40 bg-danger-soft px-4 py-2 text-caption text-fg"
                 >
                   {message}
                 </p>
@@ -168,7 +168,7 @@ export function AuthForm({ mode, pending, error, onSubmit, extra }: AuthFormProp
               {extra}
             </form>
 
-            <p className="mt-6 text-xs text-muted">
+            <p className="mt-6 text-body-sm text-muted">
               {isRegister ? 'Already have an account? ' : 'No account yet? '}
               <Link
                 href={isRegister ? '/login' : '/register'}

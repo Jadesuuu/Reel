@@ -35,23 +35,23 @@ export function DemoBanner() {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-accent/30 bg-accent-soft px-4 py-1.5 text-xs text-fg md:px-6">
-      <span className="inline-flex items-center gap-1.5 font-medium">
-        <FlaskConical className="size-3.5 text-accent" /> Demo
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-accent/30 bg-accent-soft px-4 py-2 text-body-sm text-fg md:px-8">
+      <span className="inline-flex items-center gap-2 font-medium">
+        <FlaskConical className="size-4 text-accent" /> Demo
       </span>
-      <span className="text-muted">
+      <span className="hidden text-muted sm:inline">
         Synthetic data that lives in this browser. Nothing here is a real company or posting.
         {offset > 0 ? ` Clock is ${offset} days ahead.` : ''}
       </span>
-      <span className="ml-auto flex items-center gap-1">
+      <span className="ml-auto flex items-center gap-1.5">
         <Tip content="Advance the clock ten days so pending reminders fire and their emails appear">
           <Button size="xs" variant="ghost" onClick={forward}>
-            <FastForward className="size-3" /> Fast-forward 10 days
+            <FastForward className="size-4" /> Fast-forward 10 days
           </Button>
         </Tip>
         <Tip content="Restore the seeded data and sign out">
           <Button size="xs" variant="ghost" onClick={() => setConfirming(true)}>
-            <RotateCcw className="size-3" /> Reset
+            <RotateCcw className="size-4" /> Reset
           </Button>
         </Tip>
       </span>
