@@ -32,6 +32,16 @@ const STACK_SUGGESTIONS = [
   'python',
 ];
 const EXCLUDE_SUGGESTIONS = ['php', 'wordpress', 'principal', 'staff', 'unpaid', 'intern'];
+const REGION_SUGGESTIONS = [
+  'philippines',
+  'apac',
+  'asia',
+  'worldwide',
+  'anywhere',
+  'emea',
+  'eu',
+  'us',
+];
 
 const RULES = [
   { points: '+25', rule: 'the posting is remote' },
@@ -40,6 +50,7 @@ const RULES = [
   { points: '+10', rule: 'a USD salary was parsed' },
   { points: '+5', rule: 'there is an apply link' },
   { points: '0', rule: 'any exclude keyword hits, or the salary ceiling is under your minimum' },
+  { points: '0', rule: 'the posting names a region and none of yours appear' },
 ];
 
 export default function CriteriaPage() {
@@ -51,6 +62,7 @@ export default function CriteriaPage() {
   const [roleKeywords, setRoleKeywords] = useState<string[]>([]);
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [excludeKeywords, setExcludeKeywords] = useState<string[]>([]);
+  const [regionKeywords, setRegionKeywords] = useState<string[]>([]);
   const [minSalary, setMinSalary] = useState('');
   const [dirty, setDirty] = useState(false);
 
@@ -60,6 +72,7 @@ export default function CriteriaPage() {
       setRoleKeywords(criteria.data.roleKeywords);
       setIncludeKeywords(criteria.data.includeKeywords);
       setExcludeKeywords(criteria.data.excludeKeywords);
+      setRegionKeywords(criteria.data.regionKeywords);
       setMinSalary(criteria.data.minSalaryUsd === null ? '' : String(criteria.data.minSalaryUsd));
       setDirty(false);
     }
@@ -97,6 +110,7 @@ export default function CriteriaPage() {
                   roleKeywords,
                   includeKeywords,
                   excludeKeywords,
+                  regionKeywords,
                   minSalaryUsd: minSalary.trim() === '' ? null : Number(minSalary),
                 },
                 {
@@ -153,6 +167,14 @@ export default function CriteriaPage() {
               values={excludeKeywords}
               onChange={mark(setExcludeKeywords)}
               suggestions={EXCLUDE_SUGGESTIONS}
+            />
+
+            <TagInput
+              label="Where you can work"
+              hint="a posting naming another region scores zero; blank to ignore"
+              values={regionKeywords}
+              onChange={mark(setRegionKeywords)}
+              suggestions={REGION_SUGGESTIONS}
             />
 
             <Field

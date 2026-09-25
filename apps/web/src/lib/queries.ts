@@ -129,6 +129,7 @@ export type PostingFilters = {
   remote: string;
   source: Source | '';
   stack: string;
+  open: boolean;
   page: number;
 };
 
@@ -142,6 +143,7 @@ export function usePostings(filters: PostingFilters) {
           remote: filters.remote,
           source: filters.source,
           stack: filters.stack,
+          open: filters.open ? 'true' : undefined,
           page: filters.page,
           pageSize: 25,
         })}`,
@@ -298,6 +300,7 @@ export function useSaveCriteria() {
       roleKeywords: string[];
       includeKeywords: string[];
       excludeKeywords: string[];
+      regionKeywords: string[];
       minSalaryUsd?: number | null;
     }) => apiPut<Criteria>('/criteria', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['criteria'] }),

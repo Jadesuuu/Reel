@@ -11,6 +11,7 @@ const DEFAULT_CRITERIA: CriteriaForScoring = {
   roleKeywords: [],
   includeKeywords: [],
   excludeKeywords: [],
+  regionKeywords: [],
   minSalaryUsd: null,
 };
 
@@ -43,6 +44,7 @@ export class MatchingService {
           roleKeywords: found.roleKeywords,
           includeKeywords: found.includeKeywords,
           excludeKeywords: found.excludeKeywords,
+          regionKeywords: found.regionKeywords,
           minSalaryUsd: found.minSalaryUsd,
         }
       : DEFAULT_CRITERIA;
@@ -55,6 +57,7 @@ export class MatchingService {
       select: {
         id: true,
         headline: true,
+        location: true,
         remote: true,
         stackKeywords: true,
         salaryMinUsd: true,

@@ -1,7 +1,10 @@
+import { findRegionTerms, mentionsRegion, regionBasis } from './regions.js';
+
 export type RemoteType = 'REMOTE' | 'HYBRID' | 'ONSITE' | 'UNKNOWN';
 
 export type PostingForScoring = {
   headline: string;
+  location: string | null;
   remote: RemoteType;
   stackKeywords: string[];
   salaryMinUsd: number | null;
@@ -14,6 +17,7 @@ export type CriteriaForScoring = {
   roleKeywords: string[];
   includeKeywords: string[];
   excludeKeywords: string[];
+  regionKeywords: string[];
   minSalaryUsd: number | null;
 };
 
@@ -66,6 +70,19 @@ export function score(
   for (const keyword of criteria.excludeKeywords) {
     if (matchesAnywhere(keyword, posting.headline, posting.stackKeywords)) {
       return { score: 0, reasons: [`excluded:${keyword}`] };
+    }
+  }
+
+  if (criteria.regionKeywords.length > 0) {
+    const basis = regionBasis(posting.headline, posting.location);
+    const allowed = criteria.regionKeywords.some((keyword) =>
+      mentionsRegion(basis, keyword),
+    );
+    if (!allowed) {
+      const [term] = findRegionTerms(basis);
+      if (term !== undefined) {
+        return { score: 0, reasons: [`outside:${term}`] };
+      }
     }
   }
 

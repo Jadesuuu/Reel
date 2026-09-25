@@ -10,6 +10,7 @@ import type {
   WatchedBoard,
 } from '../lib/types';
 import { SOURCES } from '../lib/sources';
+import { findRegionTerms, regionBasis } from './regions';
 import { score, MATCH_THRESHOLD } from './scoring';
 import type { DemoState, StoredMatch } from './store';
 
@@ -1029,6 +1030,7 @@ function buildPosting(
     remote: seed.remote,
     ...s,
     stackKeywords: seed.stack,
+    regionTerms: findRegionTerms(regionBasis(headline, seed.location)),
     headline,
     fingerprint: `${slug(seed.company)}|${slug(seed.role)}`,
     createdAt: new Date(postedAt.getTime() + createdAtOffsetMs).toISOString(),
@@ -1253,6 +1255,7 @@ export function buildSeed(now: Date): DemoState {
     roleKeywords: ['full stack', 'fullstack', 'full-stack', 'software engineer', 'backend'],
     includeKeywords: ['typescript', 'node', 'react', 'nestjs', 'next.js', 'postgres', 'aws'],
     excludeKeywords: ['php', 'wordpress', 'principal', 'staff'],
+    regionKeywords: ['philippines', 'apac', 'asia', 'worldwide', 'anywhere'],
     minSalaryUsd: null,
   };
 

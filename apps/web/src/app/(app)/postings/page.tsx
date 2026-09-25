@@ -43,17 +43,18 @@ export default function PostingsPage() {
   const [remote, setRemote] = useState('');
   const [source, setSource] = useState<Source | ''>('');
   const [stack, setStack] = useState('');
+  const [open, setOpen] = useState(true);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<PostingSummary | null>(null);
 
   const q = useDebounced(search.trim());
-  const postings = usePostings({ q, remote, source, stack, page });
+  const postings = usePostings({ q, remote, source, stack, open, page });
   const stats = usePostingStats();
   const saver = useSavePosting();
 
   useEffect(() => {
     setPage(1);
-  }, [q, remote, source, stack]);
+  }, [q, remote, source, stack, open]);
 
   const sourceOptions = [
     {
@@ -112,6 +113,15 @@ export default function PostingsPage() {
           value={remote}
           onValueChange={setRemote}
           options={REMOTE_OPTIONS}
+        />
+        <Segmented
+          ariaLabel="Regions"
+          value={open ? 'open' : 'all'}
+          onValueChange={(value) => setOpen(value === 'open')}
+          options={[
+            { value: 'open', label: 'Open to me' },
+            { value: 'all', label: 'Everywhere' },
+          ]}
         />
         {stack ? (
           <Badge tone="accent" className="h-8 gap-2 px-2 text-caption">

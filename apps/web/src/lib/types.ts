@@ -30,6 +30,7 @@ export type Criteria = {
   roleKeywords: string[];
   includeKeywords: string[];
   excludeKeywords: string[];
+  regionKeywords: string[];
   minSalaryUsd: number | null;
 };
 
@@ -45,6 +46,7 @@ export type PostingSummary = {
   salaryMinUsd: number | null;
   salaryMaxUsd: number | null;
   stackKeywords: string[];
+  regionTerms: string[];
   applyUrl: string | null;
   headline: string;
   postedAt: string;
