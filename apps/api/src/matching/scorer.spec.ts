@@ -10,6 +10,7 @@ function posting(
 ): PostingForScoring {
   return {
     headline: 'Acme | Full Stack Engineer | Remote',
+    location: null,
     remote: 'REMOTE',
     stackKeywords: [],
     salaryMinUsd: null,
@@ -27,6 +28,7 @@ function criteria(
     roleKeywords: [],
     includeKeywords: [],
     excludeKeywords: [],
+    regionKeywords: [],
     minSalaryUsd: null,
     ...overrides,
   };
@@ -55,6 +57,47 @@ describe('score', () => {
       criteria({ excludeKeywords: ['wordpress'] }),
     );
     expect(result).toEqual({ score: 0, reasons: ['excluded:wordpress'] });
+  });
+
+  it('rejects a posting limited to a region outside the user regions', () => {
+    const result = score(
+      posting({ headline: 'Acme | Full Stack Engineer | Remote (US only)' }),
+      criteria({ regionKeywords: ['philippines', 'worldwide'] }),
+    );
+    expect(result).toEqual({ score: 0, reasons: ['outside:us'] });
+  });
+
+  it('reads the location field as well as the headline for regions', () => {
+    const result = score(
+      posting({ location: 'Remote (EU)' }),
+      criteria({ regionKeywords: ['philippines'] }),
+    );
+    expect(result).toEqual({ score: 0, reasons: ['outside:eu'] });
+  });
+
+  it('keeps a posting that names one of the user regions', () => {
+    const result = score(
+      posting({ location: 'Remote (US, Philippines, Singapore)' }),
+      criteria({ regionKeywords: ['philippines'] }),
+    );
+    expect(result.score).toBe(25);
+    expect(result.reasons).toEqual(['remote']);
+  });
+
+  it('keeps a posting that names no region at all', () => {
+    const result = score(
+      posting(),
+      criteria({ regionKeywords: ['philippines'] }),
+    );
+    expect(result.reasons).toEqual(['remote']);
+  });
+
+  it('ignores regions entirely when the user has none', () => {
+    const result = score(
+      posting({ location: 'Remote (US)' }),
+      criteria({ regionKeywords: [] }),
+    );
+    expect(result.reasons).toEqual(['remote']);
   });
 
   it('awards 25 for a remote posting', () => {

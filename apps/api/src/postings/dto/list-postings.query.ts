@@ -1,4 +1,12 @@
-import { IsEnum, IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination.query.js';
 import { SOURCES, type Source } from '../../sources/source.types.js';
 
@@ -32,4 +40,9 @@ export class ListPostingsQueryDto extends PaginationQueryDto {
   @IsString()
   @MaxLength(40)
   stack?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  open?: boolean;
 }

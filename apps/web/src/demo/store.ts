@@ -72,7 +72,10 @@ export function getState(): DemoState {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as DemoState;
-        if (parsed.version === 1) {
+        const complete =
+          Array.isArray(parsed.criteria?.regionKeywords) &&
+          parsed.postings?.every((posting) => Array.isArray(posting.regionTerms));
+        if (parsed.version === 1 && complete) {
           state = parsed;
           setClockOffset(parsed.clockOffsetMs);
           return state;

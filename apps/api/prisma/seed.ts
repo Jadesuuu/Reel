@@ -40,6 +40,7 @@ async function main(): Promise<void> {
         'aws',
       ],
       excludeKeywords: ['php', 'wordpress', 'principal', 'staff'],
+      regionKeywords: ['philippines', 'apac', 'asia', 'worldwide', 'anywhere'],
     },
   });
 

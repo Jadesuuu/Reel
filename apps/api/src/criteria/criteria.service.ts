@@ -9,6 +9,7 @@ const DEFAULTS = {
   roleKeywords: [] as string[],
   includeKeywords: [] as string[],
   excludeKeywords: [] as string[],
+  regionKeywords: [] as string[],
   minSalaryUsd: null as number | null,
 };
 
@@ -27,6 +28,7 @@ export class CriteriaService {
       roleKeywords: normalizeKeywords(dto.roleKeywords),
       includeKeywords: normalizeKeywords(dto.includeKeywords),
       excludeKeywords: normalizeKeywords(dto.excludeKeywords),
+      regionKeywords: normalizeKeywords(dto.regionKeywords ?? []),
       minSalaryUsd: dto.minSalaryUsd ?? null,
     };
     return this.prisma.criteria.upsert({

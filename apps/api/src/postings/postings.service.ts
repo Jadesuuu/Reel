@@ -19,6 +19,7 @@ const LIST_SELECT = {
   salaryMinUsd: true,
   salaryMaxUsd: true,
   stackKeywords: true,
+  regionTerms: true,
   applyUrl: true,
   url: true,
   headline: true,
@@ -45,10 +46,13 @@ export class PostingsService {
 
   async list(
     query: ListPostingsQueryDto,
+    userId: string,
   ): Promise<Paginated<Record<string, unknown>>> {
-    const { page, pageSize, q, remote, source, boardId, stack } = query;
+    const { page, pageSize, q, remote, source, boardId, stack, open } = query;
+    const regionFilter = open ? await this.openToRegions(userId) : {};
 
     const where = {
+      ...regionFilter,
       ...(remote ? { remote } : {}),
       ...(source ? { source } : {}),
       ...(boardId ? { boardId } : {}),
@@ -75,6 +79,27 @@ export class PostingsService {
     ]);
 
     return paginate(items, page, pageSize, total);
+  }
+
+  private async openToRegions(userId: string) {
+    const criteria = await this.prisma.criteria.findUnique({
+      where: { userId },
+      select: { regionKeywords: true },
+    });
+    const keywords = criteria?.regionKeywords ?? [];
+    if (keywords.length === 0) {
+      return {};
+    }
+    const mentions = keywords.flatMap((keyword) => {
+      const short = keyword.length <= 3;
+      const needle = short ? keyword.toUpperCase() : keyword;
+      const mode = short ? undefined : ('insensitive' as const);
+      return [
+        { headline: { contains: needle, mode } },
+        { location: { contains: needle, mode } },
+      ];
+    });
+    return { OR: [{ regionTerms: { isEmpty: true } }, ...mentions] };
   }
 
   async findOne(id: string): Promise<Record<string, unknown>> {
@@ -143,6 +168,7 @@ export class PostingsService {
         salaryMinUsd: item.salaryMinUsd,
         salaryMaxUsd: item.salaryMaxUsd,
         stackKeywords: item.stackKeywords,
+        regionTerms: item.regionTerms,
         applyUrl: item.applyUrl,
         url: item.url,
         rawHtml: item.rawHtml,

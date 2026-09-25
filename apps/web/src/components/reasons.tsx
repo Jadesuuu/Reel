@@ -38,6 +38,14 @@ export function explainReason(reason: string): { label: string; points: string; 
       detail: 'An exclude keyword matched, so the posting scores zero.',
     };
   }
+  if (reason.startsWith('outside:')) {
+    const term = reason.slice(8);
+    return {
+      label: `outside · ${term}`,
+      points: '0',
+      detail: `The posting is limited to “${term}” and none of your regions appear, so it scores zero.`,
+    };
+  }
   if (reason === 'below-min-salary') {
     return {
       label: 'below minimum',

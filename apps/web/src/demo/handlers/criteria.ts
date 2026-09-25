@@ -32,6 +32,7 @@ route('PUT', '/criteria', ({ body }) => {
       roleKeywords: normalizeKeywords(body.roleKeywords),
       includeKeywords: normalizeKeywords(body.includeKeywords),
       excludeKeywords: normalizeKeywords(body.excludeKeywords),
+      regionKeywords: normalizeKeywords(body.regionKeywords),
       minSalaryUsd: typeof minSalary === 'number' ? minSalary : null,
     };
     return draft.criteria;

@@ -36,6 +36,13 @@ export class UpsertCriteriaDto {
   excludeKeywords!: string[];
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMaxSize(50)
+  @Transform(({ value }) => toStringArray(value))
+  regionKeywords?: string[];
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   minSalaryUsd?: number;

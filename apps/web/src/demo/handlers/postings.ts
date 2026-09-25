@@ -1,3 +1,4 @@
+import { mentionsRegion } from '../regions';
 import type { Posting } from '../../lib/types';
 import { notFound, paginate, requireSignedIn, route } from '../router';
 import { getState } from '../store';
@@ -15,8 +16,18 @@ route('GET', '/postings', ({ query }) => {
   const source = query.get('source');
   const boardId = query.get('boardId');
   const stack = (query.get('stack') ?? '').trim().toLowerCase();
+  const open = query.get('open') === 'true';
+  const regions = open ? state.criteria.regionKeywords : [];
 
   const items = state.postings
+    .filter(
+      (posting) =>
+        regions.length === 0 ||
+        posting.regionTerms.length === 0 ||
+        regions.some((keyword) =>
+          mentionsRegion(`${posting.headline} ${posting.location ?? ''}`, keyword),
+        ),
+    )
     .filter((posting) => !remote || posting.remote === remote)
     .filter((posting) => !source || posting.source === source)
     .filter((posting) => !boardId || posting.boardId === boardId)

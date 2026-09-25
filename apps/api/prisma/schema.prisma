@@ -74,6 +74,7 @@ model Criteria {
   roleKeywords    String[] @default([]) @map("role_keywords")
   includeKeywords String[] @default([]) @map("include_keywords")
   excludeKeywords String[] @default([]) @map("exclude_keywords")
+  regionKeywords  String[] @default([]) @map("region_keywords")
   minSalaryUsd    Int?     @map("min_salary_usd")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -114,6 +115,7 @@ model Posting {
   salaryMinUsd  Int?       @map("salary_min_usd")
   salaryMaxUsd  Int?       @map("salary_max_usd")
   stackKeywords String[]   @default([]) @map("stack_keywords")
+  regionTerms   String[]   @default([]) @map("region_terms")
   applyUrl      String?    @map("apply_url")
   url           String?
 

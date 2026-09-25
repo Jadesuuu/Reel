@@ -621,6 +621,7 @@ function score(posting: PostingForScoring, criteria: CriteriaForScoring): { scor
 
 1. If `criteria.remoteOnly && posting.remote !== 'REMOTE'` → return `{ score: 0, reasons: ['not-remote'] }`. Stop.
 2. If any `excludeKeywords` entry appears (word-boundary, case-insensitive) in `headline` or `stackKeywords` → return `{ score: 0, reasons: ['excluded:<kw>'] }`. Stop.
+   2b. (Step 21) If `regionKeywords` is non-empty and no entry appears in `headline + location` but a `REGION_TERMS` entry does → return `{ score: 0, reasons: ['outside:<term>'] }`. Stop.
 3. Start `score = 0`, `reasons = []`.
 4. `+25` and `reasons.push('remote')` if `posting.remote === 'REMOTE'`.
 5. `+30` and `reasons.push('role:<kw>')` for the **first** `roleKeywords` entry found in `headline` (only once).
@@ -1643,6 +1644,53 @@ this step keeps the ink-and-brass world and the notebook structure and replaces 
 **Done when:** no arbitrary `text-[Npx]` utility remains in `apps/web/src`; every page at 1440
 and 390 reads without zooming; the gate is green; `DESIGN.md` and `.impeccable/design.json`
 record the new ramp; README screenshots are retaken from the demo build.
+
+---
+
+### Step 21 — Where you can work
+
+**Branch:** `feat/regions`
+**Commit:** `feat: region criteria so postings outside your regions score zero and can be filtered out`
+
+**Why.** Reel knows whether a posting is remote but not where the remote worker may live.
+"Remote (US only)" scored the same +25 as "Remote (worldwide)", and the exclude keywords never
+looked at the location. For someone applying from the Philippines that is most of the inbox.
+
+**Decisions:**
+
+- Criteria gain `regionKeywords: string[]`, shown as "Where you can work" (for Jade:
+  `philippines, apac, asia, worldwide, anywhere`). Empty means "do not care", like
+  `remoteOnly: false`.
+- Scoring rule 2b, after the exclude check: when `regionKeywords` is non-empty, take
+  `headline + " " + location`. If any region keyword appears, continue. Otherwise, if any term
+  from the built-in `REGION_TERMS` vocabulary (countries, continents, trade regions, US and EU
+  time-zone abbreviations) appears, return `{ score: 0, reasons: ['outside:<term>'] }`. A posting
+  that names no region at all is left alone; silence is not a restriction.
+- Matching is word-bounded. Terms of three letters or fewer (`us`, `uk`, `eu`, `est`) match
+  only as uppercase words, so "join us" and "bonus" never count; longer terms are
+  case-insensitive. User keywords follow the same rule.
+- `Posting.regionTerms: string[]` is computed by `normalizePosting` from the same basis so the
+  postings list can filter in SQL. `GET /postings?open=true` keeps rows whose `regionTerms` is
+  empty or whose headline or location contains one of the caller's region keywords. Rows
+  ingested before this step have an empty `regionTerms` until their next upsert; the HN thread
+  is re-read every run, feeds refresh their recent items, and the inbox never depends on the
+  column because the scorer reads the text.
+- The vocabulary lives in one file (`apps/api/src/matching/regions.ts`) and is copied into
+  the demo (`apps/web/src/demo/regions.ts`) the same way the scorer is.
+
+**Contract (adds to 11.3):**
+
+| Method | Path | Change |
+|---|---|---|
+| PUT | `/criteria` | body adds `regionKeywords?: string[]` (normalised like the other lists; missing means `[]`). `GET` returns it. |
+| GET | `/postings` | adds `open?: boolean`; `true` applies the caller's region keywords as above. |
+
+**Schema (migration `v3_regions`):** `postings.region_terms text[] default '{}'`,
+`criteria.region_keywords text[] default '{}'`.
+
+**Done when:** `score` has fixture tests for open, outside and silent postings; the Postings
+page has an "Open to me / Everywhere" toggle; the criteria page has the new list with the rule
+printed beside it; inbox chips read `outside · us`; demo mode does the same; the gate is green.
 
 ---
 
