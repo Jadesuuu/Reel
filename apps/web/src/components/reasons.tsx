@@ -72,7 +72,7 @@ export function ReasonChips({
               </span>
             }
           >
-            <Badge tone={reason.startsWith('role:') ? 'accent' : 'neutral'} className="cursor-help">
+            <Badge tone="neutral" className="cursor-help">
               {info.label}
             </Badge>
           </Tip>

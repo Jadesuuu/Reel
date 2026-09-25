@@ -101,7 +101,7 @@ function MatchRow({
 
         <div className="col-span-3 mt-2.5 flex flex-wrap items-center gap-2 sm:col-span-1 sm:col-start-2">
           <SourceBadge source={posting.source} />
-          {posting.salaryText ? <Badge tone="success">{posting.salaryText}</Badge> : null}
+          {posting.salaryText ? <Badge tone="neutral">{posting.salaryText}</Badge> : null}
           <ReasonChips reasons={match.reasons} limit={focused ? 8 : 3} />
           <span className="ml-auto text-caption text-muted">{relativeDays(posting.postedAt)}</span>
         </div>

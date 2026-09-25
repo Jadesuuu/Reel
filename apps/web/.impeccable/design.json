@@ -8,26 +8,26 @@
       "attribute": "data-theme",
       "note": "Frontmatter colors are the dark (default) theme. Light values apply under [data-theme='light']; every role is preserved.",
       "light": {
-        "canvas": "#f3f0e9",
-        "surface": "#faf8f3",
-        "surface-2": "#f0ece3",
-        "surface-3": "#e7e2d7",
-        "line": "#d9d3c6",
-        "line-strong": "#c2baa9",
+        "canvas": "#ece8df",
+        "surface": "#fbfaf6",
+        "surface-2": "#f1ede4",
+        "surface-3": "#e4dfd3",
+        "line": "#cfc8b9",
+        "line-strong": "#aea695",
         "fg": "#1b1a17",
         "fg-muted": "#4a463f",
         "fg-faint": "#6a655e",
         "accent": "#75582a",
         "accent-strong": "#5c4520",
         "accent-soft": "rgba(117, 88, 42, 0.12)",
-        "accent-fg": "#faf8f3",
+        "accent-fg": "#fbfaf6",
         "danger": "#a8443c",
         "danger-soft": "rgba(168, 68, 60, 0.12)",
         "success": "#3f7a3d",
         "success-soft": "rgba(63, 122, 61, 0.12)",
         "info": "#35618a",
         "info-soft": "rgba(53, 97, 138, 0.12)",
-        "warning": "#9a6a1f",
+        "warning": "#b4521a",
         "stage-saved": "#4a463f",
         "stage-applied": "#75582a",
         "stage-interviewing": "#35618a",
@@ -40,8 +40,8 @@
       "canvas": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "oklch(13.5% 0.005 286)",
-        "light": "#f3f0e9",
+        "canonical": "oklch(14.1% 0.004 286)",
+        "light": "#ece8df",
         "tonalRamp": [
           "#0b0b0d",
           "#212124",
@@ -56,8 +56,8 @@
       "surface": {
         "role": "neutral",
         "displayName": "Page",
-        "canonical": "oklch(15.6% 0.006 286)",
-        "light": "#faf8f3",
+        "canonical": "oklch(19.3% 0.008 286)",
+        "light": "#fbfaf6",
         "tonalRamp": [
           "#0b0b0e",
           "#212125",
@@ -72,8 +72,8 @@
       "surface-2": {
         "role": "neutral",
         "displayName": "Page, raised",
-        "canonical": "oklch(18.4% 0.008 286)",
-        "light": "#f0ece3",
+        "canonical": "oklch(22.9% 0.010 286)",
+        "light": "#f1ede4",
         "tonalRamp": [
           "#0b0b0e",
           "#212125",
@@ -88,8 +88,8 @@
       "surface-3": {
         "role": "neutral",
         "displayName": "Page, current",
-        "canonical": "oklch(21.1% 0.010 286)",
-        "light": "#e7e2d7",
+        "canonical": "oklch(27.1% 0.011 286)",
+        "light": "#e4dfd3",
         "tonalRamp": [
           "#0b0b0f",
           "#212126",
@@ -104,8 +104,8 @@
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
-        "canonical": "oklch(25.5% 0.015 285)",
-        "light": "#d9d3c6",
+        "canonical": "oklch(32.9% 0.016 285)",
+        "light": "#cfc8b9",
         "tonalRamp": [
           "#0a0a11",
           "#212129",
@@ -120,8 +120,8 @@
       "line-strong": {
         "role": "neutral",
         "displayName": "Hairline, hover",
-        "canonical": "oklch(32.5% 0.018 285)",
-        "light": "#c2baa9",
+        "canonical": "oklch(41.3% 0.018 286)",
+        "light": "#aea695",
         "tonalRamp": [
           "#0a0a12",
           "#21212a",
@@ -222,8 +222,8 @@
       "accent-fg": {
         "role": "primary",
         "displayName": "Ink on brass",
-        "canonical": "oklch(15.6% 0.006 286)",
-        "light": "#faf8f3"
+        "canonical": "oklch(19.3% 0.008 286)",
+        "light": "#fbfaf6"
       },
       "danger": {
         "role": "semantic",
@@ -294,8 +294,8 @@
       "warning": {
         "role": "semantic",
         "displayName": "Amber",
-        "canonical": "oklch(76.4% 0.096 71)",
-        "light": "#9a6a1f",
+        "canonical": "oklch(71.6% 0.143 56)",
+        "light": "#b4521a",
         "tonalRamp": [
           "#210000",
           "#3c1500",

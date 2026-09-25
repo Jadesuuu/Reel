@@ -89,6 +89,27 @@ Left open on purpose: the inbox's "Save to pipeline" button is disabled for a po
 already in the pipeline and says nothing about why. Turning it into an "In pipeline" link is a
 behaviour change, not a readability one.
 
+## The colour pass
+
+A second look at the palette after the type change found that the colours were fine and the
+dosing was not. Three changes, all in `globals.css` tokens plus two chip call sites:
+
+- **The ink ramp is wider.** The four dark grounds used to be two to four units apart
+  (`#08080a` to `#18181d`) with hairlines at `#22222a`, which is invisible on a dim laptop. Now
+  canvas `#09090b`, surface `#141418`, surface-2 `#1c1c21`, surface-3 `#26262c`, hairline
+  `#34343d`, strong hairline `#4a4a55`. Panels separate from the page without a shadow. The light
+  theme was widened the same way (canvas `#ece8df`, surface `#fbfaf6`).
+- **Warning left the brass hue.** It was `#d9a86c`, six units from the accent, so an overdue
+  day-count on a card read as a highlight. It is burnt orange now (`#e6893f` dark, `#b4521a`
+  light) and only two places use it: the stale day-count and "Unsaved changes".
+- **One brass per inbox row.** The score badge keeps it. The `role:` reason chip and the salary
+  chip were accent and success tints; both are neutral now, and their meaning is in the tooltip
+  they already had. `reasons.tsx` no longer branches on the reason prefix.
+
+WCAG ratios barely move for near-black steps (the formula compresses at the dark end), so the
+numbers in `docs/PLAN.md` Step 20 are the values, not ratios; judge the ramp by eye in
+`docs/screenshots/dashboard-desktop.png`.
+
 ## Gotchas
 
 - `size-3.5` and `size-3` both became `size-4`. Two icon sizes that used to differ by 2px now

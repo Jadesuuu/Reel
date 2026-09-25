@@ -2,12 +2,12 @@
 name: Reel
 description: A working notebook for a job search — ink grounds, one brass accent, hairline rules, monospace measurement.
 colors:
-  canvas: '#08080a'
-  surface: '#0c0c0f'
-  surface-2: '#121216'
-  surface-3: '#18181d'
-  line: '#22222a'
-  line-strong: '#33333d'
+  canvas: '#09090b'
+  surface: '#141418'
+  surface-2: '#1c1c21'
+  surface-3: '#26262c'
+  line: '#34343d'
+  line-strong: '#4a4a55'
   fg: '#ece9e4'
   fg-muted: '#c2bcb3'
   fg-faint: '#9c968d'
@@ -21,7 +21,7 @@ colors:
   success-soft: 'rgba(127, 178, 122, 0.14)'
   info: '#8ab4d8'
   info-soft: 'rgba(138, 180, 216, 0.14)'
-  warning: '#d9a86c'
+  warning: '#e6893f'
   stage-saved: '#c2bcb3'
   stage-applied: '#c9a56e'
   stage-interviewing: '#8ab4d8'
@@ -347,7 +347,7 @@ A near-monochrome ink ground with a muted brass accent and four semantic tones, 
 - **Danger** (`danger`, `danger-soft`): the danger button, error banners (40% border on the soft tint), destructive menu items, the illegal drop target, failed source runs, the REJECTED stage.
 - **Success** (`success`, `success-soft`): healthy source runs, the OFFER stage, salary badges in the inbox.
 - **Info** (`info`, `info-soft`): running source runs, next-step dates on cards, the INTERVIEWING stage, the second radial in `surface-noise`.
-- **Warning** (`warning`): a stale application's day-count (APPLIED for 7+ days). A `warning-soft` tint is declared but nothing uses it; warning is never a fill.
+- **Warning** (`warning`): a burnt orange, deliberately far from the brass hue so a nag never reads as a highlight; a stale application's day-count (APPLIED for 7+ days) and the "Unsaved changes" note. A `warning-soft` tint is declared but nothing uses it; warning is never a fill.
 
 ### Stage tones
 
@@ -442,7 +442,7 @@ Borders are 1px hairlines in `line` at rest and `line-strong` on hover. Dashed h
 ### Chips
 
 - **Badge:** mono 13px, 4px corners, 4px × 8px padding, 1px border, 6px internal gap. Tones: neutral (surface-2, muted text, `line` border), outline (transparent), accent / success / danger / info (soft tint, 40% tone border, tone text), solid (ink fill, canvas text). An active filter chip stretches to 32px tall with 14px text.
-- **Reason chips:** a `role:` reason is an accent badge; every other reason is neutral; overflow is an outline badge reading `+n`. Each carries a tooltip with the mono point value and a one-sentence rule.
+- **Reason chips:** every reason is a neutral badge, including `role:`, so the score badge is the only brass in an inbox row; overflow is an outline badge reading `+n`. Each carries a tooltip with the mono point value and a one-sentence rule.
 - **Score badge:** mono 15px 500, tabular, 36px tall, min 48px wide, 4px corners. 80 and above is a solid brass fill with ink text; 60–79 is brass text on the brass tint with a 50% brass border; below 60 is muted on surface-2.
 
 ### Stage stamp

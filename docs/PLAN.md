@@ -1632,6 +1632,13 @@ this step keeps the ink-and-brass world and the notebook structure and replaces 
   reserved for genuinely tertiary text (timestamps, hints, kbd).
 - Sentences never use the stamp token. Mono letterspaced caps are for stage names, sources,
   kbd, group labels and the wordmark; a hint like "Sent, waiting to hear back" is a caption.
+- The ink ramp is wide enough to see: canvas `#09090b`, surface `#141418`, surface-2 `#1c1c21`,
+  surface-3 `#26262c`, hairline `#34343d`, strong hairline `#4a4a55` (light theme widened the
+  same way). The old steps were two to four units apart and vanished on a dim laptop.
+- Warning is burnt orange (`#e6893f` / `#b4521a`), not a second brass; a stale day-count must
+  not look like a highlight.
+- One brass per inbox row: the score badge. Reason and salary chips are neutral; their meaning
+  lives in the tooltip.
 
 **Done when:** no arbitrary `text-[Npx]` utility remains in `apps/web/src`; every page at 1440
 and 390 reads without zooming; the gate is green; `DESIGN.md` and `.impeccable/design.json`
