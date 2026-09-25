@@ -7,6 +7,7 @@ export type SourceMeta = {
   homepage: string;
   attribution: string | null;
   defaultBoardId: string | null;
+  feedBoards?: string[];
 };
 
 export const SOURCE_META: Record<Source, SourceMeta> = {
@@ -66,6 +67,12 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
     homepage: 'https://weworkremotely.com/categories/remote-programming-jobs',
     attribution: 'Jobs from the We Work Remotely RSS feed',
     defaultBoardId: 'remote-programming-jobs',
+    feedBoards: [
+      'remote-programming-jobs',
+      'remote-full-stack-programming-jobs',
+      'remote-back-end-programming-jobs',
+      'remote-devops-sysadmin-jobs',
+    ],
   },
   GREENHOUSE: {
     source: 'GREENHOUSE',
@@ -88,6 +95,54 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
     label: 'Ashby',
     kind: 'board',
     homepage: 'https://jobs.ashbyhq.com',
+    attribution: null,
+    defaultBoardId: null,
+  },
+  WORKINGNOMADS: {
+    source: 'WORKINGNOMADS',
+    label: 'Working Nomads',
+    kind: 'feed',
+    homepage: 'https://www.workingnomads.com/jobs',
+    attribution: 'Jobs from the Working Nomads public API',
+    defaultBoardId: 'development',
+  },
+  LANDINGJOBS: {
+    source: 'LANDINGJOBS',
+    label: 'Landing.jobs',
+    kind: 'feed',
+    homepage: 'https://landing.jobs/jobs',
+    attribution: 'Jobs from the Landing.jobs public API',
+    defaultBoardId: 'all',
+  },
+  THEMUSE: {
+    source: 'THEMUSE',
+    label: 'The Muse',
+    kind: 'feed',
+    homepage: 'https://www.themuse.com/jobs',
+    attribution: 'Jobs from The Muse public API',
+    defaultBoardId: 'software-engineering',
+  },
+  JOBSPRESSO: {
+    source: 'JOBSPRESSO',
+    label: 'Jobspresso',
+    kind: 'feed',
+    homepage: 'https://jobspresso.co/remote-work/',
+    attribution: 'Jobs from the Jobspresso RSS feed',
+    defaultBoardId: 'all',
+  },
+  WORKABLE: {
+    source: 'WORKABLE',
+    label: 'Workable',
+    kind: 'board',
+    homepage: 'https://apply.workable.com',
+    attribution: null,
+    defaultBoardId: null,
+  },
+  SMARTRECRUITERS: {
+    source: 'SMARTRECRUITERS',
+    label: 'SmartRecruiters',
+    kind: 'board',
+    homepage: 'https://jobs.smartrecruiters.com',
     attribution: null,
     defaultBoardId: null,
   },

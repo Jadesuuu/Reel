@@ -53,6 +53,47 @@ export async function fetchText(
   return response.text();
 }
 
+export async function postJson<T>(
+  url: string,
+  body: unknown,
+  options: { timeoutMs?: number } = {},
+): Promise<T> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(options.timeoutMs ?? FETCH_TIMEOUT_MS),
+  });
+  if (!response.ok) {
+    throw new HttpError(response.status, url);
+  }
+  return (await response.json()) as T;
+}
+
+export async function mapLimit<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array<R>(items.length);
+  let next = 0;
+  async function run(): Promise<void> {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      results[index] = await worker(items[index] as T);
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, () => run()),
+  );
+  return results;
+}
+
 export function isNotFound(error: unknown): boolean {
   return error instanceof HttpError && error.status === 404;
 }

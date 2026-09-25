@@ -1,6 +1,6 @@
 # Reel
 
-**A job-hunt tracker that does the boring part for you.** Reel reads ten public job sources on
+**A job-hunt tracker that does the boring part for you.** Reel reads sixteen public job sources on
 a schedule, scores every posting against criteria you set, and tracks each application from saved
 to offer with reminders that only fire when something has gone quiet.
 
@@ -19,9 +19,10 @@ you forgot.
 
 ## What it does
 
-**Ten sources, one inbox.** Hacker News "Who is hiring?", Remotive, Remote OK, Arbeitnow,
-Himalayas, Jobicy and We Work Remotely as feeds, plus any company careers page on Greenhouse,
-Lever or Ashby that you watch. Every posting is parsed into the same shape and scored against
+**Sixteen sources, one inbox.** Hacker News "Who is hiring?", Remotive, Remote OK, Arbeitnow,
+Himalayas, Jobicy, We Work Remotely (four categories), Working Nomads, Landing.jobs, The Muse
+and Jobspresso as feeds, plus any company careers page on Greenhouse, Lever, Ashby, Workable or
+SmartRecruiters that you watch. Every posting is parsed into the same shape and scored against
 your criteria. The score is the sum of the chips beside it — `remote`, `role · full stack`,
 `typescript` — and the rules are plain arithmetic you can read in the settings.
 
@@ -50,7 +51,7 @@ flowchart LR
   API -->|enqueue| R[(Redis / BullMQ)]
   W[Worker process<br/>same image] -->|consume| R
   W --> PG
-  W -->|HTTP| S[Ten job sources<br/>JSON + RSS]
+  W -->|HTTP| S[Sixteen job sources<br/>JSON + RSS]
   W -->|send| M[Resend]
 ```
 
@@ -105,7 +106,7 @@ rows; a single-user tool does not need rotation.
 | Unit  | Vitest                                             | 125 across 14 files |
 | E2E   | Vitest + supertest against real Postgres and Redis | 47 across 7 files   |
 
-Pure logic — the parser, the ten adapter mappers, the normaliser, the scorer, the stage machine,
+Pure logic — the parser, the sixteen adapter mappers, the normaliser, the scorer, the stage machine,
 the stats summary — is tested without Nest. Services are tested with mocked Prisma and queues.
 HTTP is tested end to end through the same middleware as production, so a mistake in helmet or
 cookie parsing fails a test instead of shipping. CI runs lint → format → typecheck → build →

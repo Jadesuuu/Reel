@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:job_listing="https://jobspresso.co"
+>
+
+<channel>
+	<title>Jobs Archive | Jobspresso</title>
+	<atom:link href="https://jobspresso.co/?feed=job_feed" rel="self" type="application/rss+xml" />
+	<link>https://jobspresso.co</link>
+	<description>Jobspresso is the easiest way to find remote jobs and careers at interesting and innovative companies.</description>
+	<lastBuildDate>Sat, 29 Aug 2026 02:13:20 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.1.2</generator>
+<site xmlns="com-wordpress:feed-additions:1">88453655</site>	<item>
+		<title>Senior Full Stack Engineer, Realtime &#038; Voice</title>
+		<link>https://jobspresso.co/job/senior-full-stack-engineer-realtime-voice/</link>
+		
+		<dc:creator><![CDATA[Hopper<br>⚲&nbsp;Canada]]></dc:creator>
+		<pubDate>Sat, 29 Aug 2026 02:11:11 +0000</pubDate>
+				<guid isPermaLink="false">https://jobspresso.co/?post_type=job_listing&#038;p=163412</guid>
+
+					<description><![CDATA[About the Role HTS Assist is Hopper&#8217;s agentic AI assistant for travel, resolving flight changes, cancellations, refunds, and bookings over chat and voice for some of the world&#8217;s largest travel brands. We&#8217;re looking for a senior full stack engineer to anchor this product, owning the realtime and voice layer end to end while building across]]></description>
+										<content:encoded><![CDATA[<p>Trimmed for the fixture.</p>]]></content:encoded>
+					
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">163412</post-id><media:content xmlns:media="http://search.yahoo.com/mrss/" medium="image" type="image/jpeg" url="https://jobspresso.co/wp-content/uploads/41990827_1937543459602328_7031249281918959616_n1-150x150.png" width="70" height="70" /><job_listing:location><![CDATA[Canada]]></job_listing:location>
+<job_listing:job_type><![CDATA[Engineer]]></job_listing:job_type>
+<job_listing:job_category><![CDATA[Full Time]]></job_listing:job_category>
+<job_listing:company><![CDATA[Hopper]]></job_listing:company>
+	</item>
+<item>
+		<title>Data Science &#038; Engineering Manager</title>
+		<link>https://jobspresso.co/job/data-science-engineering-manager/</link>
+		
+		<dc:creator><![CDATA[AllTrails<br>⚲&nbsp;United States]]></dc:creator>
+		<pubDate>Sat, 08 Aug 2026 02:15:32 +0000</pubDate>
+				<guid isPermaLink="false">https://jobspresso.co/?post_type=job_listing&#038;p=163386</guid>
+
+					<description><![CDATA[AllTrails is the app for exploring the outdoors. We help people spend more time outside by connecting them to their next adventure. Home to the world’s largest outdoor community, with members and trails around the globe, you can find AllTrails in the Apple App Store, Google Play Store, and at alltrails.com. Every day, our team]]></description>
+										<content:encoded><![CDATA[<p>Trimmed for the fixture.</p>]]></content:encoded>
+					
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">163386</post-id><media:content xmlns:media="http://search.yahoo.com/mrss/" medium="image" type="image/jpeg" url="https://jobspresso.co/wp-content/uploads/UDGWO8FF_400x4001-150x150.jpg" width="70" height="70" /><job_listing:location><![CDATA[United States]]></job_listing:location>
+<job_listing:job_type><![CDATA[AI &amp; Data, Engineer]]></job_listing:job_type>
+<job_listing:job_category><![CDATA[Full Time]]></job_listing:job_category>
+<job_listing:company><![CDATA[AllTrails]]></job_listing:company>
+	</item>
+<item>
+		<title>Principal Product Manager, Conversational AI</title>
+		<link>https://jobspresso.co/job/principal-product-manager-conversational-ai/</link>
+		
+		<dc:creator><![CDATA[Hopper<br>⚲&nbsp;Various US States]]></dc:creator>
+		<pubDate>Sat, 29 Aug 2026 02:12:12 +0000</pubDate>
+				<guid isPermaLink="false">https://jobspresso.co/?post_type=job_listing&#038;p=163413</guid>
+
+					<description><![CDATA[HTS Assist is Hopper&#8217;s agentic AI assistant for travel, resolving real customer issues like flight changes, cancellations, refunds, and bookings over chat and voice for some of the largest travel brands and enterprises in the world. As Principal Product Manager, you will own the customer-facing agent end to end: the conversations, the interface, and the]]></description>
+										<content:encoded><![CDATA[<p>Trimmed for the fixture.</p>]]></content:encoded>
+					
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">163413</post-id><media:content xmlns:media="http://search.yahoo.com/mrss/" medium="image" type="image/jpeg" url="https://jobspresso.co/wp-content/uploads/41990827_1937543459602328_7031249281918959616_n1-150x150.png" width="70" height="70" /><job_listing:location><![CDATA[Various US States]]></job_listing:location>
+<job_listing:job_type><![CDATA[Product]]></job_listing:job_type>
+<job_listing:job_category><![CDATA[Full Time]]></job_listing:job_category>
+<job_listing:company><![CDATA[Hopper]]></job_listing:company>
+	</item>
+</channel>
+</rss>

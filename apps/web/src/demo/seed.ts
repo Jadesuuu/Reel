@@ -16,7 +16,13 @@ import type { DemoState, StoredMatch } from './store';
 
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
-const SOURCE_KIND_BOARD = new Set<Source>(['GREENHOUSE', 'LEVER', 'ASHBY']);
+const SOURCE_KIND_BOARD = new Set<Source>([
+  'GREENHOUSE',
+  'LEVER',
+  'ASHBY',
+  'WORKABLE',
+  'SMARTRECRUITERS',
+]);
 
 type PostingSeed = {
   source: Source;
@@ -1239,9 +1245,7 @@ const APPLICATIONS: AppSeed[] = [
   },
 ];
 
-const FEED_SOURCES: Source[] = SOURCES.filter(
-  (source) => !['GREENHOUSE', 'LEVER', 'ASHBY'].includes(source),
-);
+const FEED_SOURCES: Source[] = SOURCES.filter((source) => !SOURCE_KIND_BOARD.has(source));
 
 export function buildSeed(now: Date): DemoState {
   const postings = POSTINGS.map((seed, index) => buildPosting(seed, index, now, 3 * HOUR));
@@ -1509,6 +1513,18 @@ function sourceLabelFor(source: Source): string {
       return 'Lever';
     case 'ASHBY':
       return 'Ashby';
+    case 'WORKINGNOMADS':
+      return 'Working Nomads';
+    case 'LANDINGJOBS':
+      return 'Landing.jobs';
+    case 'THEMUSE':
+      return 'The Muse';
+    case 'JOBSPRESSO':
+      return 'Jobspresso';
+    case 'WORKABLE':
+      return 'Workable';
+    case 'SMARTRECRUITERS':
+      return 'SmartRecruiters';
   }
 }
 

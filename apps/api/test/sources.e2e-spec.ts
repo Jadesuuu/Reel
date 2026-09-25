@@ -53,13 +53,13 @@ describe('Sources (e2e)', () => {
     await request(app.getHttpServer()).get('/api/v1/sources').expect(401);
   });
 
-  it('GET /sources lists all ten sources with metadata', async () => {
+  it('GET /sources lists all sixteen sources with metadata', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/sources')
       .set('Cookie', cookie)
       .expect(200);
 
-    expect(res.body.items).toHaveLength(10);
+    expect(res.body.items).toHaveLength(16);
     const hn = res.body.items.find(
       (item: { source: string }) => item.source === 'HN',
     );

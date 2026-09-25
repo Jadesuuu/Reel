@@ -1694,6 +1694,42 @@ printed beside it; inbox chips read `outside · us`; demo mode does the same; th
 
 ---
 
+### Step 22 — More sources
+
+**Branch:** `feat/more-sources`
+**Commit:** `feat: six more sources and the other three We Work Remotely programming feeds`
+
+**Why.** Ten sources was what could be verified in an evening on 23 Sep. On 26 Sep every
+candidate was probed live again with the same rule (public JSON or RSS, no key, no browser, no
+scraping) and these answered:
+
+| Source | Kind | Endpoint | Notes |
+|---|---|---|---|
+| Working Nomads | feed | `workingnomads.com/api/exposed_jobs/` | JSON array; only `category_name` Development / DevOps / Sysadmin is kept; id from the job url |
+| Landing.jobs | feed | `landing.jobs/api/v1/jobs?limit=100` | JSON; company parsed from the `/at/<slug>/` url; salaries in EUR keep the text and drop the USD numbers |
+| The Muse | feed | `themuse.com/api/public/jobs?category=Software%20Engineering&page=N` | JSON, three pages per run; answers without a key at a low rate limit (the v1 non-goal was wrong) |
+| Jobspresso | feed | `jobspresso.co/?feed=job_feed` | WordPress RSS, ten items, `job_listing:*` namespaced fields; only technical `job_type`s are kept |
+| Workable | board | `apply.workable.com/api/v3/accounts/<slug>/jobs` (POST) + `v2/…/jobs/<shortcode>` + `v1/widget/accounts/<slug>` | the list needs a POST with an empty filter body; details fetched five at a time, first 60 |
+| SmartRecruiters | board | `api.smartrecruiters.com/v1/companies/<id>/postings` + `/postings/<id>` | ids are case-insensitive; an unknown company answers 200 with `totalFound: 0`, which `describeBoard` treats as not found |
+
+We Work Remotely also publishes per-category feeds, so `SOURCE_META.feedBoards` lists four
+boards for it (programming, full-stack, back-end, devops/sysadmin) and the fan-out enqueues one
+job per board. The front-end feed was empty when checked and is not listed.
+
+**Probed and rejected:** Remotive ignores its `category` parameter (every category returns the
+same body), Recruitee, BambooHR, Breezy and Rippling could not be verified with a real slug, and
+Wellfound, Otta, YC Work at a Startup, LinkedIn, Indeed and Glassdoor need a login or a key.
+
+**Decisions:** `postJson` and `mapLimit` join `sources/http.ts`; detail fetches are capped at
+60 per board per run so a large company (Bosch has thousands) cannot stall a cycle. Enum values
+are added by hand-written `ALTER TYPE … ADD VALUE` (migration `v4_more_sources`), as in v2.
+
+**Done when:** every new mapper has a real fixture and a spec; the registry, `SOURCES`,
+`BOARD_PROVIDERS`, the web `SOURCE_META`, the board hints and the demo labels all know the six;
+the copy says sixteen sources; the gate is green; a live fetch of each new adapter returns items.
+
+---
+
 ### 11.6 Environment variables (additions)
 
 | Var | Required | Default | Used by |

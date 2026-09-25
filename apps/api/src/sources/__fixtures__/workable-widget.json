@@ -1,0 +1,63 @@
+{
+  "name": "Epignosis",
+  "jobs": [
+    {
+      "title": "Customer Success Manager",
+      "shortcode": "5A2534F279",
+      "code": "",
+      "employment_type": "Full-time",
+      "telecommuting": false,
+      "department": "Customer Success",
+      "url": "https://apply.workable.com/j/5A2534F279",
+      "shortlink": "https://apply.workable.com/j/5A2534F279",
+      "application_url": "https://apply.workable.com/j/5A2534F279/apply",
+      "published_on": "2026-09-24",
+      "created_at": "2026-09-24",
+      "country": "Greece",
+      "city": "Athens",
+      "state": "Attica",
+      "education": "",
+      "experience": "Associate",
+      "function": "",
+      "industry": "Computer Software",
+      "locations": [
+        {
+          "country": "Greece",
+          "countryCode": "GR",
+          "city": "Athens",
+          "region": "Attica",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "title": "Data Engineer",
+      "shortcode": "E38DB16625",
+      "code": "",
+      "employment_type": "Full-time",
+      "telecommuting": false,
+      "department": "Operations",
+      "url": "https://apply.workable.com/j/E38DB16625",
+      "shortlink": "https://apply.workable.com/j/E38DB16625",
+      "application_url": "https://apply.workable.com/j/E38DB16625/apply",
+      "published_on": "2026-09-07",
+      "created_at": "2026-09-07",
+      "country": "Greece",
+      "city": "Athens",
+      "state": "Attica",
+      "education": "Bachelor's Degree",
+      "experience": "Mid-Senior level",
+      "function": "",
+      "industry": "Computer Software",
+      "locations": [
+        {
+          "country": "Greece",
+          "countryCode": "GR",
+          "city": "Athens",
+          "region": "Attica",
+          "hidden": false
+        }
+      ]
+    }
+  ]
+}

@@ -11,11 +11,23 @@ export const SOURCES = [
   'GREENHOUSE',
   'LEVER',
   'ASHBY',
+  'WORKINGNOMADS',
+  'LANDINGJOBS',
+  'THEMUSE',
+  'JOBSPRESSO',
+  'WORKABLE',
+  'SMARTRECRUITERS',
 ] as const;
 
 export type Source = (typeof SOURCES)[number];
 
-export const BOARD_PROVIDERS = ['GREENHOUSE', 'LEVER', 'ASHBY'] as const;
+export const BOARD_PROVIDERS = [
+  'GREENHOUSE',
+  'LEVER',
+  'ASHBY',
+  'WORKABLE',
+  'SMARTRECRUITERS',
+] as const;
 
 export type BoardProvider = (typeof BOARD_PROVIDERS)[number];
 

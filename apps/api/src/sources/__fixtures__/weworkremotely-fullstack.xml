@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss">
+  <channel>
+    <title>We Work Remotely: Full-Stack Programming Jobs</title>
+    <link>https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss</link>
+    <description>We Work Remotely: Full-Stack Programming Jobs</description>
+    <language>en-US</language>
+    <ttl>60</ttl>
+    <item>
+      <title>Toptal: Salesforce Platform Lead for Global Industrial Company</title>
+      <region>North America Only</region>
+      <country></country>
+      <state></state>
+      <skills></skills>
+      <category>Full-Stack Programming</category>
+      <type>Full-Time</type>
+      <description><![CDATA[<p>Trimmed for the fixture.</p>]]></description>
+      <pubDate>Thu, 24 Sep 2026 14:45:20 +0000</pubDate>
+      <expires_at>Sat, 24 Oct 2026 14:45:20 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/toptal-salesforce-platform-lead-for-global-industrial-company</guid>
+      <link>https://weworkremotely.com/remote-jobs/toptal-salesforce-platform-lead-for-global-industrial-company</link>
+    </item>
+<item>
+      <title>Customer.io: Contract Accounts Payable Manager</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state></state>
+      <skills></skills>
+      <category>Full-Stack Programming</category>
+      <type>Full-Time</type>
+      <description><![CDATA[<p>Trimmed for the fixture.</p>]]></description>
+      <pubDate>Thu, 24 Sep 2026 07:30:50 +0000</pubDate>
+      <expires_at>Sat, 24 Oct 2026 07:30:50 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/customer-io-contract-accounts-payable-manager</guid>
+      <link>https://weworkremotely.com/remote-jobs/customer-io-contract-accounts-payable-manager</link>
+    </item>
+</channel>
+</rss>

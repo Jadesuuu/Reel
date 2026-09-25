@@ -15,6 +15,12 @@ const DEFAULT_BOARD: Record<Source, string | null> = {
   GREENHOUSE: null,
   LEVER: null,
   ASHBY: null,
+  WORKINGNOMADS: 'development',
+  LANDINGJOBS: 'all',
+  THEMUSE: 'software-engineering',
+  JOBSPRESSO: 'all',
+  WORKABLE: null,
+  SMARTRECRUITERS: null,
 };
 
 export function sourceInfo(source: Source): SourceInfo {
