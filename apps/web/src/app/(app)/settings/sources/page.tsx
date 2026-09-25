@@ -45,8 +45,8 @@ function RunDot({ info }: { info: SourceInfo }) {
     : 'never run';
   return (
     <Tip content={label}>
-      <span className="inline-flex items-center gap-1.5 text-[11px] text-faint">
-        <span className={`size-1.5 rounded-full ${tone}`} aria-hidden />
+      <span className="inline-flex items-center gap-2 text-fine text-faint">
+        <span className={`size-2 rounded-full ${tone}`} aria-hidden />
         {run ? relativeTime(run.startedAt) : 'never run'}
       </span>
     </Tip>
@@ -64,7 +64,7 @@ function SourceRow({
 }) {
   const toggle = useToggleSource();
   return (
-    <li className="flex flex-wrap items-center gap-3 px-3 py-2.5 sm:flex-nowrap">
+    <li className="flex flex-wrap items-center gap-3 px-4 py-3 sm:flex-nowrap">
       <Switch
         checked={info.enabled}
         ariaLabel={`${info.enabled ? 'Disable' : 'Enable'} ${info.label}`}
@@ -77,7 +77,7 @@ function SourceRow({
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-fg">{info.label}</span>
+          <span className="text-body text-fg">{info.label}</span>
           <a
             href={info.homepage}
             target="_blank"
@@ -85,15 +85,15 @@ function SourceRow({
             className="text-faint hover:text-fg"
             aria-label={`Open ${info.label}`}
           >
-            <ExternalLink className="size-3" />
+            <ExternalLink className="size-4" />
           </a>
         </div>
-        <p className="truncate text-[11px] text-faint">
+        <p className="truncate text-fine text-faint">
           {info.attribution ??
             (info.kind === 'board' ? 'Company boards you watch' : 'Monthly hiring thread')}
         </p>
       </div>
-      <span className="tabular w-16 text-right font-mono text-xs text-muted">
+      <span className="tabular w-16 text-right font-mono text-caption text-muted">
         {info.postings.toLocaleString()}
       </span>
       <RunDot info={info} />
@@ -106,10 +106,10 @@ function SourceRow({
           loading={running}
           disabled={!info.enabled}
         >
-          <Play className="size-3.5" />
+          <Play className="size-4" />
         </Button>
       ) : (
-        <span className="size-7" />
+        <span className="size-8" />
       )}
     </li>
   );
@@ -129,7 +129,7 @@ function Boards() {
   return (
     <Panel>
       <SectionTitle aside="Greenhouse · Lever · Ashby">Company boards</SectionTitle>
-      <p className="mb-4 max-w-[60ch] text-xs text-muted">
+      <p className="mb-4 max-w-[60ch] text-caption text-muted">
         Paste a careers-page link or the board slug. Reel checks the board exists, then pulls every
         job on it each cycle. Boards are shared by every account on this install.
       </p>
@@ -190,17 +190,17 @@ function Boards() {
           loading={add.isPending}
           className="mb-[1px]"
         >
-          <Plus className="size-4" /> Watch
+          <Plus className="size-5" /> Watch
         </Button>
       </form>
 
       <div className="mt-5">
-        {boards.isPending ? <RowsSkeleton rows={2} height="h-10" /> : null}
+        {boards.isPending ? <RowsSkeleton rows={2} height="h-11" /> : null}
         {boards.isError ? (
           <ErrorState message="Could not load boards." onRetry={() => boards.refetch()} />
         ) : null}
         {boards.data && boards.data.items.length === 0 ? (
-          <p className="rounded-md border border-dashed border-line px-4 py-6 text-center text-xs text-faint">
+          <p className="rounded-md border border-dashed border-line px-4 py-6 text-center text-caption text-faint">
             No boards yet. Try <span className="font-mono text-muted">stripe</span> on Greenhouse.
           </p>
         ) : null}
@@ -215,12 +215,12 @@ function Boards() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: 16 }}
                   transition={{ duration: 0.18 }}
-                  className="flex items-center gap-3 px-3 py-2"
+                  className="flex items-center gap-3 px-4 py-2"
                 >
                   <SourceBadge source={board.provider} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-fg">{board.company}</p>
-                    <p className="truncate font-mono text-[11px] text-faint">{board.slug}</p>
+                    <p className="truncate text-body text-fg">{board.company}</p>
+                    <p className="truncate font-mono text-fine text-faint">{board.slug}</p>
                   </div>
                   <Button
                     size="icon-sm"
@@ -233,7 +233,7 @@ function Boards() {
                       )
                     }
                   >
-                    <Play className="size-3.5" />
+                    <Play className="size-4" />
                   </Button>
                   <Button
                     size="icon-sm"
@@ -248,7 +248,7 @@ function Boards() {
                       })
                     }
                   >
-                    <Trash2 className="size-3.5" />
+                    <Trash2 className="size-4" />
                   </Button>
                 </motion.li>
               ))}
@@ -289,12 +289,12 @@ export default function SourcesPage() {
               )
             }
           >
-            <Play className="size-3.5" /> Run all now
+            <Play className="size-4" /> Run all now
           </Button>
         </div>
         {sources.isPending ? (
           <div className="p-4">
-            <RowsSkeleton rows={6} height="h-10" />
+            <RowsSkeleton rows={6} height="h-11" />
           </div>
         ) : null}
         {sources.isError ? (

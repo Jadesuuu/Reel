@@ -41,7 +41,7 @@ function Outbox() {
     <Panel className="xl:col-span-2">
       <SectionTitle aside="what the worker would have emailed">Reminder emails</SectionTitle>
       {items.length === 0 ? (
-        <p className="text-xs text-faint">
+        <p className="text-caption text-faint">
           None yet. Move an application to Applied, then use “Fast-forward 10 days” in the demo bar
           and the stale-application email lands here.
         </p>
@@ -50,15 +50,15 @@ function Outbox() {
           {items.map((message) => (
             <li key={message.id} className="py-3">
               <div className="flex items-baseline justify-between gap-3">
-                <p className="inline-flex items-center gap-2 text-sm text-fg">
-                  <Mail className="size-3.5 text-accent" /> {message.subject}
+                <p className="inline-flex items-center gap-2 text-body text-fg">
+                  <Mail className="size-4 text-accent" /> {message.subject}
                 </p>
-                <span className="tabular font-mono text-[11px] text-faint">
+                <span className="tabular font-mono text-fine text-faint">
                   {dateTime(message.sentAt)}
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-faint">to {message.to}</p>
-              <pre className="mt-2 max-w-[72ch] font-sans text-xs leading-relaxed whitespace-pre-wrap text-muted">
+              <p className="mt-1 text-fine text-faint">to {message.to}</p>
+              <pre className="mt-2 max-w-[72ch] font-sans text-caption leading-relaxed whitespace-pre-wrap text-muted">
                 {message.text}
               </pre>
             </li>
@@ -78,7 +78,7 @@ export default function AccountPage() {
     <div className="grid gap-4 xl:grid-cols-2">
       <Panel>
         <SectionTitle>Account</SectionTitle>
-        <dl className="space-y-3 text-sm">
+        <dl className="space-y-3 text-body">
           <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
             <dt className="text-muted">Email</dt>
             <dd className="truncate text-fg">{session.data?.email ?? '—'}</dd>
@@ -104,16 +104,16 @@ export default function AccountPage() {
                   {
                     value: 'dark',
                     label: (
-                      <span className="inline-flex items-center gap-1">
-                        <Moon className="size-3" /> Dark
+                      <span className="inline-flex items-center gap-1.5">
+                        <Moon className="size-4" /> Dark
                       </span>
                     ),
                   },
                   {
                     value: 'light',
                     label: (
-                      <span className="inline-flex items-center gap-1">
-                        <Sun className="size-3" /> Light
+                      <span className="inline-flex items-center gap-1.5">
+                        <Sun className="size-4" /> Light
                       </span>
                     ),
                   },
@@ -129,9 +129,9 @@ export default function AccountPage() {
             onClick={() => logout.mutate()}
             loading={logout.isPending}
           >
-            <LogOut className="size-3.5" /> Log out of this device
+            <LogOut className="size-4" /> Log out of this device
           </Button>
-          <p className="mt-2 text-xs text-faint">
+          <p className="mt-2 text-caption text-faint">
             Sessions last seven days. Logging out clears the cookie on this browser only.
           </p>
         </div>
@@ -141,9 +141,12 @@ export default function AccountPage() {
         <SectionTitle>Keyboard</SectionTitle>
         <ul className="divide-y divide-line">
           {SHORTCUTS.map((item) => (
-            <li key={item.does} className="flex items-center justify-between gap-4 py-2 text-xs">
+            <li
+              key={item.does}
+              className="flex items-center justify-between gap-4 py-2 text-caption"
+            >
               <span className="text-muted">{item.does}</span>
-              <span className="flex gap-1">
+              <span className="flex gap-1.5">
                 {item.keys.map((key) => (
                   <Kbd key={key}>{key}</Kbd>
                 ))}

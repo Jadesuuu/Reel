@@ -27,7 +27,7 @@ export function MenuContent({
         sideOffset={sideOffset}
         collisionPadding={8}
         className={cn(
-          'reel-pop z-[60] min-w-44 rounded-md border border-line bg-surface-2 p-1 shadow-md',
+          'reel-pop z-[60] min-w-56 rounded-md border border-line bg-surface-2 p-1 shadow-md',
           className,
         )}
       >
@@ -38,7 +38,7 @@ export function MenuContent({
 }
 
 const itemClass =
-  'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] text-fg outline-none data-[highlighted]:bg-surface-3 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none';
+  'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2.5 py-2 text-body-sm text-fg outline-none data-[highlighted]:bg-surface-3 data-[disabled]:opacity-50 data-[disabled]:pointer-events-none';
 
 export function MenuItem({
   className,
@@ -65,7 +65,7 @@ export function MenuRadioItem({
   return (
     <RadixMenu.RadioItem className={cn(itemClass, 'pl-7', className)} {...props}>
       <RadixMenu.ItemIndicator className="absolute left-2 inline-flex">
-        <Check className="size-3.5 text-accent" />
+        <Check className="size-4 text-accent" />
       </RadixMenu.ItemIndicator>
       {children}
     </RadixMenu.RadioItem>
@@ -80,7 +80,7 @@ export function MenuCheckboxItem({
   return (
     <RadixMenu.CheckboxItem className={cn(itemClass, 'pl-7', className)} {...props}>
       <RadixMenu.ItemIndicator className="absolute left-2 inline-flex">
-        <Check className="size-3.5 text-accent" />
+        <Check className="size-4 text-accent" />
       </RadixMenu.ItemIndicator>
       {children}
     </RadixMenu.CheckboxItem>
@@ -96,5 +96,5 @@ export function MenuSeparator() {
 }
 
 export function MenuShortcut({ children }: { children: React.ReactNode }) {
-  return <span className="ml-auto font-mono text-[11px] text-faint">{children}</span>;
+  return <span className="ml-auto font-mono text-fine text-faint">{children}</span>;
 }

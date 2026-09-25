@@ -86,35 +86,36 @@ function MatchRow({
         focused ? 'bg-surface-2' : 'hover:bg-surface-2/50',
       )}
     >
-      <div className="grid grid-cols-[auto_1fr] gap-x-3 px-3 py-3 sm:grid-cols-[auto_1fr_auto]">
-        <ScoreBadge score={match.score} className="mt-0.5" />
+      <div className="grid grid-cols-[auto_1fr_auto] gap-x-4 px-4 py-4">
+        <ScoreBadge score={match.score} className="mt-px" />
 
         <button type="button" onClick={onOpen} className="min-w-0 text-left" onFocus={onFocus}>
-          <p className="truncate text-[14px] font-medium text-fg">
+          <p className="text-body font-medium text-fg sm:truncate">
             {posting.company ?? 'Unknown company'}
             {posting.role ? (
               <span className="font-normal text-muted"> · {posting.role}</span>
             ) : null}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted">{posting.headline}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            <SourceBadge source={posting.source} />
-            {posting.salaryText ? <Badge tone="success">{posting.salaryText}</Badge> : null}
-            <ReasonChips reasons={match.reasons} limit={focused ? 8 : 3} />
-            <span className="ml-auto text-[11px] text-faint">{relativeDays(posting.postedAt)}</span>
-          </div>
+          <p className="mt-1 text-body-sm text-muted sm:truncate">{posting.headline}</p>
         </button>
+
+        <div className="col-span-3 mt-2.5 flex flex-wrap items-center gap-2 sm:col-span-1 sm:col-start-2">
+          <SourceBadge source={posting.source} />
+          {posting.salaryText ? <Badge tone="neutral">{posting.salaryText}</Badge> : null}
+          <ReasonChips reasons={match.reasons} limit={focused ? 8 : 3} />
+          <span className="ml-auto text-caption text-muted">{relativeDays(posting.postedAt)}</span>
+        </div>
 
         <div
           className={cn(
-            'col-span-2 flex items-center gap-1 sm:col-span-1 sm:self-start',
+            'col-start-3 row-start-1 flex items-start gap-1.5 self-start',
             focused
               ? 'opacity-100'
               : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
           )}
         >
           <Button size="sm" variant="ghost" onClick={onDismiss} aria-label="Dismiss">
-            <X className="size-3.5" />
+            <X className="size-4" />
           </Button>
         </div>
       </div>
@@ -129,10 +130,10 @@ function MatchRow({
             transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
             className="overflow-hidden"
           >
-            <div className="flex flex-col gap-3 border-t border-line/70 px-3 py-3 sm:pl-[3.75rem]">
-              <p className="max-w-[80ch] text-[13px] leading-relaxed text-muted">
+            <div className="flex flex-col gap-4 border-t border-line/70 px-4 py-4 sm:pl-[5rem]">
+              <p className="max-w-[72ch] text-body leading-relaxed text-muted">
                 {detail.isPending ? (
-                  <span className="skeleton inline-block h-3 w-3/4 rounded-sm align-middle" />
+                  <span className="skeleton inline-block h-5 w-3/4 rounded-sm align-middle" />
                 ) : excerpt && excerpt.length > 0 ? (
                   <>
                     {excerpt.slice(0, 420)}
@@ -142,15 +143,15 @@ function MatchRow({
                   posting.headline
                 )}
               </p>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button size="sm" variant="primary" loading={saving} onClick={onSave}>
-                  <Plus className="size-3.5" /> Save to pipeline
+                  <Plus className="size-4" /> Save to pipeline
                 </Button>
                 {applyHref ? (
                   <Button asChild size="sm" variant="outline">
                     <a href={applyHref} target="_blank" rel="noreferrer noopener">
                       {applyHost ? `Apply on ${applyHost}` : 'Open apply link'}{' '}
-                      <ExternalLink className="size-3" />
+                      <ExternalLink className="size-4" />
                     </a>
                   </Button>
                 ) : null}
@@ -288,13 +289,13 @@ export default function InboxPage() {
                 })
               }
             >
-              <RefreshCw className="size-3.5" /> Rescore
+              <RefreshCw className="size-4" /> Rescore
             </Button>
           </>
         }
       />
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <Select
           size="sm"
           ariaLabel="Filter by source"
@@ -304,7 +305,7 @@ export default function InboxPage() {
             setPage(1);
           }}
           options={sourceOptions}
-          className="min-w-40"
+          className="min-w-44"
         />
         <Select
           size="sm"
@@ -315,9 +316,9 @@ export default function InboxPage() {
             setPage(1);
           }}
           options={MIN_SCORE_OPTIONS}
-          className="min-w-32"
+          className="min-w-36"
         />
-        <div className="ml-auto hidden items-center gap-1 text-[11px] text-faint lg:flex">
+        <div className="ml-auto hidden items-center gap-1.5 text-caption text-muted lg:flex">
           <Kbd>j</Kbd>
           <Kbd>k</Kbd> move · <Kbd>s</Kbd> save · <Kbd>d</Kbd> dismiss · <Kbd>a</Kbd> apply ·{' '}
           <Kbd>↵</Kbd> open

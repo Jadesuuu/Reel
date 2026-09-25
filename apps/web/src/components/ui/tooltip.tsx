@@ -24,7 +24,7 @@ export function Tip({
           sideOffset={6}
           collisionPadding={8}
           className={cn(
-            'reel-pop z-[60] max-w-64 rounded-md border border-line bg-surface-2 px-2.5 py-1.5 text-xs leading-snug text-fg shadow-md',
+            'reel-pop z-[60] max-w-72 rounded-md border border-line bg-surface-2 px-3 py-2 text-caption leading-snug text-fg shadow-md',
             className,
           )}
         >

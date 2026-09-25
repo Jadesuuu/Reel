@@ -31,9 +31,9 @@ function DemoEntry() {
         loading={enter.isPending}
         onClick={() => enter.mutate()}
       >
-        <Sparkles className="size-4 text-accent" /> Continue as the demo user
+        <Sparkles className="size-5 text-accent" /> Continue as the demo user
       </Button>
-      <p className="mt-2 text-center text-xs text-faint">
+      <p className="mt-2 text-center text-caption text-faint">
         A seeded account with ten sources, a scored inbox and a live pipeline. Data stays in this
         browser.
       </p>

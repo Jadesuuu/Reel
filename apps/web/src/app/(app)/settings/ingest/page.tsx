@@ -26,10 +26,10 @@ function StatusPill({ run }: { run: IngestRun }) {
         : 'border-info/40 bg-info-soft text-info';
   return (
     <span
-      className={cn('stamp inline-flex h-5 items-center gap-1 rounded-[3px] border px-1.5', cls)}
+      className={cn('stamp inline-flex h-6 items-center gap-1.5 rounded-[3px] border px-1.5', cls)}
     >
       {run.status === 'RUNNING' ? (
-        <span className="size-1.5 animate-pulse rounded-full bg-info" />
+        <span className="size-2 animate-pulse rounded-full bg-info" />
       ) : null}
       {run.status.toLowerCase()}
     </span>
@@ -75,7 +75,7 @@ export default function IngestPage() {
               { value: '', label: 'All sources' },
               ...SOURCES.map((entry) => ({ value: entry, label: sourceLabel(entry) })),
             ]}
-            className="min-w-40"
+            className="min-w-44"
           />
           <Button
             size="sm"
@@ -93,14 +93,14 @@ export default function IngestPage() {
               })
             }
           >
-            <Play className="size-3.5" /> Run {source ? sourceLabel(source) : 'all'}
+            <Play className="size-4" /> Run {source ? sourceLabel(source) : 'all'}
           </Button>
         </div>
       </div>
 
       {runs.isPending ? (
         <div className="p-4">
-          <RowsSkeleton rows={6} height="h-10" />
+          <RowsSkeleton rows={6} height="h-11" />
         </div>
       ) : null}
       {runs.isError ? (
@@ -121,16 +121,16 @@ export default function IngestPage() {
 
       {items.length > 0 ? (
         <div className={cn('overflow-x-auto', runs.isPlaceholderData && 'opacity-60')}>
-          <table className="w-full min-w-[640px] text-left text-[13px]">
-            <thead className="border-b border-line text-[11px] tracking-wide text-faint uppercase">
+          <table className="w-full min-w-[640px] text-left text-body-sm">
+            <thead className="border-b border-line text-fine tracking-wide text-faint uppercase">
               <tr>
                 <th className="px-4 py-2 font-medium">Started</th>
-                <th className="px-3 py-2 font-medium">Source</th>
-                <th className="px-3 py-2 font-medium">Board</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 text-right font-medium">Seen</th>
-                <th className="px-3 py-2 text-right font-medium">New</th>
-                <th className="px-3 py-2 text-right font-medium">Updated</th>
+                <th className="px-4 py-2 font-medium">Source</th>
+                <th className="px-4 py-2 font-medium">Board</th>
+                <th className="px-4 py-2 font-medium">Status</th>
+                <th className="px-4 py-2 text-right font-medium">Seen</th>
+                <th className="px-4 py-2 text-right font-medium">New</th>
+                <th className="px-4 py-2 text-right font-medium">Updated</th>
                 <th className="px-4 py-2 text-right font-medium">Took</th>
               </tr>
             </thead>
@@ -142,32 +142,32 @@ export default function IngestPage() {
                       <span>{relativeTime(run.startedAt)}</span>
                     </Tip>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-4 py-2">
                     <SourceBadge source={run.source} />
                   </td>
-                  <td className="max-w-40 truncate px-3 py-2 font-mono text-[11px] text-faint">
+                  <td className="max-w-40 truncate px-4 py-2 font-mono text-fine text-faint">
                     {run.boardId}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-4 py-2">
                     <div className="flex items-center gap-2">
                       <StatusPill run={run} />
                       {run.error ? (
                         <Tip content={run.error}>
-                          <AlertTriangle className="size-3.5 text-danger" />
+                          <AlertTriangle className="size-4 text-danger" />
                         </Tip>
                       ) : null}
                     </div>
                   </td>
-                  <td className="tabular px-3 py-2 text-right font-mono text-xs text-muted">
+                  <td className="tabular px-4 py-2 text-right font-mono text-caption text-muted">
                     {run.itemsSeen}
                   </td>
-                  <td className="tabular px-3 py-2 text-right font-mono text-xs text-fg">
+                  <td className="tabular px-4 py-2 text-right font-mono text-caption text-fg">
                     {run.postingsCreated}
                   </td>
-                  <td className="tabular px-3 py-2 text-right font-mono text-xs text-muted">
+                  <td className="tabular px-4 py-2 text-right font-mono text-caption text-muted">
                     {run.postingsUpdated}
                   </td>
-                  <td className="tabular px-4 py-2 text-right font-mono text-xs text-faint">
+                  <td className="tabular px-4 py-2 text-right font-mono text-caption text-faint">
                     {duration(run)}
                   </td>
                 </tr>

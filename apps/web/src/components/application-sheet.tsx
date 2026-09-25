@@ -66,14 +66,14 @@ function Body({ id, onClose }: { id: string; onClose: () => void }) {
           <div className="min-w-0">
             <div className="mb-1.5 flex flex-wrap items-center gap-2">
               <StageStamp stage={detail.stage} size="md" />
-              <span className="text-[11px] text-faint">
+              <span className="text-fine text-faint">
                 {daysSince(detail.stageChangedAt)}d in stage · added {shortDate(detail.createdAt)}
               </span>
             </div>
-            <h2 className="truncate text-[17px] font-semibold tracking-tight text-fg">
+            <h2 className="truncate text-title font-semibold tracking-tight text-fg">
               {detail.company}
             </h2>
-            <p className="truncate text-sm text-muted">{detail.role}</p>
+            <p className="truncate text-body text-muted">{detail.role}</p>
           </div>
         ) : undefined
       }
@@ -97,15 +97,15 @@ function StageMover({ detail }: { detail: ApplicationDetail }) {
 
   if (next.length === 0) {
     return (
-      <p className="rounded-md border border-line bg-surface-2 px-3 py-2 text-xs text-muted">
+      <p className="rounded-md border border-line bg-surface-2 px-4 py-2 text-caption text-muted">
         {STAGE_LABEL[detail.stage]} is final. The history below is kept as it was.
       </p>
     );
   }
 
   return (
-    <div className="rounded-md border border-line bg-surface-2 p-3">
-      <div className="mb-2 flex flex-wrap items-center gap-1.5">
+    <div className="rounded-md border border-line bg-surface-2 p-4">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="stamp text-faint">Move to</span>
         {next.map((stage) => (
           <Button
@@ -140,7 +140,7 @@ function StageMover({ detail }: { detail: ApplicationDetail }) {
       </div>
       <Input
         placeholder="Optional note for this move — who, what, when"
-        className="h-8 text-[13px]"
+        className="h-9 text-body-sm"
         value={note}
         onChange={(event) => setNote(event.target.value)}
       />
@@ -299,12 +299,12 @@ function Overview({ detail }: { detail: ApplicationDetail }) {
         {detail.url ? (
           <Button asChild size="sm" variant="ghost">
             <a href={detail.url} target="_blank" rel="noreferrer noopener">
-              Open posting <ExternalLink className="size-3" />
+              Open posting <ExternalLink className="size-4" />
             </a>
           </Button>
         ) : null}
         {detail.posting ? (
-          <span className="ml-auto flex items-center gap-1.5 text-[11px] text-faint">
+          <span className="ml-auto flex items-center gap-2 text-fine text-faint">
             from <SourceBadge source={detail.posting.source} href={detail.posting.url} />
           </span>
         ) : null}
@@ -351,7 +351,7 @@ function Timeline({ detail }: { detail: ApplicationDetail }) {
           placeholder="Log what happened — a call, an email, a question to ask"
           value={note}
           onChange={(event) => setNote(event.target.value)}
-          className="h-9"
+          className="h-10"
           aria-label="New note"
         />
         <Button
@@ -361,7 +361,7 @@ function Timeline({ detail }: { detail: ApplicationDetail }) {
           disabled={!note.trim()}
           loading={addNote.isPending}
         >
-          <MessageSquareText className="size-4" /> Log
+          <MessageSquareText className="size-5" /> Log
         </Button>
       </form>
 
@@ -395,16 +395,14 @@ function TimelineItem({ event }: { event: StageEvent }) {
         )}
         style={isNote ? undefined : { background: `var(--stage-${event.toStage.toLowerCase()})` }}
       />
-      <div className="flex flex-wrap items-baseline gap-x-2 text-xs">
-        <span className="tabular font-mono text-[11px] text-faint">
-          {dateTime(event.createdAt)}
-        </span>
+      <div className="flex flex-wrap items-baseline gap-x-2 text-caption">
+        <span className="tabular font-mono text-fine text-faint">{dateTime(event.createdAt)}</span>
         {isNote ? (
           <span className="text-muted">Note</span>
         ) : event.fromStage ? (
-          <span className="flex items-center gap-1 text-fg">
+          <span className="flex items-center gap-1.5 text-fg">
             <span className={STAGE_TEXT[event.fromStage]}>{STAGE_LABEL[event.fromStage]}</span>
-            <ArrowRight className="size-3 text-faint" />
+            <ArrowRight className="size-4 text-faint" />
             <span className={STAGE_TEXT[event.toStage]}>{STAGE_LABEL[event.toStage]}</span>
           </span>
         ) : (
@@ -415,7 +413,7 @@ function TimelineItem({ event }: { event: StageEvent }) {
         )}
       </div>
       {event.note ? (
-        <p className="mt-1 max-w-[60ch] text-[13px] leading-relaxed whitespace-pre-wrap text-muted">
+        <p className="mt-1 max-w-[60ch] text-body-sm leading-relaxed whitespace-pre-wrap text-muted">
           {event.note}
         </p>
       ) : null}
@@ -452,7 +450,7 @@ function Reminders({ detail }: { detail: ApplicationDetail }) {
             });
           }}
         >
-          <Field label="Remind me on" htmlFor="remind" className="flex-1 min-w-40">
+          <Field label="Remind me on" htmlFor="remind" className="flex-1 min-w-44">
             <Input
               id="remind"
               type="date"
@@ -462,7 +460,7 @@ function Reminders({ detail }: { detail: ApplicationDetail }) {
             />
           </Field>
           <Button type="submit" variant="secondary" disabled={!date} loading={schedule.isPending}>
-            <Bell className="size-4" /> Set follow-up
+            <Bell className="size-5" /> Set follow-up
           </Button>
         </form>
       ) : null}
@@ -470,7 +468,7 @@ function Reminders({ detail }: { detail: ApplicationDetail }) {
       <div>
         <div className="stamp mb-2 text-faint">Pending</div>
         {pending.length === 0 ? (
-          <p className="text-xs text-faint">
+          <p className="text-caption text-faint">
             {detail.stage === 'APPLIED'
               ? 'No reminder pending. Moving to Applied again sets a ten-day one automatically.'
               : 'Nothing pending. A follow-up can be set on any open application.'}
@@ -523,11 +521,11 @@ function ReminderRow({
       ? `cancelled ${shortDate(reminder.cancelledAt)}`
       : dueLabel(reminder.dueAt);
   return (
-    <li className="flex items-center gap-3 px-3 py-2 text-xs">
+    <li className="flex items-center gap-3 px-4 py-2 text-caption">
       {reminder.kind === 'FOLLOW_UP' ? (
-        <CalendarClock className="size-3.5 text-info" />
+        <CalendarClock className="size-4 text-info" />
       ) : (
-        <Bell className="size-3.5 text-accent" />
+        <Bell className="size-4 text-accent" />
       )}
       <div className="min-w-0 flex-1">
         <p className="text-fg">
@@ -538,7 +536,7 @@ function ReminderRow({
       </div>
       {onCancel ? (
         <Button size="xs" variant="ghost" onClick={onCancel} loading={cancelling}>
-          <BellOff className="size-3" /> Cancel
+          <BellOff className="size-4" /> Cancel
         </Button>
       ) : null}
     </li>
@@ -578,9 +576,9 @@ function Detail({ detail, onDeleted }: { detail: ApplicationDetail; onDeleted: (
       </Tabs>
 
       <div className="flex items-center justify-between border-t border-line pt-4">
-        <span className="text-[11px] text-faint">Updated {dateTime(detail.updatedAt)}</span>
+        <span className="text-fine text-faint">Updated {dateTime(detail.updatedAt)}</span>
         <Button size="sm" variant="danger" onClick={() => setConfirming(true)}>
-          <Trash2 className="size-3.5" /> Delete
+          <Trash2 className="size-4" /> Delete
         </Button>
       </div>
 

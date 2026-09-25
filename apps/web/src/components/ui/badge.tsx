@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
 
 export const badgeVariants = cva(
-  'inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-[11px] leading-none whitespace-nowrap',
+  'inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 font-mono text-fine leading-none whitespace-nowrap',
   {
     variants: {
       tone: {
@@ -38,7 +38,7 @@ export function ScoreBadge({ score, className }: { score: number; className?: st
   return (
     <span
       className={cn(
-        'tabular inline-flex h-7 min-w-10 items-center justify-center rounded-sm border px-1.5 font-mono text-[13px] font-medium',
+        'tabular inline-flex h-9 min-w-12 items-center justify-center rounded-sm border px-2 font-mono text-measure font-medium',
         tone,
         className,
       )}

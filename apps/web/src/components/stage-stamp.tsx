@@ -15,7 +15,7 @@ export function StageStamp({
     <span
       className={cn(
         'stamp inline-flex items-center rounded-[3px] border bg-transparent',
-        size === 'sm' ? 'h-5 px-1.5' : 'h-6 px-2 text-[11px]',
+        size === 'sm' ? 'h-6 px-2' : 'h-7 px-2.5 text-fine',
         STAGE_BORDER[stage],
         STAGE_TEXT[stage],
         className,
@@ -30,7 +30,7 @@ export function StageDot({ stage, className }: { stage: Stage; className?: strin
   return (
     <span
       aria-hidden
-      className={cn('inline-block size-1.5 rounded-full', className)}
+      className={cn('inline-block size-2 rounded-full', className)}
       style={{ background: `var(--stage-${stage.toLowerCase()})` }}
     />
   );

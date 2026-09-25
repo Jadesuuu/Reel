@@ -30,11 +30,11 @@ function Today({
     stats?.upcoming.filter((item) => new Date(item.at).getTime() - Date.now() < 3 * 86_400_000) ??
     [];
   return (
-    <div className="mb-8">
-      <h1 className="max-w-[40ch] text-[22px] leading-snug font-semibold tracking-tight text-fg">
+    <div className="mb-10">
+      <h1 className="max-w-[36ch] text-headline font-semibold tracking-tight text-fg lg:text-headline-lg">
         {newMatches === undefined || stats === undefined ? (
-          <span className="inline-block h-7 w-80 align-middle">
-            <Skeleton className="h-6 w-full" />
+          <span className="inline-block h-9 w-96 align-middle">
+            <Skeleton className="h-8 w-full" />
           </span>
         ) : (
           <>
@@ -72,20 +72,20 @@ function Today({
           </>
         )}
       </h1>
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button asChild variant="primary" size="sm">
+      <div className="mt-5 flex flex-wrap items-center gap-2.5">
+        <Button asChild variant="primary" size="md">
           <Link href="/inbox">
-            <Inbox className="size-3.5" /> Open inbox
+            <Inbox className="size-4" /> Open inbox
           </Link>
         </Button>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild variant="outline" size="md">
           <Link href="/pipeline?new=1">
-            <Plus className="size-3.5" /> Add application
+            <Plus className="size-4" /> Add application
           </Link>
         </Button>
-        <Button asChild variant="ghost" size="sm">
+        <Button asChild variant="ghost" size="md">
           <Link href="/settings/ingest">
-            <RefreshCw className="size-3.5" /> Ingest runs
+            <RefreshCw className="size-4" /> Ingest runs
           </Link>
         </Button>
       </div>
@@ -107,8 +107,8 @@ function Funnel({ stats, upcoming }: { stats: ApplicationStats; upcoming: Upcomi
     <Panel>
       <SectionTitle
         aside={
-          <Link href="/pipeline" className="inline-flex items-center gap-1 hover:text-fg">
-            Pipeline <ArrowRight className="size-3" />
+          <Link href="/pipeline" className="inline-flex items-center gap-1.5 hover:text-fg">
+            Pipeline <ArrowRight className="size-4" />
           </Link>
         }
       >
@@ -123,7 +123,7 @@ function Funnel({ stats, upcoming }: { stats: ApplicationStats; upcoming: Upcomi
             <li key={stage}>
               <Link
                 href={`/pipeline?stage=${stage}`}
-                className="group -mx-2 grid grid-cols-[7.5rem_1fr_2.5rem] items-center gap-3 rounded-md px-2 py-2.5 hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent"
+                className="group -mx-2 grid grid-cols-[9.5rem_1fr_3rem] items-center gap-4 rounded-md px-2 py-3 hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent"
               >
                 <StageStamp stage={stage} />
                 <span className="relative block h-px w-full bg-line">
@@ -137,15 +137,23 @@ function Funnel({ stats, upcoming }: { stats: ApplicationStats; upcoming: Upcomi
                     )}
                   />
                 </span>
-                <span className="tabular text-right font-mono text-[13px] text-fg">{count}</span>
+                <span className="tabular text-right font-mono text-measure text-fg">{count}</span>
               </Link>
             </li>
           );
         })}
       </ol>
-      <p className="tabular mt-3 border-t border-line pt-3 font-mono text-[11px] text-muted">
-        {stats.appliedThisWeek} applied this week · {percent(stats.responseRate)} reply rate ·{' '}
-        {median === null ? 'no replies yet' : `median ${median}d to first reply`}
+      <p className="mt-4 border-t border-line pt-4 text-caption text-muted">
+        <span className="tabular font-mono text-fg">{stats.appliedThisWeek}</span> applied this week
+        · <span className="tabular font-mono text-fg">{percent(stats.responseRate)}</span> reply
+        rate ·{' '}
+        {median === null ? (
+          'no replies yet'
+        ) : (
+          <>
+            median <span className="tabular font-mono text-fg">{median}d</span> to first reply
+          </>
+        )}
       </p>
     </Panel>
   );
@@ -167,7 +175,7 @@ function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
     <Panel>
       <SectionTitle aside="last 8 weeks">Activity</SectionTitle>
       {total === 0 ? (
-        <p className="py-6 text-center text-xs text-faint">
+        <p className="py-8 text-center text-body-sm text-muted">
           Stage changes will show up here week by week.
         </p>
       ) : (
@@ -175,12 +183,12 @@ function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
           {WEEKLY_SERIES.map((series) => {
             const sum = weekly.reduce((acc, week) => acc + week[series.key], 0);
             return (
-              <div key={series.key}>
+              <div key={series.key} className="min-w-0">
                 <div className="mb-1 flex items-baseline justify-between">
-                  <span className="text-xs text-muted">{series.label}</span>
-                  <span className="tabular font-mono text-xs text-fg">{sum}</span>
+                  <span className="text-caption text-muted">{series.label}</span>
+                  <span className="tabular font-mono text-caption text-fg">{sum}</span>
                 </div>
-                <div className="h-14 border-b border-line">
+                <div className="h-20 border-b border-line">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={weekly}
@@ -194,7 +202,7 @@ function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
                           if (!active || !payload?.length) return null;
                           const week = payload[0]!.payload as WeeklyBucket;
                           return (
-                            <div className="rounded-md border border-line bg-surface-2 px-2 py-1 text-[11px] text-fg shadow-md">
+                            <div className="rounded-md border border-line bg-surface-2 px-2 py-1 text-fine text-fg shadow-md">
                               Week of {shortDate(week.weekStart)}:{' '}
                               <span className="tabular font-mono">{week[series.key]}</span>
                             </div>
@@ -213,7 +221,7 @@ function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-1 flex justify-between font-mono text-[10px] text-faint">
+                <div className="mt-1.5 flex justify-between font-mono text-fine whitespace-nowrap text-faint">
                   <span>{shortDate(weekly[0]!.weekStart)}</span>
                   <span className="text-accent">this week</span>
                 </div>
@@ -226,7 +234,11 @@ function Weekly({ weekly }: { weekly: WeeklyBucket[] }) {
   );
 }
 
+const UPCOMING_LIMIT = 6;
+
 function Upcoming({ items }: { items: UpcomingItem[] }) {
+  const shown = items.slice(0, UPCOMING_LIMIT);
+  const rest = items.length - shown.length;
   return (
     <Panel className="scroll-mt-20">
       <div id="coming-up" />
@@ -245,23 +257,25 @@ function Upcoming({ items }: { items: UpcomingItem[] }) {
           animate="visible"
           className="divide-y divide-line"
         >
-          {items.map((item) => (
+          {shown.map((item) => (
             <motion.li key={`${item.applicationId}-${item.kind}-${item.at}`} variants={listItem}>
               <Link
                 href={`/pipeline?open=${item.applicationId}`}
-                className="-mx-2 flex items-center gap-3 rounded-md px-2 py-2.5 hover:bg-surface-2"
+                className="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
               >
-                <div className="w-14 shrink-0">
-                  <div className="tabular font-mono text-xs text-fg">{shortDate(item.at)}</div>
-                  <div className="text-[10.5px] text-faint">{dueLabel(item.at)}</div>
+                <div className="w-[4.5rem] shrink-0">
+                  <div className="tabular font-mono text-measure-sm text-fg">
+                    {shortDate(item.at)}
+                  </div>
+                  <div className="text-fine text-muted">{dueLabel(item.at)}</div>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-fg">{item.company}</p>
-                  <p className="truncate text-xs text-muted">
+                  <p className="truncate text-body text-fg">{item.company}</p>
+                  <p className="truncate text-body-sm text-muted">
                     {item.kind === 'REMINDER' ? 'Follow-up reminder' : 'Next step'} · {item.role}
                   </p>
                 </div>
-                <span className="flex items-center gap-1.5 text-[11px] text-faint">
+                <span className="flex items-center gap-2 text-caption text-muted">
                   <StageDot stage={item.stage} /> {STAGE_LABEL[item.stage]}
                 </span>
               </Link>
@@ -269,6 +283,14 @@ function Upcoming({ items }: { items: UpcomingItem[] }) {
           ))}
         </motion.ol>
       )}
+      {rest > 0 ? (
+        <Link
+          href="/pipeline"
+          className="mt-3 inline-flex items-center gap-1.5 text-body-sm text-muted hover:text-fg"
+        >
+          {rest} more in the next 14 days <ArrowRight className="size-4" />
+        </Link>
+      ) : null}
     </Panel>
   );
 }
@@ -277,7 +299,7 @@ function SourceHealth() {
   const sources = useSources();
   const postings = usePostingStats();
 
-  if (sources.isPending) return <RowsSkeleton rows={4} height="h-8" />;
+  if (sources.isPending) return <RowsSkeleton rows={4} height="h-9" />;
   if (sources.isError)
     return <ErrorState message="Could not load sources." onRetry={() => sources.refetch()} />;
 
@@ -289,15 +311,16 @@ function SourceHealth() {
     <Panel>
       <SectionTitle
         aside={
-          <Link href="/settings/sources" className="inline-flex items-center gap-1 hover:text-fg">
-            Sources <ArrowRight className="size-3" />
+          <Link href="/settings/sources" className="inline-flex items-center gap-1.5 hover:text-fg">
+            Sources <ArrowRight className="size-4" />
           </Link>
         }
       >
         Sources
         {postings.data ? (
-          <span className="tabular ml-2 font-mono text-xs font-normal text-faint">
-            {postings.data.total.toLocaleString()} postings
+          <span className="ml-2 text-caption font-normal text-muted">
+            <span className="tabular font-mono">{postings.data.total.toLocaleString()}</span>{' '}
+            postings
           </span>
         ) : null}
       </SectionTitle>
@@ -313,7 +336,7 @@ function SourceHealth() {
                   ? 'bg-info'
                   : 'bg-success';
           return (
-            <li key={item.source} className="flex items-center gap-3 py-2 text-xs">
+            <li key={item.source} className="flex items-center gap-3 py-2 text-body-sm">
               <Tip
                 content={
                   run
@@ -321,13 +344,13 @@ function SourceHealth() {
                     : 'Never run'
                 }
               >
-                <span className={`size-1.5 rounded-full ${tone}`} aria-hidden />
+                <span className={`size-2 rounded-full ${tone}`} aria-hidden />
               </Tip>
               <SourceBadge source={item.source} full />
               <span className="tabular ml-auto font-mono text-faint">
                 {item.postings.toLocaleString()}
               </span>
-              <span className="hidden w-20 text-right text-faint sm:inline">
+              <span className="hidden w-24 text-right text-muted sm:inline">
                 {run ? relativeTime(run.startedAt) : '—'}
               </span>
             </li>
@@ -355,8 +378,8 @@ export default function DashboardPage() {
         />
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
-        <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-4">
           {stats.data ? (
             <Funnel stats={stats.data} upcoming={stats.data.upcoming} />
           ) : (
@@ -364,13 +387,15 @@ export default function DashboardPage() {
           )}
           {stats.data ? <Weekly weekly={stats.data.weekly} /> : <Skeleton className="h-40" />}
         </div>
-        <div className="space-y-4">
+        <div className="min-w-0">
           {stats.data ? <Upcoming items={stats.data.upcoming} /> : <Skeleton className="h-52" />}
+        </div>
+        <div className="min-w-0 lg:col-start-1">
           <SourceHealth />
         </div>
       </div>
 
-      <p className="mt-8 text-[11px] text-faint">
+      <p className="mt-10 text-caption text-faint">
         {session.data ? `${session.data.email} · ` : null}
         {longDate(new Date().toISOString())}
       </p>

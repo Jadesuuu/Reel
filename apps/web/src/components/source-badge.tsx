@@ -21,13 +21,13 @@ export function SourceBadge({
   const body = (
     <span
       className={cn(
-        'inline-flex h-5 items-center gap-1 rounded-sm border border-line bg-surface-2 px-1.5 font-mono text-[10.5px] tracking-wide text-muted uppercase',
+        'inline-flex h-6 shrink-0 items-center gap-1.5 rounded-sm border border-line bg-surface-2 px-2 font-mono text-stamp whitespace-nowrap text-muted uppercase',
         href && 'hover:border-line-strong hover:text-fg',
         className,
       )}
     >
       {label}
-      {href ? <ExternalLink className="size-2.5" aria-hidden /> : null}
+      {href ? <ExternalLink className="size-3" aria-hidden /> : null}
     </span>
   );
 

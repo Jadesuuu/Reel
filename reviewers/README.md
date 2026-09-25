@@ -25,6 +25,7 @@ Read them in order. Each one follows the same shape:
 | 17   | [Application tracking v2](step-17-applications-v2.md) | `feat/applications-v2` |
 | 18   | [Web overhaul](step-18-web-overhaul.md)               | `feat/web-overhaul`    |
 | 19   | [Demo mode](step-19-demo.md)                          | `feat/web-demo`        |
+| 20   | [Readability pass](step-20-readability.md)            | `feat/web-readability` |
 
 Steps 1–6 were built in an earlier pass and have no reviewer yet. The repairs document covers
 what was wrong with them; the code itself is small enough to read directly, starting at

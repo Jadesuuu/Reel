@@ -8,7 +8,7 @@ import { cn } from '../../lib/cn';
 
 export const buttonVariants = cva(
   [
-    'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-medium',
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium',
     'transition-[background-color,border-color,color,transform,box-shadow] duration-150 ease-out',
     'select-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
@@ -25,12 +25,12 @@ export const buttonVariants = cva(
         link: 'text-accent underline-offset-4 hover:underline h-auto px-0',
       },
       size: {
-        xs: 'h-6 px-2 text-[11px] rounded-sm gap-1',
-        sm: 'h-7 px-2.5 text-xs',
-        md: 'h-9 px-3.5 text-sm',
-        lg: 'h-10 px-4 text-sm',
-        icon: 'size-8 p-0',
-        'icon-sm': 'size-7 p-0',
+        xs: 'h-7 px-2 text-fine rounded-sm gap-1.5',
+        sm: 'h-8 px-3 text-caption',
+        md: 'h-10 px-3.5 text-body',
+        lg: 'h-11 px-4 text-body',
+        icon: 'size-9 p-0',
+        'icon-sm': 'size-8 p-0',
       },
     },
     defaultVariants: {
@@ -65,7 +65,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       aria-busy={loading || undefined}
       {...props}
     >
-      {loading ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : null}
+      {loading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
       {children}
     </button>
   );

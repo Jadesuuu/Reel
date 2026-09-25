@@ -18,7 +18,7 @@ export function TextSkeleton({ lines = 3 }: { lines?: number }) {
   return (
     <div className="space-y-2" aria-busy>
       {Array.from({ length: lines }, (_, index) => (
-        <Skeleton key={index} className={cn('h-3', index === lines - 1 ? 'w-2/3' : 'w-full')} />
+        <Skeleton key={index} className={cn('h-4', index === lines - 1 ? 'w-2/3' : 'w-full')} />
       ))}
     </div>
   );

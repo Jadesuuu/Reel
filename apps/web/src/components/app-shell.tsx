@@ -70,11 +70,11 @@ function IngestState() {
     >
       <Link
         href="/settings/ingest"
-        className="hidden items-center gap-1.5 rounded-md px-2 py-1 font-mono text-[10.5px] tracking-wide text-faint uppercase hover:bg-surface-2 hover:text-fg lg:inline-flex"
+        className="hidden items-center gap-2 rounded-md px-2 py-1 font-mono text-stamp tracking-wide text-faint uppercase hover:bg-surface-2 hover:text-fg lg:inline-flex"
       >
         <span
           className={cn(
-            'size-1.5 rounded-full',
+            'size-2 rounded-full',
             running > 0
               ? 'animate-pulse bg-info'
               : latest.status === 'FAILED'
@@ -106,16 +106,16 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh">
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-surface md:flex">
-        <div className="flex h-14 items-center px-5">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-surface md:flex">
+        <div className="flex h-16 items-center px-6">
           <Link
             href="/dashboard"
-            className="font-mono text-[12px] tracking-[0.32em] text-accent uppercase"
+            className="font-mono text-caption tracking-[0.32em] text-accent uppercase"
           >
             Reel
           </Link>
         </div>
-        <nav className="flex-1 space-y-0.5 px-3" aria-label="Primary">
+        <nav className="flex-1 space-y-1 px-4" aria-label="Primary">
           {NAV.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -125,13 +125,13 @@ export function AppShell({
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'group flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] transition-colors duration-150',
+                  'group flex h-11 items-center gap-3 rounded-md px-3 text-body transition-colors duration-150',
                   active ? 'bg-surface-3 text-fg' : 'text-muted hover:bg-surface-2 hover:text-fg',
                 )}
               >
                 <Icon
                   className={cn(
-                    'size-4',
+                    'size-5',
                     active ? 'text-accent' : 'text-faint group-hover:text-muted',
                   )}
                 />
@@ -144,19 +144,19 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         {banner}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-canvas/85 px-4 backdrop-blur-md md:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-canvas/85 px-4 backdrop-blur-md md:px-6">
           <Link
             href="/dashboard"
-            className="font-mono text-[12px] tracking-[0.32em] text-accent uppercase md:hidden"
+            className="font-mono text-caption tracking-[0.32em] text-accent uppercase md:hidden"
           >
             Reel
           </Link>
           <button
             type="button"
             onClick={() => setPaletteOpen(true)}
-            className="hidden h-8 w-full max-w-md items-center gap-2 rounded-md border border-line bg-surface px-2.5 text-left text-xs text-muted transition-colors hover:border-line-strong hover:text-fg md:flex"
+            className="hidden h-10 w-full max-w-lg items-center gap-2.5 rounded-md border border-line bg-surface px-3 text-left text-body-sm text-muted transition-colors hover:border-line-strong hover:text-fg md:flex"
           >
-            <Search className="size-3.5" />
+            <Search className="size-4" />
             <span className="flex-1 truncate">
               Search {current ? current.label.toLowerCase() : 'Reel'}, jump anywhere, run an action…
             </span>
@@ -164,7 +164,7 @@ export function AppShell({
             <Kbd>K</Kbd>
           </button>
           <IngestState />
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-1.5">
             <Button
               variant="ghost"
               size="icon-sm"
@@ -172,7 +172,7 @@ export function AppShell({
               aria-label="Search"
               onClick={() => setPaletteOpen(true)}
             >
-              <Search className="size-4" />
+              <Search className="size-5" />
             </Button>
             <ThemeToggle />
             <Menu>
@@ -183,15 +183,15 @@ export function AppShell({
                   className="gap-2 pl-1.5"
                   aria-label="Account menu"
                 >
-                  <span className="flex size-5 items-center justify-center rounded-full bg-accent-soft text-accent">
-                    <UserRound className="size-3" />
+                  <span className="flex size-6 items-center justify-center rounded-full bg-accent-soft text-accent">
+                    <UserRound className="size-4" />
                   </span>
-                  <span className="hidden max-w-40 truncate text-xs sm:inline">{email}</span>
+                  <span className="hidden max-w-48 truncate text-body-sm sm:inline">{email}</span>
                 </Button>
               </MenuTrigger>
               <MenuContent>
                 <MenuLabel>Signed in as</MenuLabel>
-                <div className="truncate px-2 pb-1.5 text-xs text-muted">{email}</div>
+                <div className="truncate px-2 pb-2 text-body-sm text-muted">{email}</div>
                 <MenuSeparator />
                 <MenuItem asChild>
                   <Link href="/settings/account">Account settings</Link>
@@ -201,15 +201,15 @@ export function AppShell({
                 </MenuItem>
                 <MenuSeparator />
                 <MenuItem onSelect={() => logout.mutate()} disabled={logout.isPending}>
-                  <LogOut className="size-3.5" /> Log out
+                  <LogOut className="size-4" /> Log out
                 </MenuItem>
               </MenuContent>
             </Menu>
           </div>
         </header>
 
-        <main className="flex-1 px-4 pt-6 pb-24 md:px-6 md:pb-10 lg:px-8">
-          <div className="mx-auto w-full max-w-[1200px]">{children}</div>
+        <main className="flex-1 px-4 pt-8 pb-28 md:px-8 md:pb-12 lg:px-10">
+          <div className="mx-auto w-full max-w-[1360px]">{children}</div>
         </main>
       </div>
 
@@ -226,11 +226,11 @@ export function AppShell({
               href={item.href}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex flex-1 flex-col items-center gap-1 py-2 text-[10.5px] transition-colors',
+                'flex flex-1 flex-col items-center gap-1 py-2.5 text-fine font-medium transition-colors',
                 active ? 'text-accent' : 'text-faint',
               )}
             >
-              <Icon className="size-[18px]" />
+              <Icon className="size-[22px]" />
               {item.label}
             </Link>
           );
