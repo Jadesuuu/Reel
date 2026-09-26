@@ -125,7 +125,27 @@ export class MatchingService {
       this.prisma.match.count({ where }),
     ]);
 
-    return paginate(items, page, pageSize, total);
+    const applications = await this.prisma.application.findMany({
+      where: { userId, postingId: { in: items.map((item) => item.postingId) } },
+      select: { id: true, stage: true, postingId: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    const byPosting = new Map(
+      applications.map((application) => [
+        application.postingId,
+        { id: application.id, stage: application.stage },
+      ]),
+    );
+
+    return paginate(
+      items.map((item) => ({
+        ...item,
+        application: byPosting.get(item.postingId) ?? null,
+      })),
+      page,
+      pageSize,
+      total,
+    );
   }
 
   async dismiss(userId: string, matchId: string) {

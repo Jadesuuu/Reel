@@ -137,6 +137,37 @@ describe('Matches (e2e)', () => {
     expect(res.body.items[0].posting).not.toHaveProperty('rawText');
   });
 
+  it('carries the application once the posting is saved to the pipeline', async () => {
+    const strong = await prisma.posting.findFirstOrThrow({
+      where: { externalId: `${THREAD_ID}-strong` },
+      select: { id: true },
+    });
+    const find = (items: { postingId: string }[]) =>
+      items.find((item) => item.postingId === strong.id) as
+        { application: { id: string; stage: string } | null } | undefined;
+
+    const before = await request(app.getHttpServer())
+      .get('/api/v1/matches?pageSize=100')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(find(before.body.items)?.application).toBeNull();
+
+    const created = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', cookie)
+      .send({ postingId: strong.id })
+      .expect(201);
+
+    const after = await request(app.getHttpServer())
+      .get('/api/v1/matches?pageSize=100')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(find(after.body.items)?.application).toEqual({
+      id: created.body.id,
+      stage: 'SAVED',
+    });
+  });
+
   it('dismisses a match and hides it from the default list', async () => {
     const strong = await prisma.posting.findFirstOrThrow({
       where: { externalId: `${THREAD_ID}-strong` },

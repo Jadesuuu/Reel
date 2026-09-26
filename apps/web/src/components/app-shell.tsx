@@ -2,20 +2,22 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   Inbox,
   KanbanSquare,
   LayoutDashboard,
   LogOut,
   Newspaper,
+  RefreshCw,
   Search,
   Settings,
   UserRound,
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { modKey } from '../lib/keyboard';
-import { useIngestRuns } from '../lib/queries';
+import { useIngestRuns, useRunIngest } from '../lib/queries';
 import { useLogout, useSession } from '../lib/session';
 import { relativeTime } from '../lib/format';
 import { Tip } from './ui/tooltip';
@@ -56,35 +58,76 @@ export const NAV = [
 ] as const;
 
 function IngestState() {
+  const router = useRouter();
   const runs = useIngestRuns({ page: 1 });
+  const runIngest = useRunIngest();
   const running = runs.data?.items.filter((run) => run.status === 'RUNNING').length ?? 0;
   const latest = runs.data?.items[0];
-  if (!latest) return null;
+  const busy = running > 0 || runIngest.isPending;
+
+  const refetch = () =>
+    runIngest.mutate(
+      {},
+      {
+        onSuccess: () =>
+          toast.success('Refetching every source', {
+            description:
+              'Each enabled source runs in the worker. New postings are scored as they land.',
+            action: { label: 'Watch', onClick: () => router.push('/settings/ingest') },
+          }),
+        onError: () => toast.error('Could not queue the refetch. Is the API running?'),
+      },
+    );
+
   return (
-    <Tip
-      content={
-        running > 0
-          ? `${running} ingest ${running === 1 ? 'job' : 'jobs'} running`
-          : `Last ingest ${relativeTime(latest.startedAt)} · ${latest.status.toLowerCase()}`
-      }
-    >
-      <Link
-        href="/settings/ingest"
-        className="hidden items-center gap-2 rounded-md px-2 py-1 font-mono text-stamp tracking-wide text-faint uppercase hover:bg-surface-2 hover:text-fg lg:inline-flex"
-      >
-        <span
-          className={cn(
-            'size-2 rounded-full',
+    <div className="flex items-center">
+      {latest ? (
+        <Tip
+          content={
             running > 0
-              ? 'animate-pulse bg-info'
-              : latest.status === 'FAILED'
-                ? 'bg-danger'
-                : 'bg-success',
-          )}
-        />
-        {running > 0 ? 'ingesting' : relativeTime(latest.startedAt)}
-      </Link>
-    </Tip>
+              ? `${running} ingest ${running === 1 ? 'job' : 'jobs'} running`
+              : `Last ingest ${relativeTime(latest.startedAt)} · ${latest.status.toLowerCase()}`
+          }
+          side="bottom"
+        >
+          <Link
+            href="/settings/ingest"
+            aria-label={
+              running > 0 ? 'Ingest running' : `Last ingest ${relativeTime(latest.startedAt)}`
+            }
+            className="inline-flex h-8 items-center gap-2 rounded-md px-2 font-mono text-stamp tracking-wide text-faint uppercase transition-colors duration-150 hover:bg-surface-2 hover:text-fg"
+          >
+            <span
+              className={cn(
+                'size-2 rounded-full',
+                running > 0
+                  ? 'animate-pulse bg-info'
+                  : latest.status === 'FAILED'
+                    ? 'bg-danger'
+                    : 'bg-success',
+              )}
+            />
+            <span className="tabular hidden sm:inline">
+              {running > 0 ? 'ingesting' : relativeTime(latest.startedAt)}
+            </span>
+          </Link>
+        </Tip>
+      ) : null}
+      <Tip content="Refetch every source" side="bottom">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={busy ? 'Refetching every source' : 'Refetch every source'}
+          aria-busy={busy}
+          disabled={busy}
+          onClick={refetch}
+        >
+          <RefreshCw
+            className={cn('size-5', busy && 'animate-spin text-info motion-reduce:animate-none')}
+          />
+        </Button>
+      </Tip>
+    </div>
   );
 }
 
@@ -163,8 +206,8 @@ export function AppShell({
             <Kbd>{modKey()}</Kbd>
             <Kbd>K</Kbd>
           </button>
-          <IngestState />
           <div className="ml-auto flex items-center gap-1.5">
+            <IngestState />
             <Button
               variant="ghost"
               size="icon-sm"

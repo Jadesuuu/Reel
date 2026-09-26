@@ -59,7 +59,16 @@ route('GET', '/matches', ({ query }) => {
       (a, b) =>
         b.match.score - a.match.score || b.posting!.postedAt.localeCompare(a.posting!.postedAt),
     )
-    .map(({ match, posting }) => ({ ...match, posting: summaryOf(posting!) }));
+    .map(({ match, posting }) => {
+      const application = state.applications
+        .filter((entry) => entry.postingId === match.postingId)
+        .at(-1);
+      return {
+        ...match,
+        posting: summaryOf(posting!),
+        application: application ? { id: application.id, stage: application.stage } : null,
+      };
+    });
 
   return paginate(items, query);
 });

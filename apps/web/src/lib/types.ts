@@ -83,6 +83,7 @@ export type Match = {
   dismissed: boolean;
   createdAt: string;
   posting: PostingSummary;
+  application: { id: string; stage: Stage } | null;
 };
 
 export type EventKind = 'STAGE_CHANGE' | 'NOTE';

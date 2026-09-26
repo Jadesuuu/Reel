@@ -195,7 +195,10 @@ export function useApplicationStats() {
 }
 
 function invalidateApplications(queryClient: ReturnType<typeof useQueryClient>, id?: string) {
-  const tasks = [queryClient.invalidateQueries({ queryKey: ['applications'] })];
+  const tasks = [
+    queryClient.invalidateQueries({ queryKey: ['applications'] }),
+    queryClient.invalidateQueries({ queryKey: ['matches'] }),
+  ];
   if (id) tasks.push(queryClient.invalidateQueries({ queryKey: ['application', id] }));
   return Promise.all(tasks);
 }

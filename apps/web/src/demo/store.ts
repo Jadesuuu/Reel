@@ -25,7 +25,7 @@ export type DemoMail = {
   sentAt: string;
 };
 
-export type StoredMatch = Omit<Match, 'posting'>;
+export type StoredMatch = Omit<Match, 'posting' | 'application'>;
 
 export type DemoState = {
   version: number;
