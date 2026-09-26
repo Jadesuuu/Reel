@@ -1,10 +1,11 @@
 'use client';
 
-import { ExternalLink, MapPin, Plus } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, MapPin, Plus } from 'lucide-react';
 import { hostOf, longDate, remoteLabel } from '../lib/format';
 import { usePosting } from '../lib/queries';
 import type { PostingSummary } from '../lib/types';
 import { SourceBadge } from './source-badge';
+import { StageStamp } from './stage-stamp';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Sheet, SheetContent } from './ui/sheet';
@@ -31,6 +32,7 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
   const saver = useSavePosting();
   const data = detail.data ?? posting;
   const applyHref = data.applyUrl ?? data.url;
+  const tracked = detail.data?.application ?? null;
 
   return (
     <SheetContent
@@ -41,6 +43,7 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
           <div className="mb-1.5 flex items-center gap-2">
             <SourceBadge source={data.source} href={data.url} />
             <span className="text-fine text-faint">{longDate(data.postedAt)}</span>
+            {tracked ? <StageStamp stage={tracked.stage} className="ml-auto" /> : null}
           </div>
           <h2 className="truncate text-title font-semibold tracking-tight text-fg">
             {data.company ?? 'Unknown company'}
@@ -50,16 +53,23 @@ function PostingSheetBody({ posting }: { posting: PostingSummary }) {
       }
       footer={
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="primary"
-            size="md"
-            loading={saver.isPending}
-            onClick={() =>
-              saver.save({ postingId: data.id, company: data.company, role: data.role })
-            }
-          >
-            <Plus className="size-5" /> Save to pipeline
-          </Button>
+          {tracked ? (
+            <Button variant="primary" size="md" onClick={() => saver.open(tracked.id)}>
+              Open in pipeline <ArrowUpRight className="size-5" />
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="md"
+              loading={saver.isPending}
+              disabled={detail.isPending}
+              onClick={() =>
+                saver.save({ postingId: data.id, company: data.company, role: data.role })
+              }
+            >
+              <Plus className="size-5" /> Save to pipeline
+            </Button>
+          )}
           {applyHref ? (
             <Button asChild variant="outline" size="md">
               <a href={applyHref} target="_blank" rel="noreferrer noopener">

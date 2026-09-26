@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ExternalLink, Inbox as InboxIcon, Plus, RefreshCw, X } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, Inbox as InboxIcon, Plus, RefreshCw, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
 import { PostingSheet } from '../../../components/posting-sheet';
 import { ReasonChips } from '../../../components/reasons';
 import { SourceBadge } from '../../../components/source-badge';
+import { StageStamp } from '../../../components/stage-stamp';
 import { Badge, ScoreBadge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/ui/empty-state';
@@ -46,6 +47,7 @@ function MatchRow({
   onOpen,
   onDismiss,
   onSave,
+  onOpenApplication,
   saving,
 }: {
   match: Match;
@@ -54,6 +56,7 @@ function MatchRow({
   onOpen: () => void;
   onDismiss: () => void;
   onSave: () => void;
+  onOpenApplication: () => void;
   saving: boolean;
 }) {
   const posting = match.posting;
@@ -100,6 +103,16 @@ function MatchRow({
         </button>
 
         <div className="col-span-3 mt-2.5 flex flex-wrap items-center gap-2 sm:col-span-1 sm:col-start-2">
+          {match.application ? (
+            <button
+              type="button"
+              onClick={onOpenApplication}
+              aria-label={`In your pipeline under ${match.application.stage.toLowerCase()}. Open it`}
+              className="rounded-[3px] transition-opacity duration-150 hover:opacity-80"
+            >
+              <StageStamp stage={match.application.stage} />
+            </button>
+          ) : null}
           <SourceBadge source={posting.source} />
           {posting.salaryText ? <Badge tone="neutral">{posting.salaryText}</Badge> : null}
           <ReasonChips reasons={match.reasons} limit={focused ? 8 : 3} />
@@ -144,9 +157,15 @@ function MatchRow({
                 )}
               </p>
               <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm" variant="primary" loading={saving} onClick={onSave}>
-                  <Plus className="size-4" /> Save to pipeline
-                </Button>
+                {match.application ? (
+                  <Button size="sm" variant="primary" onClick={onOpenApplication}>
+                    Open in pipeline <ArrowUpRight className="size-4" />
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="primary" loading={saving} onClick={onSave}>
+                    <Plus className="size-4" /> Save to pipeline
+                  </Button>
+                )}
                 {applyHref ? (
                   <Button asChild size="sm" variant="outline">
                     <a href={applyHref} target="_blank" rel="noreferrer noopener">
@@ -213,7 +232,15 @@ export default function InboxPage() {
     });
   }
 
+  function openApplication(match: Match) {
+    if (match.application) saver.open(match.application.id);
+  }
+
   function saveMatch(match: Match) {
+    if (match.application) {
+      openApplication(match);
+      return;
+    }
     saver.save({
       postingId: match.posting.id,
       company: match.posting.company,
@@ -385,6 +412,7 @@ export default function InboxPage() {
                   onOpen={() => setSelected(match.posting)}
                   onDismiss={() => dismissMatch(match)}
                   onSave={() => saveMatch(match)}
+                  onOpenApplication={() => openApplication(match)}
                   saving={saver.isPending && saver.variables?.postingId === match.posting.id}
                 />
               ))}

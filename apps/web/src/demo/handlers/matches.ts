@@ -1,6 +1,7 @@
 import { MATCH_THRESHOLD, score } from '../scoring';
 import { notFound, paginate, requireSignedIn, route } from '../router';
 import { demoNow, getState, mutate } from '../store';
+import { trackedFor } from '../tracked';
 import { summaryOf } from './postings';
 
 export function rescore(): number {
@@ -59,7 +60,11 @@ route('GET', '/matches', ({ query }) => {
       (a, b) =>
         b.match.score - a.match.score || b.posting!.postedAt.localeCompare(a.posting!.postedAt),
     )
-    .map(({ match, posting }) => ({ ...match, posting: summaryOf(posting!) }));
+    .map(({ match, posting }) => ({
+      ...match,
+      posting: summaryOf(posting!),
+      application: trackedFor(state, match.postingId),
+    }));
 
   return paginate(items, query);
 });

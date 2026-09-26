@@ -2,6 +2,7 @@ import { mentionsRegion } from '../regions';
 import type { Posting } from '../../lib/types';
 import { notFound, paginate, requireSignedIn, route } from '../router';
 import { getState } from '../store';
+import { trackedFor } from '../tracked';
 
 export function summaryOf(posting: Posting) {
   const { rawText: _rawText, ...rest } = posting;
@@ -40,7 +41,7 @@ route('GET', '/postings', ({ query }) => {
         (posting.role ?? '').toLowerCase().includes(q),
     )
     .toSorted((a, b) => b.postedAt.localeCompare(a.postedAt))
-    .map(summaryOf);
+    .map((posting) => ({ ...summaryOf(posting), application: trackedFor(state, posting.id) }));
 
   return paginate(items, query);
 });
@@ -73,5 +74,5 @@ route('GET', '/postings/:id', ({ params }) => {
   requireSignedIn(state.signedIn);
   const posting = state.postings.find((entry) => entry.id === params.id);
   if (!posting) notFound('Posting not found');
-  return posting;
+  return { ...posting, application: trackedFor(state, posting.id) };
 });

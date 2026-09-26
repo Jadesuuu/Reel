@@ -80,6 +80,10 @@ describe('Applications (e2e)', () => {
     expect(res.body.company).toBe('Northwind Labs');
     expect(res.body.role).toBe('Full Stack Engineer');
     expect(res.body.url).toBe('https://northwind.example/apply');
+    expect(res.body.via).toBe('Hacker News');
+    expect(res.body.location).toBe('Remote, US');
+    expect(res.body.salaryText).toBe('$150k-$180k');
+    expect(res.body.appliedAt).toBeNull();
     expect(res.body.stage).toBe('SAVED');
     expect(res.body.events).toHaveLength(1);
     expect(res.body.events[0]).toMatchObject({
@@ -258,17 +262,43 @@ describe('Applications (e2e)', () => {
       .expect(404);
   });
 
-  it('copies location, salary and source label from the posting', async () => {
-    const res = await request(app.getHttpServer())
+  it('refuses a second application for the same posting, per user', async () => {
+    const again = await request(app.getHttpServer())
       .post('/api/v1/applications')
       .set('Cookie', cookie)
       .send({ postingId })
+      .expect(409);
+    expect(again.body.message).toBe('That posting is already in your pipeline');
+
+    const theirs = await request(app.getHttpServer())
+      .post('/api/v1/applications')
+      .set('Cookie', otherCookie)
+      .send({ postingId })
       .expect(201);
 
-    expect(res.body.via).toBe('Hacker News');
-    expect(res.body.location).toBe('Remote, US');
-    expect(res.body.salaryText).toBe('$150k-$180k');
-    expect(res.body.appliedAt).toBeNull();
+    await request(app.getHttpServer())
+      .delete(`/api/v1/applications/${theirs.body.id}`)
+      .set('Cookie', otherCookie)
+      .expect(204);
+  });
+
+  it('shows the application on the posting list and detail', async () => {
+    const detail = await request(app.getHttpServer())
+      .get(`/api/v1/postings/${postingId}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(detail.body.application).toMatchObject({
+      stage: expect.any(String),
+    });
+
+    const list = await request(app.getHttpServer())
+      .get('/api/v1/postings?q=Northwind&pageSize=100')
+      .set('Cookie', cookie)
+      .expect(200);
+    const row = list.body.items.find(
+      (item: { id: string }) => item.id === postingId,
+    );
+    expect(row.application).toEqual(detail.body.application);
   });
 
   it('accepts the richer manual fields and rejects a bad contact email', async () => {

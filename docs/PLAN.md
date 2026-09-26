@@ -1322,14 +1322,14 @@ noted.
 
 | Method | Path | Query | Response |
 |---|---|---|---|
-| GET | `/postings` | `q`, `remote`, `source?: Source`, `boardId?` (replaces `threadId`), `stack?: string` (has keyword), `page`, `pageSize` | unchanged shape; items include `url` |
+| GET | `/postings` | `q`, `remote`, `source?: Source`, `boardId?` (replaces `threadId`), `stack?: string` (has keyword), `page`, `pageSize` | unchanged shape; items include `url` and `application: { id, stage } \| null` for the caller (Step 23) |
 | GET | `/postings/stats` | — | `200 { total, bySource: [{ source, count, latestPostedAt }], byRemote: [{ remote, count }] }` |
 
 **Matches**
 
 | Method | Path | Query | Response |
 |---|---|---|---|
-| GET | `/matches` | adds `source?: Source`, `minScore?: number` | unchanged shape; `posting` summary includes `source` and `url` |
+| GET | `/matches` | adds `source?: Source`, `minScore?: number` | unchanged shape; `posting` summary includes `source` and `url`; each item carries `application: { id, stage } | null`, the caller's most recent application for that posting (Step 23) |
 
 **Applications**
 
@@ -1727,6 +1727,47 @@ are added by hand-written `ALTER TYPE … ADD VALUE` (migration `v4_more_sources
 **Done when:** every new mapper has a real fixture and a spec; the registry, `SOURCES`,
 `BOARD_PROVIDERS`, the web `SOURCE_META`, the board hints and the demo labels all know the six;
 the copy says sixteen sources; the gate is green; a live fetch of each new adapter returns items.
+
+---
+
+### Step 23 — Refetch from anywhere, and tracked matches in the inbox
+
+**Branch:** `feat/refetch-and-tracked-matches`
+**Commits:** `feat: header refetch button and pipeline stage on inbox matches`, then
+`feat: pipeline stage on postings and one application per posting`
+
+**Why.** Two gaps found in daily use on 27 Sep. The only manual "fetch everything" was the
+Run all button in Settings → Ingest, one screen away from where freshness matters. And a match
+that had already been saved looked exactly like a new one, so it was easy to save it twice.
+
+**What changes:**
+
+- The header's ingest chip gains a ghost refresh button beside it. One click calls
+  `POST /ingest/run` with no source, which fans out to every enabled source. While any run is
+  `RUNNING` the icon spins in the info tone and the button is disabled. It is visible at every
+  width; below `sm` the chip shows only its status dot.
+- `GET /matches` items carry `application: { id, stage } | null`, found with one extra
+  `findMany` over the page's posting ids, scoped to the caller.
+- An inbox row with an application shows its stage stamp first in the chip row; the stamp
+  links to the application. The focused row's primary button becomes "Open in pipeline", and
+  the `s` key opens it instead of saving a duplicate.
+- `GET /postings` items and `GET /postings/:id` carry the same `application` field (the
+  shared helper is `applications/tracked.ts`). The Postings table shows the stamp in place of
+  the Save button; the posting sheet shows it in its header and swaps its primary button for
+  "Open in pipeline".
+- `POST /applications` with a `postingId` the caller already has an application for answers
+  `409 Conflict` with `That posting is already in your pipeline`. Other users are unaffected.
+  The web shows a neutral toast for a 409 instead of an error.
+- Application mutations also invalidate `['matches']`, `['postings']` and `['posting']`, so
+  the stamp follows stage changes everywhere.
+
+**Not changed:** the guard is a read-then-write check, not a unique index. Two simultaneous
+saves by the same user could still both land; one user clicking one button makes that
+theoretical, and a partial unique index can follow if it ever happens.
+
+**Done when:** the new e2e cases (match has `application: null`, then the saved application;
+a second save answers 409 while another user can still save; the posting list and detail carry
+the application) pass; the demo mirrors the field; the gate is green.
 
 ---
 

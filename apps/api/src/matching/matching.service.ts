@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { trackedByPosting } from '../applications/tracked.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
 import type { Source } from '../sources/source.types.js';
@@ -125,7 +126,21 @@ export class MatchingService {
       this.prisma.match.count({ where }),
     ]);
 
-    return paginate(items, page, pageSize, total);
+    const byPosting = await trackedByPosting(
+      this.prisma,
+      userId,
+      items.map((item) => item.postingId),
+    );
+
+    return paginate(
+      items.map((item) => ({
+        ...item,
+        application: byPosting.get(item.postingId) ?? null,
+      })),
+      page,
+      pageSize,
+      total,
+    );
   }
 
   async dismiss(userId: string, matchId: string) {

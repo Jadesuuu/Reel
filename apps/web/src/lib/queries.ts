@@ -23,6 +23,7 @@ import type {
   StageEvent,
   UpdateApplicationInput,
   WatchedBoard,
+  Tracked,
 } from './types';
 
 export function query(params: Record<string, string | number | boolean | undefined | null>) {
@@ -137,7 +138,7 @@ export function usePostings(filters: PostingFilters) {
   return useQuery({
     queryKey: ['postings', filters],
     queryFn: () =>
-      apiFetch<Paginated<Posting>>(
+      apiFetch<Paginated<Tracked<Posting>>>(
         `/postings${query({
           q: filters.q,
           remote: filters.remote,
@@ -155,7 +156,7 @@ export function usePostings(filters: PostingFilters) {
 export function usePosting(id: string | null) {
   return useQuery({
     queryKey: ['posting', id],
-    queryFn: () => apiFetch<Posting>(`/postings/${id!}`),
+    queryFn: () => apiFetch<Tracked<Posting>>(`/postings/${id!}`),
     enabled: id !== null,
   });
 }
@@ -195,7 +196,12 @@ export function useApplicationStats() {
 }
 
 function invalidateApplications(queryClient: ReturnType<typeof useQueryClient>, id?: string) {
-  const tasks = [queryClient.invalidateQueries({ queryKey: ['applications'] })];
+  const tasks = [
+    queryClient.invalidateQueries({ queryKey: ['applications'] }),
+    queryClient.invalidateQueries({ queryKey: ['matches'] }),
+    queryClient.invalidateQueries({ queryKey: ['postings'] }),
+    queryClient.invalidateQueries({ queryKey: ['posting'] }),
+  ];
   if (id) tasks.push(queryClient.invalidateQueries({ queryKey: ['application', id] }));
   return Promise.all(tasks);
 }

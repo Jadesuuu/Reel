@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { trackedByPosting } from '../applications/tracked.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
 import type { NormalizedPosting, Source } from '../sources/source.types.js';
@@ -78,7 +79,21 @@ export class PostingsService {
       this.prisma.posting.count({ where }),
     ]);
 
-    return paginate(items, page, pageSize, total);
+    const byPosting = await trackedByPosting(
+      this.prisma,
+      userId,
+      items.map((item) => item.id),
+    );
+
+    return paginate(
+      items.map((item) => ({
+        ...item,
+        application: byPosting.get(item.id) ?? null,
+      })),
+      page,
+      pageSize,
+      total,
+    );
   }
 
   private async openToRegions(userId: string) {
@@ -102,7 +117,7 @@ export class PostingsService {
     return { OR: [{ regionTerms: { isEmpty: true } }, ...mentions] };
   }
 
-  async findOne(id: string): Promise<Record<string, unknown>> {
+  async findOne(id: string, userId: string): Promise<Record<string, unknown>> {
     const posting = await this.prisma.posting.findUnique({
       where: { id },
       select: DETAIL_SELECT,
@@ -110,7 +125,8 @@ export class PostingsService {
     if (!posting) {
       throw new NotFoundException('Posting not found');
     }
-    return posting;
+    const byPosting = await trackedByPosting(this.prisma, userId, [id]);
+    return { ...posting, application: byPosting.get(id) ?? null };
   }
 
   async stats(): Promise<PostingStats> {
