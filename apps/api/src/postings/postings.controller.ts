@@ -26,7 +26,7 @@ export class PostingsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postings.findOne(id);
+  findOne(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.postings.findOne(id, user.userId);
   }
 }

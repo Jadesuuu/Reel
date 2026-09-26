@@ -5,6 +5,7 @@ import { Newspaper, Plus, Search, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PostingSheet } from '../../../components/posting-sheet';
 import { SourceBadge } from '../../../components/source-badge';
+import { StageStamp } from '../../../components/stage-stamp';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { EmptyState } from '../../../components/ui/empty-state';
@@ -250,22 +251,36 @@ export default function PostingsPage() {
                     <span className="text-caption whitespace-nowrap text-muted">
                       {relativeDays(posting.postedAt)}
                     </span>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-                      loading={saver.isPending && saver.variables?.postingId === posting.id}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        saver.save({
-                          postingId: posting.id,
-                          company: posting.company,
-                          role: posting.role,
-                        });
-                      }}
-                    >
-                      <Plus className="size-4" /> Save
-                    </Button>
+                    {posting.application ? (
+                      <button
+                        type="button"
+                        aria-label={`In your pipeline under ${posting.application.stage.toLowerCase()}. Open it`}
+                        className="rounded-[3px] transition-opacity duration-150 hover:opacity-80"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          saver.open(posting.application!.id);
+                        }}
+                      >
+                        <StageStamp stage={posting.application.stage} />
+                      </button>
+                    ) : (
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                        loading={saver.isPending && saver.variables?.postingId === posting.id}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          saver.save({
+                            postingId: posting.id,
+                            company: posting.company,
+                            role: posting.role,
+                          });
+                        }}
+                      >
+                        <Plus className="size-4" /> Save
+                      </Button>
+                    )}
                   </div>
                 </div>
               </motion.li>

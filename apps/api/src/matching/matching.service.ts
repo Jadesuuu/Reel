@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { trackedByPosting } from '../applications/tracked.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { paginate, toSkipTake, type Paginated } from '../common/pagination.js';
 import type { Source } from '../sources/source.types.js';
@@ -125,16 +126,10 @@ export class MatchingService {
       this.prisma.match.count({ where }),
     ]);
 
-    const applications = await this.prisma.application.findMany({
-      where: { userId, postingId: { in: items.map((item) => item.postingId) } },
-      select: { id: true, stage: true, postingId: true },
-      orderBy: { createdAt: 'asc' },
-    });
-    const byPosting = new Map(
-      applications.map((application) => [
-        application.postingId,
-        { id: application.id, stage: application.stage },
-      ]),
+    const byPosting = await trackedByPosting(
+      this.prisma,
+      userId,
+      items.map((item) => item.postingId),
     );
 
     return paginate(

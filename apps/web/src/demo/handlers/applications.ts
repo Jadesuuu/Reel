@@ -1,7 +1,7 @@
 import { sourceLabel } from '../../lib/sources';
 import { ALLOWED, canTransition } from '../../lib/stages';
 import type { Application, Reminder, Stage, StageEvent } from '../../lib/types';
-import { bad, notFound, paginate, requireSignedIn, route, text } from '../router';
+import { bad, notFound, paginate, requireSignedIn, route, text, conflict } from '../router';
 import { summarize } from '../stats';
 import { demoNow, getState, mutate, nextId } from '../store';
 import { summaryOf } from './postings';
@@ -90,6 +90,8 @@ route('POST', '/applications', ({ body }) => {
   const postingId = typeof body.postingId === 'string' ? body.postingId : null;
   const posting = postingId ? state.postings.find((entry) => entry.id === postingId) : undefined;
   if (postingId && !posting) notFound('Posting not found');
+  if (posting && state.applications.some((entry) => entry.postingId === posting.id))
+    conflict('That posting is already in your pipeline');
 
   const company = text(body.company) ?? posting?.company ?? null;
   const role = text(body.role) ?? posting?.role ?? null;

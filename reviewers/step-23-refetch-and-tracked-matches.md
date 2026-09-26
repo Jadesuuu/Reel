@@ -45,7 +45,34 @@ answer inside the posting summary and would have to repeat the `userId` filter t
 **Why the stamp and not a badge.** A stage already has one look everywhere in Reel: the outlined
 stamp in the stage's tone. Reusing it means the inbox and the pipeline say "Saved" the same way.
 
+## Second commit: Postings and the duplicate guard
+
+8. **`apps/api/src/applications/tracked.ts`** — `trackedByPosting(prisma, userId, postingIds)`
+   is the lookup from item 2, moved out so matches and postings share it. It returns an empty
+   `Map` without querying when there are no ids.
+9. **`apps/api/src/postings/postings.service.ts`** — `list()` adds `application` to each row the
+   same way matches do; `findOne(id, userId)` now needs the caller, so the controller passes
+   `@CurrentUser()` to it.
+10. **`apps/api/src/applications/applications.service.ts`** — before creating from a posting,
+    `findFirst` looks for the caller's existing application and throws `ConflictException`
+    (HTTP 409) if there is one.
+11. **`apps/api/test/applications.e2e-spec.ts`** — the old "copies location, salary and source"
+    case saved the same posting a second time, which is now refused, so its assertions moved
+    into the first create case. The new cases check the 409, that another user can still save
+    it (then clean up), and that list and detail carry the application.
+12. **`apps/web/src/components/use-save-posting.ts`** — gains `open(applicationId)`, used by the
+    inbox, the table and the sheet, and turns a 409 into a neutral "already in your pipeline"
+    toast.
+13. **`apps/web/src/app/(app)/postings/page.tsx`** and **`components/posting-sheet.tsx`** — the
+    stamp and "Open in pipeline". The sheet reads `application` from its detail query and keeps
+    Save disabled until that query answers, so it never offers Save for a tracked posting.
+14. **`apps/web/src/lib/types.ts`** — `Tracked<T>` is `T & { application: ... }`, a generic
+    that adds the field to any type. `Tracked<Posting>` is what the postings endpoints return;
+    the demo store keeps plain `Posting` because the field is computed on read.
+15. **`apps/web/src/demo/tracked.ts`**, **`router.ts`** (`conflict`), and the postings,
+    matches and applications handlers — the same behaviour in the demo.
+
 ## Not done
 
-`POST /applications` still accepts a posting that already has an application; the inbox just
-stops offering it. The Postings drawer does not show the stage yet.
+The duplicate guard is a check before the insert, not a database constraint. Two saves fired
+at the same instant by the same user could both succeed.

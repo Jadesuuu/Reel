@@ -1322,7 +1322,7 @@ noted.
 
 | Method | Path | Query | Response |
 |---|---|---|---|
-| GET | `/postings` | `q`, `remote`, `source?: Source`, `boardId?` (replaces `threadId`), `stack?: string` (has keyword), `page`, `pageSize` | unchanged shape; items include `url` |
+| GET | `/postings` | `q`, `remote`, `source?: Source`, `boardId?` (replaces `threadId`), `stack?: string` (has keyword), `page`, `pageSize` | unchanged shape; items include `url` and `application: { id, stage } \| null` for the caller (Step 23) |
 | GET | `/postings/stats` | — | `200 { total, bySource: [{ source, count, latestPostedAt }], byRemote: [{ remote, count }] }` |
 
 **Matches**
@@ -1733,7 +1733,8 @@ the copy says sixteen sources; the gate is green; a live fetch of each new adapt
 ### Step 23 — Refetch from anywhere, and tracked matches in the inbox
 
 **Branch:** `feat/refetch-and-tracked-matches`
-**Commit:** `feat: header refetch button and pipeline stage on inbox matches`
+**Commits:** `feat: header refetch button and pipeline stage on inbox matches`, then
+`feat: pipeline stage on postings and one application per posting`
 
 **Why.** Two gaps found in daily use on 27 Sep. The only manual "fetch everything" was the
 Run all button in Settings → Ingest, one screen away from where freshness matters. And a match
@@ -1750,13 +1751,23 @@ that had already been saved looked exactly like a new one, so it was easy to sav
 - An inbox row with an application shows its stage stamp first in the chip row; the stamp
   links to the application. The focused row's primary button becomes "Open in pipeline", and
   the `s` key opens it instead of saving a duplicate.
-- Application mutations also invalidate `['matches']`, so the stamp follows stage changes.
+- `GET /postings` items and `GET /postings/:id` carry the same `application` field (the
+  shared helper is `applications/tracked.ts`). The Postings table shows the stamp in place of
+  the Save button; the posting sheet shows it in its header and swaps its primary button for
+  "Open in pipeline".
+- `POST /applications` with a `postingId` the caller already has an application for answers
+  `409 Conflict` with `That posting is already in your pipeline`. Other users are unaffected.
+  The web shows a neutral toast for a 409 instead of an error.
+- Application mutations also invalidate `['matches']`, `['postings']` and `['posting']`, so
+  the stamp follows stage changes everywhere.
 
-**Not changed:** `POST /applications` still accepts a posting that already has an
-application. The Postings drawer does not show the stage yet.
+**Not changed:** the guard is a read-then-write check, not a unique index. Two simultaneous
+saves by the same user could still both land; one user clicking one button makes that
+theoretical, and a partial unique index can follow if it ever happens.
 
-**Done when:** the new e2e case (match has `application: null`, then the saved application
-after `POST /applications`) passes; the demo mirrors the field; the gate is green.
+**Done when:** the new e2e cases (match has `application: null`, then the saved application;
+a second save answers 409 while another user can still save; the posting list and detail carry
+the application) pass; the demo mirrors the field; the gate is green.
 
 ---
 

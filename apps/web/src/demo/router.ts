@@ -67,6 +67,10 @@ export function bad(message: string): never {
   throw new ApiError(400, message);
 }
 
+export function conflict(message: string): never {
+  throw new ApiError(409, message);
+}
+
 export function notFound(message: string): never {
   throw new ApiError(404, message);
 }

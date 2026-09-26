@@ -58,6 +58,10 @@ export type PostingSummary = {
   postedAt: string;
 };
 
+export type TrackedApplication = { id: string; stage: Stage };
+
+export type Tracked<T> = T & { application: TrackedApplication | null };
+
 export type Posting = PostingSummary & {
   externalId: string;
   boardId: string;
@@ -83,7 +87,7 @@ export type Match = {
   dismissed: boolean;
   createdAt: string;
   posting: PostingSummary;
-  application: { id: string; stage: Stage } | null;
+  application: TrackedApplication | null;
 };
 
 export type EventKind = 'STAGE_CHANGE' | 'NOTE';

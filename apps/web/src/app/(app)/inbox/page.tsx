@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpRight, ExternalLink, Inbox as InboxIcon, Plus, RefreshCw, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { PostingSheet } from '../../../components/posting-sheet';
 import { ReasonChips } from '../../../components/reasons';
@@ -205,7 +204,6 @@ export default function InboxPage() {
   const dismiss = useDismissMatch();
   const rescore = useRescore();
   const saver = useSavePosting();
-  const router = useRouter();
 
   const items = matches.data?.items ?? [];
   const focused = items[focusIndex];
@@ -235,7 +233,7 @@ export default function InboxPage() {
   }
 
   function openApplication(match: Match) {
-    if (match.application) router.push(`/pipeline?open=${match.application.id}`);
+    if (match.application) saver.open(match.application.id);
   }
 
   function saveMatch(match: Match) {

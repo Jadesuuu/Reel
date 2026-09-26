@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -76,6 +77,13 @@ export class ApplicationsService {
       });
       if (!posting) {
         throw new NotFoundException('Posting not found');
+      }
+      const existing = await this.prisma.application.findFirst({
+        where: { userId, postingId: posting.id },
+        select: { id: true },
+      });
+      if (existing) {
+        throw new ConflictException('That posting is already in your pipeline');
       }
       company = company ?? posting.company;
       role = role ?? posting.role;
