@@ -1,0 +1,136 @@
+[
+  {
+    "id": "recruitee__patsnap__2711725",
+    "apply_url": "https://patsnap.recruitee.com/o/backend-engineer-senior-backend-engineer",
+    "is_expired": false,
+    "job_information": {
+      "title": "Backend Engineer / Senior Backend Engineer"
+    },
+    "v5_processed_job_data": {
+      "core_job_title": "Backend Engineer",
+      "company_name": "Patsnap",
+      "company_website": "patsnap.com",
+      "workplace_type": "Remote",
+      "workplace_countries": ["SG"],
+      "workplace_continents": ["Asia"],
+      "is_workplace_worldwide_ok": false,
+      "formatted_workplace_location": "Singapore, Central Singapore, Singapore",
+      "yearly_min_compensation": null,
+      "yearly_max_compensation": null,
+      "listed_compensation_currency": "USD",
+      "listed_compensation_frequency": "Yearly",
+      "estimated_publish_date": "2026-09-28T06:16:25.000Z",
+      "technical_tools": [
+        "Java",
+        "Spring",
+        "Spring Boot",
+        "SQL",
+        "NoSQL",
+        "Docker",
+        "Kubernetes"
+      ],
+      "requirements_summary": "Bachelor's or Master's degree in computer science; 3+ years of Java backend development; Spring, RESTful APIs, microservices, databases, CI/CD, and containerization experience.",
+      "commitment": ["Full Time"],
+      "seniority_level": "Mid Level",
+      "role_type": "Individual Contributor",
+      "job_category": "Software Development",
+      "visa_sponsorship": false
+    },
+    "attributed_org": { "name": "Patsnap", "website": "patsnap.com" },
+    "enriched_company_data": {
+      "name": "Patsnap",
+      "homepage_uri": "https://patsnap.com"
+    }
+  },
+  {
+    "id": "ashby__ohr__6f1c2a",
+    "apply_url": "https://jobs.ashbyhq.com/ohr/6f1c2a",
+    "is_expired": false,
+    "job_information": { "title": "Software Engineer" },
+    "v5_processed_job_data": {
+      "core_job_title": "Software Engineer",
+      "company_name": "Ohr",
+      "company_website": "ohr.dev",
+      "workplace_type": "Remote",
+      "workplace_countries": [],
+      "workplace_continents": [],
+      "is_workplace_worldwide_ok": true,
+      "formatted_workplace_location": null,
+      "yearly_min_compensation": 120000,
+      "yearly_max_compensation": 160000,
+      "listed_compensation_currency": "USD",
+      "listed_compensation_frequency": "Yearly",
+      "estimated_publish_date": "2026-09-29T02:18:10.313Z",
+      "technical_tools": [
+        "TypeScript",
+        "Node.js",
+        "React",
+        "PostgreSQL",
+        "AWS"
+      ],
+      "requirements_summary": "4+ years building full stack products with TypeScript, Node and React; comfortable owning features end to end.",
+      "commitment": ["Full Time"],
+      "seniority_level": "Senior Level",
+      "role_type": "Individual Contributor",
+      "job_category": "Software Development",
+      "visa_sponsorship": true
+    },
+    "attributed_org": { "name": "Ohr", "website": "ohr.dev" },
+    "enriched_company_data": null
+  },
+  {
+    "id": "zohorecruit__taker__608819000000325008",
+    "apply_url": "https://taker.zohorecruit.com/jobs/Careers/608819000000325008/Software-Engineer",
+    "is_expired": false,
+    "job_information": { "title": "Software Engineer" },
+    "v5_processed_job_data": {
+      "core_job_title": "Software Engineer",
+      "company_name": null,
+      "company_website": null,
+      "workplace_type": "Hybrid",
+      "workplace_countries": ["US"],
+      "workplace_continents": ["North America"],
+      "is_workplace_worldwide_ok": false,
+      "formatted_workplace_location": null,
+      "yearly_min_compensation": 90000,
+      "yearly_max_compensation": 110000,
+      "listed_compensation_currency": "EUR",
+      "listed_compensation_frequency": "Yearly",
+      "estimated_publish_date": "2026-09-27T21:27:06.000Z",
+      "technical_tools": ["Python", "Django"],
+      "requirements_summary": "2+ years with Python web services.",
+      "commitment": ["Full Time"],
+      "seniority_level": "Entry Level",
+      "role_type": "Individual Contributor",
+      "job_category": "Software Development",
+      "visa_sponsorship": false
+    },
+    "attributed_org": { "name": "Taker", "website": "taker.io" },
+    "enriched_company_data": {
+      "name": "Taker",
+      "homepage_uri": "https://taker.io"
+    }
+  },
+  {
+    "id": "grnhse__jetinsight__4021",
+    "apply_url": "https://boards.greenhouse.io/jetinsight/jobs/4021",
+    "is_expired": true,
+    "job_information": { "title": "Software Engineer" },
+    "v5_processed_job_data": {
+      "core_job_title": "Software Engineer",
+      "company_name": "JetInsight",
+      "workplace_type": "Remote",
+      "estimated_publish_date": "2020-09-25T21:27:06.000Z"
+    }
+  },
+  {
+    "id": "dover__missing__1",
+    "apply_url": null,
+    "is_expired": false,
+    "job_information": { "title": "Software Engineer" },
+    "v5_processed_job_data": {
+      "company_name": "Dover",
+      "workplace_type": "Remote"
+    }
+  }
+]

@@ -41,6 +41,7 @@ export type DemoState = {
   runs: IngestRun[];
   sourceSettings: Record<Source, boolean>;
   boards: WatchedBoard[];
+  browser: { linked: boolean; createdAt: string | null };
   clockOffsetMs: number;
   mail: DemoMail[];
   counter: number;
@@ -76,6 +77,7 @@ export function getState(): DemoState {
           Array.isArray(parsed.criteria?.regionKeywords) &&
           parsed.postings?.every((posting) => Array.isArray(posting.regionTerms));
         if (parsed.version === 1 && complete) {
+          parsed.browser ??= { linked: true, createdAt: parsed.user.createdAt };
           state = parsed;
           setClockOffset(parsed.clockOffsetMs);
           return state;

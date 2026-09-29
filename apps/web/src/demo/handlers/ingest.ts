@@ -12,6 +12,10 @@ const FEED_DEFAULT: Partial<Record<Source, string>> = {
   HIMALAYAS: 'all',
   JOBICY: 'developer',
   WEWORKREMOTELY: 'remote-programming-jobs',
+  HIRINGCAFE: 'software-engineer',
+  WELLFOUND: 'software-engineer',
+  JOBSTREET: 'software-engineer',
+  KALIBRR: 'it-and-software',
 };
 
 function stamp(): string {
@@ -22,7 +26,7 @@ function targets(state = getState()): Array<{ source: Source; boardId: string }>
   const list: Array<{ source: Source; boardId: string }> = [];
   for (const source of SOURCES) {
     if (!(state.sourceSettings[source] ?? true)) continue;
-    if (SOURCE_META[source].kind === 'feed') {
+    if (SOURCE_META[source].kind !== 'board') {
       list.push({ source, boardId: FEED_DEFAULT[source] ?? 'all' });
     } else {
       for (const board of state.boards) {
@@ -38,7 +42,7 @@ function startRun(source: Source, boardId: string): IngestRun {
     id: nextId('run'),
     source,
     boardId,
-    status: 'RUNNING',
+    status: SOURCE_META[source].kind === 'browser' ? 'WAITING' : 'RUNNING',
     startedAt: demoNow().toISOString(),
     finishedAt: null,
     itemsSeen: 0,
@@ -82,9 +86,30 @@ function finishRun(runId: string): void {
   rescore();
 }
 
+function setStatus(runId: string, status: IngestRun['status'], error: string | null): void {
+  mutate((draft) => {
+    const run = draft.runs.find((entry) => entry.id === runId);
+    if (!run) return;
+    run.status = status;
+    run.error = error;
+    if (status === 'FAILED') run.finishedAt = demoNow().toISOString();
+  });
+}
+
 function schedule(run: IngestRun, delay: number): void {
   if (typeof window === 'undefined') return;
-  window.setTimeout(() => finishRun(run.id), delay);
+  if (run.status !== 'WAITING') {
+    window.setTimeout(() => finishRun(run.id), delay);
+    return;
+  }
+  window.setTimeout(() => {
+    if (!getState().browser.linked) {
+      setStatus(run.id, 'FAILED', 'No browser connected');
+      return;
+    }
+    setStatus(run.id, 'RUNNING', null);
+    window.setTimeout(() => finishRun(run.id), delay + 2_500);
+  }, delay);
 }
 
 route('POST', '/ingest/run', ({ body }) => {

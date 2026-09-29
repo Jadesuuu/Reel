@@ -61,7 +61,10 @@ function IngestState() {
   const router = useRouter();
   const runs = useIngestRuns({ page: 1 });
   const runIngest = useRunIngest();
-  const running = runs.data?.items.filter((run) => run.status === 'RUNNING').length ?? 0;
+  const running =
+    runs.data?.items.filter((run) => run.status === 'RUNNING' || run.status === 'WAITING').length ??
+    0;
+  const waitingOnly = running > 0 && !runs.data?.items.some((run) => run.status === 'RUNNING');
   const latest = runs.data?.items[0];
   const busy = running > 0 || runIngest.isPending;
 
@@ -85,7 +88,9 @@ function IngestState() {
         <Tip
           content={
             running > 0
-              ? `${running} ingest ${running === 1 ? 'job' : 'jobs'} running`
+              ? waitingOnly
+                ? `${running} ${running === 1 ? 'run is' : 'runs are'} waiting for your browser`
+                : `${running} ingest ${running === 1 ? 'job' : 'jobs'} running`
               : `Last ingest ${relativeTime(latest.startedAt)} · ${latest.status.toLowerCase()}`
           }
           side="bottom"
@@ -108,7 +113,11 @@ function IngestState() {
               )}
             />
             <span className="tabular hidden sm:inline">
-              {running > 0 ? 'ingesting' : relativeTime(latest.startedAt)}
+              {running > 0
+                ? waitingOnly
+                  ? 'waiting'
+                  : 'ingesting'
+                : relativeTime(latest.startedAt)}
             </span>
           </Link>
         </Tip>

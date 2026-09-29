@@ -34,8 +34,8 @@ function DemoEntry() {
         <Sparkles className="size-5 text-accent" /> Continue as the demo user
       </Button>
       <p className="mt-2 text-center text-caption text-faint">
-        A seeded account with sixteen sources, a scored inbox and a live pipeline. Data stays in
-        this browser.
+        A seeded account with twenty sources, a scored inbox and a live pipeline. Data stays in this
+        browser.
       </p>
     </div>
   );

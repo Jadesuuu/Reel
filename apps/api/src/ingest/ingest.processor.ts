@@ -4,9 +4,11 @@ import { Queue, type Job } from 'bullmq';
 import { MatchingService } from '../matching/matching.service.js';
 import { PostingsService } from '../postings/postings.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { BrowserRunsService } from '../sources/browser/browser-runs.service.js';
 import { normalizePosting } from '../sources/normalize.js';
 import { SOURCE_META } from '../sources/source-meta.js';
 import { SourceRegistry } from '../sources/source-registry.js';
+import { isBrowserSource } from '../sources/source.types.js';
 import { SourcesService } from '../sources/sources.service.js';
 import {
   INGEST_ALL_JOB,
@@ -39,6 +41,7 @@ export class IngestProcessor extends WorkerHost {
     private readonly postings: PostingsService,
     private readonly matching: MatchingService,
     private readonly prisma: PrismaService,
+    private readonly browserRuns: BrowserRunsService,
   ) {
     super();
   }
@@ -79,9 +82,30 @@ export class IngestProcessor extends WorkerHost {
       throw new Error('ingest-source job needs a source');
     }
     const source = data.source;
-    const adapter = this.registry.get(source);
     const requestedBoard =
       data.boardId ?? SOURCE_META[source].defaultBoardId ?? 'latest';
+
+    if (isBrowserSource(source)) {
+      const { runId, created } = await this.browserRuns.request(
+        source,
+        requestedBoard,
+      );
+      this.logger.log(
+        created
+          ? `Waiting for a browser to fetch ${source}/${requestedBoard}`
+          : `${source}/${requestedBoard} already has an open browser run`,
+      );
+      return {
+        runId,
+        source,
+        boardId: requestedBoard,
+        itemsSeen: 0,
+        created: 0,
+        updated: 0,
+      };
+    }
+
+    const adapter = this.registry.get(source);
 
     const run = await this.prisma.ingestRun.create({
       data: { source, boardId: requestedBoard },

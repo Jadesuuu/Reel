@@ -804,9 +804,160 @@ const POSTINGS: PostingSeed[] = [
       'Customer-facing web app for compliance filings. Next.js, GraphQL, a mature design system.',
     host: 'vandelay.systems',
   },
+  {
+    source: 'HIRINGCAFE',
+    boardId: 'software-engineer',
+    company: 'Ohr',
+    role: 'Software Engineer',
+    location: 'Worldwide',
+    remote: 'REMOTE',
+    salary: [120_000, 160_000],
+    stack: ['typescript', 'node', 'react', 'postgres', 'aws'],
+    daysAgo: 1,
+    blurb:
+      '4+ years building full stack products with TypeScript, Node and React; comfortable owning features end to end. Tools: TypeScript, Node.js, React, PostgreSQL, AWS. Visa sponsorship offered.',
+    host: 'jobs.ashbyhq.com',
+  },
+  {
+    source: 'HIRINGCAFE',
+    boardId: 'backend-engineer',
+    company: 'Patsnap',
+    role: 'Backend Engineer / Senior Backend Engineer',
+    location: 'Singapore',
+    remote: 'REMOTE',
+    stack: ['java', 'docker', 'kubernetes'],
+    daysAgo: 2,
+    blurb:
+      '3+ years of Java backend development; Spring, RESTful APIs, microservices, databases, CI/CD and containers. Tools: Java, Spring Boot, SQL, Docker, Kubernetes. Seniority: Mid Level.',
+    host: 'patsnap.recruitee.com',
+  },
+  {
+    source: 'HIRINGCAFE',
+    boardId: 'full-stack-engineer',
+    company: 'Coastline Health',
+    role: 'Full Stack Engineer',
+    location: 'Philippines, Vietnam, Indonesia',
+    remote: 'REMOTE',
+    salary: [70_000, 95_000],
+    stack: ['typescript', 'react', 'node', 'graphql', 'gcp'],
+    daysAgo: 3,
+    blurb:
+      'Telehealth for clinics across Southeast Asia. Build the scheduling and records product with TypeScript on both ends. Tools: TypeScript, React, Node.js, GraphQL, GCP. Commitment: Full Time.',
+    host: 'boards.greenhouse.io',
+  },
+  {
+    source: 'WELLFOUND',
+    boardId: 'software-engineer',
+    company: 'Confident LIMS',
+    role: 'Senior Software Engineer',
+    location: 'Canada, South America, United States, Latin America',
+    remote: 'REMOTE',
+    salary: '$100k – $180k',
+    stack: ['typescript', 'node', 'react', 'postgres'],
+    daysAgo: 4,
+    blurb:
+      'The easiest way to test. Confident powers analytical testing labs. Own the TypeScript services behind our LIMS; Postgres, Node and React every day. 5+ years of experience.',
+    host: 'wellfound.com',
+  },
+  {
+    source: 'WELLFOUND',
+    boardId: 'backend-engineer',
+    company: 'Speak',
+    role: 'Backend Engineer',
+    location: 'San Francisco (remote: United States)',
+    remote: 'HYBRID',
+    salary: '$150k – $280k',
+    stack: ['go', 'python', 'gcp'],
+    daysAgo: 6,
+    blurb:
+      'AI language tutor that helps you speak. Our mission is to reinvent the way people learn, starting with language. You will build Go and Python services on GCP.',
+    host: 'wellfound.com',
+  },
+  {
+    source: 'JOBSTREET',
+    boardId: 'software-engineer',
+    company: 'Outsourced Quality Assured Services',
+    role: 'Senior Full-Stack Web & Mobile Developer (.NET/Angular) - Homebased',
+    location: 'Quezon City, Metro Manila',
+    remote: 'REMOTE',
+    salary: 'PHP 180,000 - 220,000 per month',
+    stack: ['c#', '.net', 'angular', 'typescript'],
+    daysAgo: 1,
+    blurb:
+      'Build and maintain web and mobile products for Australian clients from home. Full time, Philippine hours, ISO-certified employer of record.',
+    host: 'ph.jobstreet.com',
+  },
+  {
+    source: 'JOBSTREET',
+    boardId: 'backend-developer',
+    company: 'QBE Insurance',
+    role: 'Software Engineering Analyst (AI Prompt Engineer) - Manila/Cebu',
+    location: 'Manila City, Metro Manila',
+    remote: 'HYBRID',
+    stack: ['python', 'llm'],
+    daysAgo: 2,
+    blurb:
+      'AI engineer who designs and deploys GenAI solutions for the group shared services. Hybrid, Manila or Cebu.',
+    host: 'ph.jobstreet.com',
+  },
+  {
+    source: 'KALIBRR',
+    boardId: 'it-and-software',
+    company: 'Nova Virtual Solutions',
+    role: 'Senior QA Lead Automation Engineer',
+    location: 'Mandaluyong, Metro Manila, Philippines',
+    remote: 'REMOTE',
+    stack: ['typescript', 'node', 'docker'],
+    daysAgo: 5,
+    blurb:
+      'Lead the quality engineering initiatives and move the team from manual to automated testing. Work from home, full time.',
+    host: 'www.kalibrr.com',
+  },
+  {
+    source: 'WELLFOUND',
+    boardId: 'devops-engineer',
+    company: 'Harborline',
+    role: 'DevOps Engineer',
+    location: 'Worldwide',
+    remote: 'REMOTE',
+    salary: '$80k – $120k',
+    stack: ['kubernetes', 'terraform', 'aws', 'go'],
+    daysAgo: 8,
+    blurb:
+      'Fleet telemetry for shipping lines. Keep a global Kubernetes footprint boring with Terraform and Go tooling. 4+ years of experience.',
+    host: 'wellfound.com',
+  },
 ];
 
 const RESERVE: PostingSeed[] = [
+  {
+    source: 'HIRINGCAFE',
+    boardId: 'software-engineer',
+    company: 'Kestrel Payments',
+    role: 'Backend Engineer',
+    location: 'Worldwide',
+    remote: 'REMOTE',
+    salary: [120_000, 150_000],
+    stack: ['typescript', 'nestjs', 'postgres', 'redis', 'aws'],
+    daysAgo: 0,
+    blurb:
+      'Payment rails for marketplaces in Southeast Asia. You would own the ledger service and its public API. Tools: TypeScript, NestJS, Postgres, Redis, AWS. Seniority: Mid Level.',
+    host: 'jobs.ashbyhq.com',
+  },
+  {
+    source: 'WELLFOUND',
+    boardId: 'software-engineer',
+    company: 'Lanternfish',
+    role: 'Full Stack Engineer',
+    location: 'Asia, Europe',
+    remote: 'REMOTE',
+    salary: '$90k – $130k',
+    stack: ['typescript', 'react', 'next.js', 'node', 'postgres'],
+    daysAgo: 0,
+    blurb:
+      'Search for scientific literature that reads the papers for you. Small team, async by default, hiring across Asia and Europe. 3+ years of experience.',
+    host: 'wellfound.com',
+  },
   {
     source: 'HN',
     boardId: '49501234',
@@ -1424,6 +1575,10 @@ export function buildSeed(now: Date): DemoState {
     ['GREENHOUSE', 'northwindlabs', 3],
     ['LEVER', 'umbrellarobotics', 2],
     ['ASHBY', 'vandelay', 2],
+    ['HIRINGCAFE', 'software-engineer', 120],
+    ['WELLFOUND', 'software-engineer', 74],
+    ['JOBSTREET', 'software-engineer', 100],
+    ['KALIBRR', 'it-and-software', 100],
   ];
   targets.forEach(([source, boardId, seen], index) => {
     const startedAt = new Date(cycleStart.getTime() + index * 9_000);
@@ -1485,6 +1640,7 @@ export function buildSeed(now: Date): DemoState {
     runs,
     sourceSettings,
     boards,
+    browser: { linked: true, createdAt: new Date(now.getTime() - 6 * DAY).toISOString() },
     clockOffsetMs: 0,
     mail: [],
     counter: counter + 100,
@@ -1525,6 +1681,14 @@ function sourceLabelFor(source: Source): string {
       return 'Workable';
     case 'SMARTRECRUITERS':
       return 'SmartRecruiters';
+    case 'HIRINGCAFE':
+      return 'HiringCafe';
+    case 'WELLFOUND':
+      return 'Wellfound';
+    case 'JOBSTREET':
+      return 'JobStreet';
+    case 'KALIBRR':
+      return 'Kalibrr';
   }
 }
 

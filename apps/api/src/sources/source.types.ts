@@ -17,6 +17,10 @@ export const SOURCES = [
   'JOBSPRESSO',
   'WORKABLE',
   'SMARTRECRUITERS',
+  'HIRINGCAFE',
+  'WELLFOUND',
+  'JOBSTREET',
+  'KALIBRR',
 ] as const;
 
 export type Source = (typeof SOURCES)[number];
@@ -31,11 +35,22 @@ export const BOARD_PROVIDERS = [
 
 export type BoardProvider = (typeof BOARD_PROVIDERS)[number];
 
-export type SourceKind = 'feed' | 'board';
+export const BROWSER_SOURCES = ['HIRINGCAFE', 'WELLFOUND'] as const;
+
+export type BrowserSource = (typeof BROWSER_SOURCES)[number];
+
+export type SourceKind = 'feed' | 'board' | 'browser';
 
 export function isSource(value: unknown): value is Source {
   return (
     typeof value === 'string' && (SOURCES as readonly string[]).includes(value)
+  );
+}
+
+export function isBrowserSource(value: unknown): value is BrowserSource {
+  return (
+    typeof value === 'string' &&
+    (BROWSER_SOURCES as readonly string[]).includes(value)
   );
 }
 

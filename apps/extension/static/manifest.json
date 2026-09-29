@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Reel browser sources",
+  "version": "0.1.0",
+  "description": "Reads HiringCafe and Wellfound from your browser and hands the jobs to Reel.",
+  "background": { "service_worker": "background.js", "type": "module" },
+  "options_page": "options.html",
+  "action": { "default_title": "Reel browser sources" },
+  "permissions": ["alarms", "storage", "tabs", "scripting"],
+  "host_permissions": [
+    "http://localhost:4000/*",
+    "http://127.0.0.1:4000/*",
+    "https://hiringcafe.com/*",
+    "https://hiring.cafe/*",
+    "https://wellfound.com/*"
+  ],
+  "optional_host_permissions": ["https://*/*"]
+}

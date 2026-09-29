@@ -7,7 +7,7 @@ import { PageHeader } from '../../../components/ui/states';
 
 const TABS = [
   { href: '/settings/criteria', label: 'Criteria', hint: 'What counts as a match' },
-  { href: '/settings/sources', label: 'Sources', hint: 'Feeds and company boards' },
+  { href: '/settings/sources', label: 'Sources', hint: 'Feeds, boards and your browser' },
   { href: '/settings/ingest', label: 'Ingest runs', hint: 'What the worker did' },
   { href: '/settings/account', label: 'Account', hint: 'You and this device' },
 ];

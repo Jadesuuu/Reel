@@ -1,0 +1,129 @@
+{
+  "count": 204,
+  "jobs": [
+    {
+      "id": 271747,
+      "name": "Senior QA Lead Automation Engineer",
+      "slug": "senior-qa-lead-automation-engineer",
+      "company_name": "Nova Virtual Solutions",
+      "company": {
+        "code": "nova-virtual-solutions",
+        "name": "Nova Virtual Solutions"
+      },
+      "activation_date": "2026-08-27T13:51:13.179013+00:00",
+      "base_salary": null,
+      "maximum_salary": null,
+      "salary_currency": null,
+      "salary_interval": null,
+      "google_location": {
+        "address_components": {
+          "address_line_1": null,
+          "city": "Mandaluyong",
+          "country": "Philippines",
+          "region": "Metro Manila"
+        }
+      },
+      "is_work_from_home": true,
+      "is_hybrid": false,
+      "tenure": "Full time",
+      "function": "IT and Software",
+      "job_sds_skills": [],
+      "apply_redirect_url": null,
+      "description": "<p><strong>Role overview</strong></p>\n\n<p>We are looking for a senior quality assurance automation engineer / quality assurance lead to lead our quality engineering initiatives. you will help transition our testing practices from manual verification to a reliable automation framework integrated into our software delivery process.</p>\n\n<p>The role focuses on automated testing, application quality, database performance, security, data protection, production monitoring, and manual testing.</p>\n\n<p><strong>Key responsibilities</strong></p>\n\n<p><strong>Automated testing</strong></p>\n\n<p>Build and maintain automated end-to-end test suites using cypress and playwright.</p>\n\n<p>Automate critical wor"
+    },
+    {
+      "id": 265258,
+      "name": "Audio Visual Equipment Operator II",
+      "slug": "audio-visual-equipment-operator-ii",
+      "company_name": "Quezon City Local Government",
+      "company": {
+        "code": "quezon-city-local-government",
+        "name": "Quezon City Local Government"
+      },
+      "activation_date": "2026-05-07T06:40:26.777309+00:00",
+      "base_salary": 17000,
+      "maximum_salary": 20000,
+      "salary_currency": "PHP",
+      "salary_interval": "month",
+      "google_location": {
+        "address_components": {
+          "address_line_1": "Seminary Rd, Bahay Toro",
+          "city": "Quezon City",
+          "country": "Philippines",
+          "region": "Metro Manila"
+        }
+      },
+      "is_work_from_home": false,
+      "is_hybrid": false,
+      "tenure": "Full time",
+      "function": "IT and Software",
+      "job_sds_skills": [],
+      "apply_redirect_url": null,
+      "description": "<p>         </p>\n\n<ul>\n\t<li>Projects slides of hospital physical set-up and staff to new employees for orientation</li>\n\t<li>Assist the resource speakers in the medical staff meeting or in scientific meetings in projection during presentation of their topics with audio visual slides</li>\n\t<li>Attends to the sound system during meetings</li>\n\t<li>Provide and assist the either department who request for the overhead and slide projectors to be used in discussion and lectures</li>\n\t<li>Attend to the safekeeping and maintenance of audio-visual apparatus and sound system in case of malfunctioning, report and request repair of said apparatus to the engineering department</li>\n\t<li>Provides music an"
+    },
+    {
+      "id": 238867,
+      "name": "Database Administrator",
+      "slug": "database-administrator",
+      "company_name": "Stradcom Corporation",
+      "company": {
+        "code": "stradcom-corporation-1",
+        "name": "Stradcom Corporation"
+      },
+      "activation_date": "2026-08-26T08:33:56.369179+00:00",
+      "base_salary": null,
+      "maximum_salary": null,
+      "salary_currency": null,
+      "salary_interval": null,
+      "google_location": {
+        "address_components": {
+          "address_line_1": "East Ave, Pinyahan",
+          "city": "Quezon City",
+          "country": "Philippines",
+          "region": "Metro Manila"
+        }
+      },
+      "is_work_from_home": false,
+      "is_hybrid": true,
+      "tenure": "Full time",
+      "function": "IT and Software",
+      "job_sds_skills": [],
+      "apply_redirect_url": null,
+      "description": "<ul>\n\t<li style=\"list-style-type: none;\">Provide technical support to Customer Care Specialists/Customer Care Associates and Field Service Engineers on back-up and recovery for databases and replication servers;</li>\n\t<li>Perform back-up and recovery for databases and replication servers;</li>\n\t<li>Design and load schedules and automated processes for servers;</li>\n\t<li>Meet service commitments and assigned deliverables based on service level agreement;</li>\n\t<li>Participate in production verification activities and developing user interface strategy;</li>\n\t<li>Monitor and analyze system performance and capacity and report to Database Administration Manager for review;</li>\n\t<li>Implement, m"
+    },
+    {
+      "id": 270716,
+      "name": "Lead DevOps",
+      "slug": "lead-devops",
+      "company_name": "Satellite Office ",
+      "company": {
+        "code": "satellite-office-solutions-pty-ltd",
+        "name": "Satellite Office "
+      },
+      "activation_date": "2026-08-04T02:18:06.668140+00:00",
+      "base_salary": null,
+      "maximum_salary": null,
+      "salary_currency": null,
+      "salary_interval": null,
+      "google_location": {
+        "address_components": {
+          "city": "Pasig",
+          "country": "Philippines",
+          "region": "Metro Manila"
+        }
+      },
+      "is_work_from_home": false,
+      "is_hybrid": false,
+      "tenure": "Full time",
+      "function": "IT and Software",
+      "job_sds_skills": [],
+      "apply_redirect_url": null,
+      "description": "<p>Overview</p>\n\n<p>Some engineers keep the lights on. You make sure they never flicker in the first place. We're looking for a senior DevSecOps Engineer to own and continuously sharpen the security, reliability, observability, and cost efficiency of our cloud and edge infrastructure — and to have real influence over how it's all built.</p>\n\n<p>This is a hands-on, senior individual contributor role. No managing for the sake of managing — just deep technical ownership, strong opinions, and the autonomy to act on them.</p>\n\n<p>What you'll own</p>\n\n<p>Cloudflare &amp; edge security — You'll configure, manage, and tune the full Cloudflare stack: WAF, CDN and caching strategy, firewall rules, rat"
+    },
+    {
+      "id": null,
+      "name": "Broken",
+      "slug": "x"
+    }
+  ]
+}

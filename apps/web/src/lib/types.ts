@@ -18,7 +18,13 @@ export type Source =
   | 'THEMUSE'
   | 'JOBSPRESSO'
   | 'WORKABLE'
-  | 'SMARTRECRUITERS';
+  | 'SMARTRECRUITERS'
+  | 'HIRINGCAFE'
+  | 'WELLFOUND'
+  | 'JOBSTREET'
+  | 'KALIBRR';
+
+export type BrowserSource = 'HIRINGCAFE' | 'WELLFOUND';
 
 export type BoardProvider = 'GREENHOUSE' | 'LEVER' | 'ASHBY' | 'WORKABLE' | 'SMARTRECRUITERS';
 
@@ -177,7 +183,7 @@ export type ApplicationStats = {
   weekly: WeeklyBucket[];
 };
 
-export type RunStatus = 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+export type RunStatus = 'WAITING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
 
 export type IngestRun = {
   id: string;
@@ -192,7 +198,7 @@ export type IngestRun = {
   error: string | null;
 };
 
-export type SourceKind = 'feed' | 'board';
+export type SourceKind = 'feed' | 'board' | 'browser';
 
 export type SourceInfo = {
   source: Source;
@@ -205,6 +211,16 @@ export type SourceInfo = {
   postings: number;
   lastRun: IngestRun | null;
 };
+
+export type BrowserStatus = {
+  linked: boolean;
+  connected: boolean;
+  createdAt: string | null;
+  lastSeenAt: string | null;
+  userAgent: string | null;
+};
+
+export type BrowserToken = { token: string; createdAt: string };
 
 export type WatchedBoard = {
   id: string;

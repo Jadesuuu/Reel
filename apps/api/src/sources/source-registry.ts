@@ -15,6 +15,8 @@ import { TheMuseAdapter } from './adapters/themuse.adapter.js';
 import { JobspressoAdapter } from './adapters/jobspresso.adapter.js';
 import { WorkableAdapter } from './adapters/workable.adapter.js';
 import { SmartRecruitersAdapter } from './adapters/smartrecruiters.adapter.js';
+import { JobStreetAdapter } from './adapters/jobstreet.adapter.js';
+import { KalibrrAdapter } from './adapters/kalibrr.adapter.js';
 import type {
   BoardAdapter,
   BoardProvider,
@@ -39,6 +41,8 @@ export const ADAPTERS = [
   JobspressoAdapter,
   WorkableAdapter,
   SmartRecruitersAdapter,
+  JobStreetAdapter,
+  KalibrrAdapter,
 ];
 
 @Injectable()
@@ -62,6 +66,8 @@ export class SourceRegistry {
     jobspresso: JobspressoAdapter,
     workable: WorkableAdapter,
     smartRecruiters: SmartRecruitersAdapter,
+    jobStreet: JobStreetAdapter,
+    kalibrr: KalibrrAdapter,
   ) {
     const all: SourceAdapter[] = [
       hn,
@@ -80,6 +86,8 @@ export class SourceRegistry {
       jobspresso,
       workable,
       smartRecruiters,
+      jobStreet,
+      kalibrr,
     ];
     this.adapters = new Map(all.map((adapter) => [adapter.source, adapter]));
   }

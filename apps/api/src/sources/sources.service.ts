@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { BrowserRunsService } from './browser/browser-runs.service.js';
 import { SOURCE_META, type SourceMeta } from './source-meta.js';
 import { SourceRegistry } from './source-registry.js';
 import {
@@ -29,6 +30,7 @@ export class SourcesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly registry: SourceRegistry,
+    private readonly browserRuns: BrowserRunsService,
   ) {}
 
   private async ensureSettings(): Promise<Map<Source, boolean>> {
@@ -41,6 +43,7 @@ export class SourcesService {
   }
 
   async list(): Promise<{ items: SourceInfo[] }> {
+    await this.browserRuns.expireStale();
     const [enabled, counts, runs] = await Promise.all([
       this.ensureSettings(),
       this.prisma.posting.groupBy({ by: ['source'], _count: { _all: true } }),
@@ -136,7 +139,7 @@ export class SourcesService {
       if (!(enabled.get(source) ?? true)) {
         continue;
       }
-      if (SOURCE_META[source].kind === 'feed') {
+      if (SOURCE_META[source].kind !== 'board') {
         const feedBoards = SOURCE_META[source].feedBoards;
         if (feedBoards && feedBoards.length > 0) {
           for (const boardId of feedBoards) {

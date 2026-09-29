@@ -1,0 +1,111 @@
+{
+  "totalCount": 4421,
+  "data": [
+    {
+      "id": "94945210",
+      "title": "Software Engineering Analyst (AI Prompt Engineer)- Manila/Cebu",
+      "companyName": "QBE Insurance",
+      "advertiser": {
+        "id": "60335585",
+        "description": "QBE GROUP SHARED SERVICES LIMITED - PHILIPPINE BRANCH"
+      },
+      "listingDate": "2026-09-29T06:42:22Z",
+      "salaryLabel": "",
+      "workTypes": ["Full time"],
+      "workArrangements": {
+        "displayText": "Hybrid"
+      },
+      "teaser": "AI Engineer – Specializes in designing and deploying GenAI solutions.",
+      "bulletPoints": [],
+      "locations": [
+        {
+          "label": "Manila City, Metro Manila",
+          "countryCode": "PH"
+        }
+      ],
+      "classifications": [
+        {
+          "classification": {
+            "description": "Information & Communication Technology"
+          },
+          "subclassification": {
+            "description": "Engineering - Software"
+          }
+        }
+      ],
+      "roleId": "software-engineer-analyst"
+    },
+    {
+      "id": "94944532",
+      "title": "Senior Full-Stack Web & Mobile Developer (.NET/Angular) - Homebased",
+      "companyName": "Outsourced Quality Assured Services Inc.",
+      "advertiser": {
+        "id": "60331218",
+        "description": "Outsourced Quality Assured Services Inc. (ISO Certified)"
+      },
+      "listingDate": "2026-09-29T06:25:29Z",
+      "salaryLabel": "₱180,000 – ₱220,000 per month",
+      "workTypes": ["Full time"],
+      "workArrangements": {
+        "displayText": "Remote"
+      },
+      "teaser": "Experienced Senior Full-Stack Developer to take ownership of software platforms and technical services.",
+      "bulletPoints": [
+        "Homebased",
+        "Dayshift",
+        "HMO+1 dependent FREE upon day 1"
+      ],
+      "locations": [
+        {
+          "label": "Quezon City, Metro Manila",
+          "countryCode": "PH"
+        }
+      ],
+      "classifications": [
+        {
+          "classification": {
+            "description": "Information & Communication Technology"
+          },
+          "subclassification": {
+            "description": "Developers/Programmers"
+          }
+        }
+      ],
+      "roleId": "mobile-developer"
+    },
+    {
+      "id": "94943817",
+      "title": "Platform Infrastructure Dashboard SME",
+      "advertiser": {
+        "id": "60397321",
+        "description": "EY GDS"
+      },
+      "listingDate": "2026-09-29T06:05:32Z",
+      "salaryLabel": "₱90,000 – ₱130,000 per month",
+      "workTypes": ["Full time"],
+      "workArrangements": {},
+      "teaser": "Design and build infrastructure observability dashboards for EY's next-generation automation platform.",
+      "bulletPoints": ["Rotational Shifts", "5 Days working from Onsite"],
+      "locations": [
+        {
+          "label": "Taguig City, Metro Manila",
+          "countryCode": "PH"
+        }
+      ],
+      "classifications": [
+        {
+          "classification": {
+            "description": "Information & Communication Technology"
+          },
+          "subclassification": {
+            "description": "Networks & Systems Administration"
+          }
+        }
+      ]
+    },
+    {
+      "id": "",
+      "title": "Broken"
+    }
+  ]
+}
