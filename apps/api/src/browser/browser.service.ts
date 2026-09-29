@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomBytes } from 'node:crypto';
-import { MatchingService } from '../matching/matching.service.js';
+import {
+  MatchingService,
+  type FreshMatches,
+} from '../matching/matching.service.js';
 import { PostingsService } from '../postings/postings.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { mapBrowserItems } from '../sources/browser/browser.mappers.js';
@@ -23,7 +26,11 @@ export type BrowserStatus = {
   userAgent: string | null;
 };
 
-export type PollResult = { jobs: BrowserJob[]; pollIntervalMs: number };
+export type PollResult = {
+  jobs: BrowserJob[];
+  fresh: FreshMatches;
+  pollIntervalMs: number;
+};
 
 @Injectable()
 export class BrowserService {
@@ -74,14 +81,21 @@ export class BrowserService {
     await this.prisma.browserToken.deleteMany({ where: { userId } });
   }
 
-  async poll(tokenId: string, userAgent?: string): Promise<PollResult> {
+  async poll(
+    tokenId: string,
+    userId: string,
+    userAgent?: string,
+  ): Promise<PollResult> {
     await this.prisma.browserToken.update({
       where: { id: tokenId },
       data: { lastSeenAt: new Date(), ...(userAgent ? { userAgent } : {}) },
     });
     await this.runs.expireStale();
-    const jobs = await this.runs.claim();
-    return { jobs, pollIntervalMs: BROWSER_POLL_INTERVAL_MS };
+    const [jobs, fresh] = await Promise.all([
+      this.runs.claim(),
+      this.matching.freshForUser(userId),
+    ]);
+    return { jobs, fresh, pollIntervalMs: BROWSER_POLL_INTERVAL_MS };
   }
 
   async complete(runId: string, dto: CompleteRunDto) {

@@ -43,8 +43,13 @@ export type Criteria = {
   includeKeywords: string[];
   excludeKeywords: string[];
   regionKeywords: string[];
+  nearbyKeywords: string[];
+  levels: Level[];
   minSalaryUsd: number | null;
 };
+
+export const LEVELS = ['intern', 'junior', 'mid', 'senior', 'lead'] as const;
+export type Level = (typeof LEVELS)[number];
 
 export type PostingSummary = {
   id: string;
@@ -59,6 +64,7 @@ export type PostingSummary = {
   salaryMaxUsd: number | null;
   stackKeywords: string[];
   regionTerms: string[];
+  level: Level | null;
   applyUrl: string | null;
   headline: string;
   postedAt: string;

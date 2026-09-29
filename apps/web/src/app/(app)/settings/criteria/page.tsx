@@ -10,7 +10,9 @@ import { Field, Input } from '../../../../components/ui/input';
 import { Switch } from '../../../../components/ui/switch';
 import { RowsSkeleton } from '../../../../components/ui/skeleton';
 import { ErrorState, Panel, SectionTitle } from '../../../../components/ui/states';
+import { cn } from '../../../../lib/cn';
 import { useCriteria, useRescore, useSaveCriteria } from '../../../../lib/queries';
+import { LEVELS, type Level } from '../../../../lib/types';
 
 const ROLE_SUGGESTIONS = [
   'full stack',
@@ -31,7 +33,7 @@ const STACK_SUGGESTIONS = [
   'go',
   'python',
 ];
-const EXCLUDE_SUGGESTIONS = ['php', 'wordpress', 'principal', 'staff', 'unpaid', 'intern'];
+const EXCLUDE_SUGGESTIONS = ['php', 'wordpress', 'unpaid', 'clearance', 'contract'];
 const REGION_SUGGESTIONS = [
   'philippines',
   'apac',
@@ -42,15 +44,38 @@ const REGION_SUGGESTIONS = [
   'eu',
   'us',
 ];
+const NEARBY_SUGGESTIONS = [
+  'metro manila',
+  'manila',
+  'makati',
+  'taguig',
+  'bgc',
+  'pasig',
+  'ortigas',
+  'quezon city',
+  'philippines',
+];
+
+const LEVEL_LABEL: Record<Level, string> = {
+  intern: 'Intern',
+  junior: 'Junior',
+  mid: 'Mid',
+  senior: 'Senior',
+  lead: 'Lead / Staff',
+};
 
 const RULES = [
   { points: '+25', rule: 'the posting is remote' },
+  { points: '+20', rule: 'not remote, but the location is near you' },
   { points: '+30', rule: 'the first role keyword found in the headline' },
   { points: '+10', rule: 'each include keyword in the stack or headline, up to +40' },
+  { points: '+10', rule: 'the posting is explicitly open to one of your regions' },
   { points: '+10', rule: 'a USD salary was parsed' },
   { points: '+5', rule: 'there is an apply link' },
+  { points: '+10', rule: 'posted in the last three days, or +5 in the last ten' },
   { points: '0', rule: 'any exclude keyword hits, or the salary ceiling is under your minimum' },
-  { points: '0', rule: 'the posting names a region and none of yours appear' },
+  { points: '0', rule: 'the title reads as a level you did not pick' },
+  { points: '0', rule: 'the posting is limited to a region that is not one of yours' },
 ];
 
 export default function CriteriaPage() {
@@ -63,6 +88,8 @@ export default function CriteriaPage() {
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [excludeKeywords, setExcludeKeywords] = useState<string[]>([]);
   const [regionKeywords, setRegionKeywords] = useState<string[]>([]);
+  const [nearbyKeywords, setNearbyKeywords] = useState<string[]>([]);
+  const [levels, setLevels] = useState<Level[]>([]);
   const [minSalary, setMinSalary] = useState('');
   const [dirty, setDirty] = useState(false);
 
@@ -73,6 +100,8 @@ export default function CriteriaPage() {
       setIncludeKeywords(criteria.data.includeKeywords);
       setExcludeKeywords(criteria.data.excludeKeywords);
       setRegionKeywords(criteria.data.regionKeywords);
+      setNearbyKeywords(criteria.data.nearbyKeywords ?? []);
+      setLevels(criteria.data.levels ?? []);
       setMinSalary(criteria.data.minSalaryUsd === null ? '' : String(criteria.data.minSalaryUsd));
       setDirty(false);
     }
@@ -83,6 +112,15 @@ export default function CriteriaPage() {
       setter(value);
       setDirty(true);
     };
+  }
+
+  function toggleLevel(level: Level) {
+    setLevels((current) =>
+      current.includes(level)
+        ? current.filter((entry) => entry !== level)
+        : LEVELS.filter((entry) => entry === level || current.includes(entry)),
+    );
+    setDirty(true);
   }
 
   return (
@@ -111,6 +149,8 @@ export default function CriteriaPage() {
                   includeKeywords,
                   excludeKeywords,
                   regionKeywords,
+                  nearbyKeywords,
+                  levels,
                   minSalaryUsd: minSalary.trim() === '' ? null : Number(minSalary),
                 },
                 {
@@ -137,7 +177,7 @@ export default function CriteriaPage() {
               <span>
                 <span className="block text-body text-fg">Remote only</span>
                 <span className="block text-caption text-muted">
-                  Anything not marked remote scores zero.
+                  Anything not marked remote scores zero, unless it is near you.
                 </span>
               </span>
               <Switch
@@ -146,6 +186,14 @@ export default function CriteriaPage() {
                 ariaLabel="Remote only"
               />
             </label>
+
+            <TagInput
+              label="Near you"
+              hint="on-site or hybrid postings in these places still count, +20"
+              values={nearbyKeywords}
+              onChange={mark(setNearbyKeywords)}
+              suggestions={NEARBY_SUGGESTIONS}
+            />
 
             <TagInput
               label="Role keywords"
@@ -168,6 +216,35 @@ export default function CriteriaPage() {
               onChange={mark(setExcludeKeywords)}
               suggestions={EXCLUDE_SUGGESTIONS}
             />
+
+            <fieldset>
+              <legend className="text-body-sm text-fg">Levels you are applying for</legend>
+              <p className="mt-0.5 text-caption text-muted">
+                a title that reads as another level scores zero; titles with no level pass; pick
+                none to ignore
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {LEVELS.map((level) => {
+                  const on = levels.includes(level);
+                  return (
+                    <button
+                      key={level}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleLevel(level)}
+                      className={cn(
+                        'rounded-md border px-3 py-1.5 text-body-sm transition-colors duration-150',
+                        on
+                          ? 'border-accent bg-accent-soft text-accent'
+                          : 'border-line bg-surface text-muted hover:bg-surface-2 hover:text-fg',
+                      )}
+                    >
+                      {LEVEL_LABEL[level]}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
 
             <TagInput
               label="Where you can work"
@@ -247,12 +324,13 @@ export default function CriteriaPage() {
           ))}
         </ol>
         <p className="mt-4 border-t border-line pt-3 text-caption text-muted">
-          Maximum 110. A posting becomes a match at <span className="font-mono text-fg">40</span> or
+          Maximum 130. A posting becomes a match at <span className="font-mono text-fg">40</span> or
           more. The chips in the{' '}
           <Link href="/inbox" className="text-accent hover:underline">
             inbox
           </Link>{' '}
-          are these rules, so every number can be traced.
+          are these rules, so every number can be traced. Regions are read from the headline, the
+          location, and sentences in the description like “must be located in”.
         </p>
       </Panel>
     </div>

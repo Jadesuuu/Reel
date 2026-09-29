@@ -1,6 +1,7 @@
 export const DEFAULT_API_URL = 'http://localhost:4000/api/v1';
+export const DEFAULT_WEB_URL = 'http://localhost:3000';
 
-export type Settings = { apiUrl: string; token: string };
+export type Settings = { apiUrl: string; token: string; webUrl: string };
 
 export type LastRun = {
   source: string;
@@ -27,6 +28,14 @@ export function normalizeApiUrl(value: string): string {
   return /\/api\/v1$/i.test(withScheme) ? withScheme : `${withScheme}/api/v1`;
 }
 
+export function normalizeWebUrl(value: string): string {
+  const trimmed = value.trim().replace(/\/+$/, '');
+  if (trimmed.length === 0) {
+    return DEFAULT_WEB_URL;
+  }
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+}
+
 export function originOf(apiUrl: string): string | null {
   try {
     return new URL(apiUrl).origin;
@@ -40,10 +49,11 @@ export function isLocalOrigin(origin: string): boolean {
 }
 
 export async function loadSettings(): Promise<Settings> {
-  const stored = await chrome.storage.local.get(['apiUrl', 'token']);
+  const stored = await chrome.storage.local.get(['apiUrl', 'token', 'webUrl']);
   return {
     apiUrl: normalizeApiUrl(typeof stored.apiUrl === 'string' ? stored.apiUrl : ''),
     token: typeof stored.token === 'string' ? stored.token.trim() : '',
+    webUrl: normalizeWebUrl(typeof stored.webUrl === 'string' ? stored.webUrl : ''),
   };
 }
 
@@ -51,6 +61,7 @@ export async function saveSettings(settings: Settings): Promise<void> {
   await chrome.storage.local.set({
     apiUrl: normalizeApiUrl(settings.apiUrl),
     token: settings.token.trim(),
+    webUrl: normalizeWebUrl(settings.webUrl),
   });
 }
 

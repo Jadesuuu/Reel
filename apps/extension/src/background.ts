@@ -1,4 +1,4 @@
-import { complete, poll, type BrowserJob } from './api.js';
+import { complete, poll, type BrowserJob, type FreshMatches } from './api.js';
 import { parseNextData } from './next-data.js';
 import { loadSettings, recordStatus, type Settings } from './settings.js';
 import { siteFor } from './sites/index.js';
@@ -6,8 +6,60 @@ import { closeTab, navigateTab, openTab, waitForNextData } from './tab.js';
 
 const ALARM = 'reel-poll';
 const POLL_MINUTES = 0.5;
+const NOTIFICATION_ID = 'reel-fresh-matches';
+const BADGE_COLOR = '#3b5bdb';
 
 let busy = false;
+
+function describeFresh(fresh: FreshMatches): string {
+  return fresh.top
+    .map((item) => {
+      const name = [item.company, item.role].filter(Boolean).join(' - ');
+      return `${item.score} ${name || 'Untitled posting'}`;
+    })
+    .join('\n');
+}
+
+export async function showFresh(fresh: FreshMatches | undefined): Promise<void> {
+  const count = fresh?.count ?? 0;
+  await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
+  await chrome.action.setBadgeText({ text: count > 0 ? String(count) : '' });
+  await chrome.action.setTitle({
+    title:
+      count > 0
+        ? `Reel: ${count} strong new ${count === 1 ? 'match' : 'matches'}`
+        : 'Reel browser sources',
+  });
+
+  const stored = await chrome.storage.local.get('notifiedFresh');
+  const previous = stored.notifiedFresh as { since: string; count: number } | undefined;
+  if (!fresh || count === 0) {
+    if (previous) {
+      await chrome.storage.local.remove('notifiedFresh');
+    }
+    return;
+  }
+  if (previous && previous.since === fresh.since && previous.count >= count) {
+    return;
+  }
+  await chrome.storage.local.set({ notifiedFresh: { since: fresh.since, count } });
+  chrome.notifications.create(NOTIFICATION_ID, {
+    type: 'basic',
+    iconUrl: 'icon.png',
+    title: `${count} strong new ${count === 1 ? 'match' : 'matches'} in Reel`,
+    message: describeFresh(fresh),
+    priority: 1,
+  });
+}
+
+async function openInbox(): Promise<void> {
+  const settings = await loadSettings();
+  if (settings.token.length === 0) {
+    await chrome.runtime.openOptionsPage();
+    return;
+  }
+  await chrome.tabs.create({ url: `${settings.webUrl}/inbox` });
+}
 
 function schedule(): void {
   chrome.alarms.get(ALARM, (existing) => {
@@ -105,6 +157,7 @@ export async function pollOnce(): Promise<{ claimed: number }> {
   busy = true;
   try {
     const result = await poll(settings, navigator.userAgent);
+    await showFresh(result.fresh);
     if (result.jobs.length === 0) {
       await recordStatus('connected', 'Connected. Nothing to fetch right now.');
     }
@@ -142,7 +195,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 chrome.action.onClicked.addListener(() => {
-  void chrome.runtime.openOptionsPage();
+  void openInbox();
+});
+
+chrome.notifications.onClicked.addListener((id) => {
+  if (id === NOTIFICATION_ID) {
+    chrome.notifications.clear(id);
+    void openInbox();
+  }
 });
 
 chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {

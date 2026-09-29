@@ -158,6 +158,9 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
       'backend-engineer',
       'frontend-engineer',
       'full-stack-engineer',
+      'typescript',
+      'react',
+      'node.js',
     ],
   },
   WELLFOUND: {
@@ -187,6 +190,9 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
       'backend-developer',
       'full-stack-developer',
       'frontend-developer',
+      'typescript',
+      'react',
+      'node.js',
     ],
   },
   KALIBRR: {

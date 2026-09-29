@@ -22,6 +22,7 @@
     "start:worker": "nest start --entryFile worker",
     "start:worker:dev": "nest start --watch --entryFile worker",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "backfill:fit": "tsx scripts/backfill-fit.ts",
     "prisma": "prisma"
   },
   "dependencies": {

@@ -3,6 +3,7 @@ import {
   loadSettings,
   loadStatus,
   normalizeApiUrl,
+  normalizeWebUrl,
   originOf,
   saveSettings,
   type Status,
@@ -19,6 +20,7 @@ function element<T extends HTMLElement>(id: string): T {
 const form = element<HTMLFormElement>('form');
 const apiUrlInput = element<HTMLInputElement>('api-url');
 const tokenInput = element<HTMLInputElement>('token');
+const webUrlInput = element<HTMLInputElement>('web-url');
 const saveButton = element<HTMLButtonElement>('save');
 const checkButton = element<HTMLButtonElement>('check');
 const savedNote = element<HTMLSpanElement>('saved');
@@ -95,8 +97,10 @@ form.addEventListener('submit', (event) => {
         savedNote.textContent = 'Chrome needs permission for that address.';
         return;
       }
-      await saveSettings({ apiUrl, token: tokenInput.value });
+      const webUrl = normalizeWebUrl(webUrlInput.value);
+      await saveSettings({ apiUrl, token: tokenInput.value, webUrl });
       apiUrlInput.value = apiUrl;
+      webUrlInput.value = webUrl;
       savedNote.textContent = 'Saved.';
       await pollNow();
     } finally {
@@ -119,5 +123,6 @@ void (async () => {
   const settings = await loadSettings();
   apiUrlInput.value = settings.apiUrl;
   tokenInput.value = settings.token;
+  webUrlInput.value = settings.webUrl;
   render(await loadStatus());
 })();

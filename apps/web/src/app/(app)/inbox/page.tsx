@@ -24,24 +24,47 @@ import { useHotkeys } from '../../../lib/keyboard';
 import { listItem, listStagger } from '../../../lib/motion';
 import {
   useDismissMatch,
+  useMarkMatchesSeen,
   useMatches,
   usePosting,
   usePrefetchMatches,
   useRescore,
   useSources,
+  type MatchSort,
 } from '../../../lib/queries';
 import { SOURCES, sourceLabel } from '../../../lib/sources';
 import type { Match, PostingSummary, Source } from '../../../lib/types';
 
 const MIN_SCORE_OPTIONS = [
   { value: '0', label: 'Any score' },
-  { value: '50', label: '50 and up' },
-  { value: '70', label: '70 and up' },
-  { value: '90', label: '90 and up' },
+  { value: '60', label: '60 and up' },
+  { value: '80', label: '80 and up' },
+  { value: '100', label: '100 and up' },
 ];
+
+const DAYS_OPTIONS = [
+  { value: '3', label: 'Last 3 days' },
+  { value: '7', label: 'Last 7 days' },
+  { value: '14', label: 'Last 14 days' },
+  { value: '30', label: 'Last 30 days' },
+  { value: '0', label: 'Any time' },
+];
+
+const VISIT_KEY = 'reel:inbox-visited';
+
+function readPreviousVisit(): string | null {
+  try {
+    const previous = window.localStorage.getItem(VISIT_KEY);
+    window.localStorage.setItem(VISIT_KEY, new Date().toISOString());
+    return previous;
+  } catch {
+    return null;
+  }
+}
 
 function MatchRow({
   match,
+  isNew,
   focused,
   onFocus,
   onOpen,
@@ -51,6 +74,7 @@ function MatchRow({
   saving,
 }: {
   match: Match;
+  isNew: boolean;
   focused: boolean;
   onFocus: () => void;
   onOpen: () => void;
@@ -94,6 +118,12 @@ function MatchRow({
 
         <button type="button" onClick={onOpen} className="min-w-0 text-left" onFocus={onFocus}>
           <p className="text-body font-medium text-fg sm:truncate">
+            {isNew ? (
+              <span
+                className="mr-2 inline-block size-2 -translate-y-px rounded-full bg-accent align-middle"
+                aria-label="New since your last visit"
+              />
+            ) : null}
             {posting.company ?? 'Unknown company'}
             {posting.role ? (
               <span className="font-normal text-muted"> · {posting.role}</span>
@@ -191,6 +221,9 @@ export default function InboxPage() {
   const [page, setPage] = useState(1);
   const [source, setSource] = useState<Source | ''>('');
   const [minScore, setMinScore] = useState('0');
+  const [days, setDays] = useState('14');
+  const [sort, setSort] = useState<MatchSort>('best');
+  const [previousVisit, setPreviousVisit] = useState<string | null>(null);
   const [focusIndex, setFocusIndex] = useState(0);
   const [selected, setSelected] = useState<PostingSummary | null>(null);
 
@@ -199,11 +232,20 @@ export default function InboxPage() {
     page,
     source,
     minScore: minScore === '0' ? undefined : Number(minScore),
+    days: days === '0' ? undefined : Number(days),
+    sort,
   });
   const sources = useSources();
   const dismiss = useDismissMatch();
   const rescore = useRescore();
+  const markSeen = useMarkMatchesSeen();
   const saver = useSavePosting();
+
+  useEffect(() => {
+    setPreviousVisit(readPreviousVisit());
+    markSeen.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const items = matches.data?.items ?? [];
   const focused = items[focusIndex];
@@ -214,6 +256,8 @@ export default function InboxPage() {
       page: page + 1,
       source,
       minScore: minScore === '0' ? undefined : Number(minScore),
+      days: days === '0' ? undefined : Number(days),
+      sort,
     },
     matches.data !== undefined && page * matches.data.pageSize < matches.data.total,
   );
@@ -345,6 +389,29 @@ export default function InboxPage() {
           options={MIN_SCORE_OPTIONS}
           className="min-w-36"
         />
+        <Select
+          size="sm"
+          ariaLabel="Posted within"
+          value={days}
+          onValueChange={(value) => {
+            setDays(value);
+            setPage(1);
+          }}
+          options={DAYS_OPTIONS}
+          className="min-w-36"
+        />
+        <Segmented
+          ariaLabel="Sort"
+          value={sort}
+          onValueChange={(value) => {
+            setSort(value as MatchSort);
+            setPage(1);
+          }}
+          options={[
+            { value: 'best', label: 'Best' },
+            { value: 'newest', label: 'Newest' },
+          ]}
+        />
         <div className="ml-auto hidden items-center gap-1.5 text-caption text-muted lg:flex">
           <Kbd>j</Kbd>
           <Kbd>k</Kbd> move · <Kbd>s</Kbd> save · <Kbd>d</Kbd> dismiss · <Kbd>a</Kbd> apply ·{' '}
@@ -363,15 +430,15 @@ export default function InboxPage() {
           title={
             dismissed
               ? 'Nothing dismissed'
-              : source || minScore !== '0'
+              : source || minScore !== '0' || days !== '0'
                 ? 'No matches with these filters'
                 : 'No matches yet'
           }
           hint={
             dismissed
               ? 'Matches you dismiss land here, in case you change your mind.'
-              : source || minScore !== '0'
-                ? 'Loosen the source or score filter to see more.'
+              : source || minScore !== '0' || days !== '0'
+                ? 'Loosen the source, score or posted-within filter to see more.'
                 : 'Run an ingest from Settings, then rescore. Matches need a score of 40 or more against your criteria.'
           }
           action={
@@ -407,6 +474,7 @@ export default function InboxPage() {
                 <MatchRow
                   key={match.id}
                   match={match}
+                  isNew={previousVisit !== null && match.createdAt > previousVisit}
                   focused={index === focusIndex}
                   onFocus={() => setFocusIndex(index)}
                   onOpen={() => setSelected(match.posting)}

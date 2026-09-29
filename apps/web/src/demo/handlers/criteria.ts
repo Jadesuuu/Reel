@@ -1,3 +1,4 @@
+import { LEVELS, type Level } from '../../lib/types';
 import { bad, requireSignedIn, route } from '../router';
 import { getState, mutate } from '../store';
 
@@ -33,6 +34,10 @@ route('PUT', '/criteria', ({ body }) => {
       includeKeywords: normalizeKeywords(body.includeKeywords),
       excludeKeywords: normalizeKeywords(body.excludeKeywords),
       regionKeywords: normalizeKeywords(body.regionKeywords),
+      nearbyKeywords: normalizeKeywords(body.nearbyKeywords),
+      levels: normalizeKeywords(body.levels).filter((entry): entry is Level =>
+        (LEVELS as readonly string[]).includes(entry),
+      ),
       minSalaryUsd: typeof minSalary === 'number' ? minSalary : null,
     };
     return draft.criteria;

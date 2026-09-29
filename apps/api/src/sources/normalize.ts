@@ -6,7 +6,12 @@ import {
   parseSalary,
   type RemoteType,
 } from '../hn/hn.parser.js';
-import { findRegionTerms, regionBasis } from '../matching/regions.js';
+import { detectLevel } from '../matching/level.js';
+import {
+  findRegionTerms,
+  regionBasis,
+  restrictionBasis,
+} from '../matching/regions.js';
 import type { NormalizedPosting, RawPosting } from './source.types.js';
 
 const HEADLINE_MAX = 300;
@@ -118,7 +123,10 @@ export function normalizePosting(raw: RawPosting): NormalizedPosting {
     salaryMinUsd: salary.salaryMinUsd,
     salaryMaxUsd: salary.salaryMaxUsd,
     stackKeywords,
-    regionTerms: findRegionTerms(regionBasis(headline, raw.location)),
+    regionTerms: findRegionTerms(
+      `${regionBasis(headline, raw.location)} | ${restrictionBasis(rawText)}`,
+    ),
+    level: detectLevel(headline, raw.role),
     rawHtml: raw.html,
     rawText,
     headline,

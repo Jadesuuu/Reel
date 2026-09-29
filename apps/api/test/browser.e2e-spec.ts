@@ -98,6 +98,11 @@ describe('Browser (e2e)', () => {
       .send({ userAgent: 'e2e' })
       .expect(200);
     expect(poll.body.pollIntervalMs).toBe(30_000);
+    expect(poll.body.fresh).toEqual({
+      count: expect.any(Number),
+      since: expect.any(String),
+      top: expect.any(Array),
+    });
     expect(poll.body.jobs).toEqual([
       { runId: requested.runId, source: 'HIRINGCAFE', boardId, since: null },
     ]);

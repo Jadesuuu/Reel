@@ -3,11 +3,13 @@ import {
   ArrayMaxSize,
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
   Min,
 } from 'class-validator';
+import { LEVELS } from '../../matching/level.js';
 
 function toStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.map((v) => String(v)) : [];
@@ -41,6 +43,22 @@ export class UpsertCriteriaDto {
   @ArrayMaxSize(50)
   @Transform(({ value }) => toStringArray(value))
   regionKeywords?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMaxSize(50)
+  @Transform(({ value }) => toStringArray(value))
+  nearbyKeywords?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsIn(LEVELS, { each: true })
+  @ArrayMaxSize(5)
+  @Transform(({ value }) =>
+    toStringArray(value).map((entry) => entry.trim().toLowerCase()),
+  )
+  levels?: string[];
 
   @IsOptional()
   @IsInt()

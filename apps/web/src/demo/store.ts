@@ -42,6 +42,7 @@ export type DemoState = {
   sourceSettings: Record<Source, boolean>;
   boards: WatchedBoard[];
   browser: { linked: boolean; createdAt: string | null };
+  matchesSeenAt: string | null;
   clockOffsetMs: number;
   mail: DemoMail[];
   counter: number;
@@ -75,7 +76,10 @@ export function getState(): DemoState {
         const parsed = JSON.parse(raw) as DemoState;
         const complete =
           Array.isArray(parsed.criteria?.regionKeywords) &&
-          parsed.postings?.every((posting) => Array.isArray(posting.regionTerms));
+          Array.isArray(parsed.criteria?.levels) &&
+          parsed.postings?.every(
+            (posting) => Array.isArray(posting.regionTerms) && 'level' in posting,
+          );
         if (parsed.version === 1 && complete) {
           parsed.browser ??= { linked: true, createdAt: parsed.user.createdAt };
           state = parsed;

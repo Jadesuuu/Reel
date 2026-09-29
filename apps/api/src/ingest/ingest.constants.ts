@@ -1,8 +1,8 @@
 export const INGEST_QUEUE = 'ingest';
 export const INGEST_ALL_JOB = 'ingest-all';
 export const INGEST_SOURCE_JOB = 'ingest-source';
-export const INGEST_CRON = '0 */6 * * *';
-export const INGEST_SCHEDULER_ID = 'ingest-every-6h';
+export const INGEST_CRON = '0 */3 * * *';
+export const INGEST_SCHEDULER_ID = 'ingest-every-3h';
 
 export const INGEST_JOB_OPTIONS = {
   attempts: 3,

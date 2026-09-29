@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiDelete, apiFetch, apiPatch, apiPost, apiPut } from './api';
 import type {
+  Level,
   Application,
   ApplicationDetail,
   ApplicationListItem,
@@ -39,11 +40,15 @@ export function query(params: Record<string, string | number | boolean | undefin
   return text.length > 0 ? `?${text}` : '';
 }
 
+export type MatchSort = 'best' | 'newest';
+
 export type MatchFilters = {
   dismissed: boolean;
   page: number;
   source?: Source | '';
   minScore?: number;
+  days?: number;
+  sort?: MatchSort;
   pageSize?: number;
 };
 
@@ -58,9 +63,17 @@ export function useMatches(filters: MatchFilters) {
           pageSize: filters.pageSize ?? 25,
           source: filters.source,
           minScore: filters.minScore,
+          days: filters.days,
+          sort: filters.sort,
         })}`,
       ),
     placeholderData: (previous) => previous,
+  });
+}
+
+export function useMarkMatchesSeen() {
+  return useMutation({
+    mutationFn: () => apiPost<{ seenAt: string }>('/matches/seen'),
   });
 }
 
@@ -78,6 +91,8 @@ export function usePrefetchMatches(filters: MatchFilters, enabled: boolean) {
             pageSize: filters.pageSize ?? 25,
             source: filters.source,
             minScore: filters.minScore,
+            days: filters.days,
+            sort: filters.sort,
           })}`,
         ),
       staleTime: 30_000,
@@ -309,6 +324,8 @@ export function useSaveCriteria() {
       includeKeywords: string[];
       excludeKeywords: string[];
       regionKeywords: string[];
+      nearbyKeywords: string[];
+      levels: Level[];
       minSalaryUsd?: number | null;
     }) => apiPut<Criteria>('/criteria', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['criteria'] }),

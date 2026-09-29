@@ -98,6 +98,7 @@ export type NormalizedPosting = {
   salaryMaxUsd: number | null;
   stackKeywords: string[];
   regionTerms: string[];
+  level: string | null;
   rawHtml: string;
   rawText: string;
   headline: string;

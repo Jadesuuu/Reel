@@ -20,6 +20,11 @@ If a site shows a "verify you are human" check, the tab comes to the front so yo
 The run waits up to two and a half minutes for that. Chrome has to be open for any of this to
 happen; a run nobody picks up fails after fifteen minutes with "No browser connected".
 
+The same poll also returns how many strong matches (score 80 or more) Reel has scored since you
+last opened the inbox. That number sits on the toolbar icon, and each new batch raises one
+Chrome notification naming the top three. Clicking the icon or the notification opens the
+inbox, which clears the count on the next poll.
+
 ## Load it
 
 ```
@@ -27,9 +32,11 @@ pnpm --filter extension build
 ```
 
 Then in Chrome: `chrome://extensions`, turn on Developer mode, Load unpacked, choose
-`apps/extension/dist`. Click the Reel icon in the toolbar, paste the API address and the token
-from Settings → Sources → Your browser, and save. Rebuild and press the reload icon on the
-extension card after changing the code.
+`apps/extension/dist`. Right-click the Reel icon in the toolbar and choose Options, paste the
+API address and the token from Settings → Sources → Your browser, and save. The web address
+below them is where the icon and notifications open the inbox; leave it at
+`http://localhost:3000` for a local Reel. Rebuild and press the reload icon on the extension
+card after changing the code.
 
 The API address defaults to `http://localhost:4000/api/v1`. A deployed API needs its origin
 allowed once; the options page asks Chrome for that permission when you save.

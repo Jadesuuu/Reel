@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_API_URL, isLocalOrigin, normalizeApiUrl, originOf } from './settings.js';
+import {
+  DEFAULT_API_URL,
+  isLocalOrigin,
+  normalizeApiUrl,
+  originOf,
+  normalizeWebUrl,
+} from './settings.js';
 
 describe('normalizeApiUrl', () => {
   it('falls back to the local API', () => {
@@ -13,6 +19,14 @@ describe('normalizeApiUrl', () => {
     expect(normalizeApiUrl('https://api.reel.example/api/v1/')).toBe(
       'https://api.reel.example/api/v1',
     );
+  });
+});
+
+describe('normalizeWebUrl', () => {
+  it('falls back to the local web app and adds a scheme', () => {
+    expect(normalizeWebUrl('')).toBe('http://localhost:3000');
+    expect(normalizeWebUrl('reel.example.com/')).toBe('http://reel.example.com');
+    expect(normalizeWebUrl('https://reel.example.com')).toBe('https://reel.example.com');
   });
 });
 
