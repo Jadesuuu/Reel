@@ -68,6 +68,7 @@ model User {
   email        String   @unique
   passwordHash String   @map("password_hash")
   timezone     String   @default("Asia/Manila")
+  matchesSeenAt DateTime? @map("matches_seen_at")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -87,6 +88,8 @@ model Criteria {
   includeKeywords String[] @default([]) @map("include_keywords")
   excludeKeywords String[] @default([]) @map("exclude_keywords")
   regionKeywords  String[] @default([]) @map("region_keywords")
+  nearbyKeywords  String[] @default([]) @map("nearby_keywords")
+  levels          String[] @default([])
   minSalaryUsd    Int?     @map("min_salary_usd")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -128,6 +131,7 @@ model Posting {
   salaryMaxUsd  Int?       @map("salary_max_usd")
   stackKeywords String[]   @default([]) @map("stack_keywords")
   regionTerms   String[]   @default([]) @map("region_terms")
+  level         String?
   applyUrl      String?    @map("apply_url")
   url           String?
 
@@ -196,6 +200,7 @@ model Match {
 
   @@unique([userId, postingId])
   @@index([userId, dismissed, score])
+  @@index([userId, createdAt])
   @@map("matches")
 }
 

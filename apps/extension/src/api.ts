@@ -9,7 +9,17 @@ export type BrowserJob = {
   since: string | null;
 };
 
-export type PollResult = { jobs: BrowserJob[]; pollIntervalMs: number };
+export type FreshMatches = {
+  count: number;
+  since: string;
+  top: Array<{ company: string | null; role: string | null; score: number }>;
+};
+
+export type PollResult = {
+  jobs: BrowserJob[];
+  fresh?: FreshMatches;
+  pollIntervalMs: number;
+};
 
 export type CompletePayload = {
   items: unknown[];

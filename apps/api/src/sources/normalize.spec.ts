@@ -209,3 +209,33 @@ describe('helpers', () => {
     expect(positive('80000')).toBeNull();
   });
 });
+
+describe('normalizePosting level and restrictions', () => {
+  it('detects the level from the role', () => {
+    expect(
+      normalizePosting(raw({ role: 'Senior Full Stack Engineer' })).level,
+    ).toBe('senior');
+    expect(
+      normalizePosting(raw({ role: 'Full Stack Engineer' })).level,
+    ).toBeNull();
+  });
+
+  it('labels the location with a region', () => {
+    expect(
+      normalizePosting(raw({ location: 'Toronto, Ontario' })).regionTerms,
+    ).toEqual(['canada']);
+    expect(normalizePosting(raw({ location: 'Remote' })).regionTerms).toEqual(
+      [],
+    );
+  });
+
+  it('reads residency restrictions out of the description', () => {
+    const normalized = normalizePosting(
+      raw({
+        location: 'Remote',
+        html: '<p>We use TypeScript.</p><p>Candidates must be located in the United States.</p>',
+      }),
+    );
+    expect(normalized.regionTerms).toEqual(['us']);
+  });
+});

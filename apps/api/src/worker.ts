@@ -8,6 +8,7 @@ import {
   INGEST_ALL_JOB,
   INGEST_QUEUE,
   INGEST_SCHEDULER_ID,
+  LEGACY_SCHEDULER_IDS,
 } from './ingest/ingest.constants.js';
 
 async function bootstrap(): Promise<void> {
@@ -17,6 +18,9 @@ async function bootstrap(): Promise<void> {
   const logger = new Logger('Worker');
   const queue = app.get<Queue>(getQueueToken(INGEST_QUEUE));
 
+  for (const legacy of LEGACY_SCHEDULER_IDS) {
+    await queue.removeJobScheduler(legacy);
+  }
   await queue.upsertJobScheduler(
     INGEST_SCHEDULER_ID,
     { pattern: INGEST_CRON },

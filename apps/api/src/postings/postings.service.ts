@@ -21,6 +21,7 @@ const LIST_SELECT = {
   salaryMaxUsd: true,
   stackKeywords: true,
   regionTerms: true,
+  level: true,
   applyUrl: true,
   url: true,
   headline: true,
@@ -114,7 +115,13 @@ export class PostingsService {
         { location: { contains: needle, mode } },
       ];
     });
-    return { OR: [{ regionTerms: { isEmpty: true } }, ...mentions] };
+    return {
+      OR: [
+        { regionTerms: { isEmpty: true } },
+        { regionTerms: { hasSome: keywords } },
+        ...mentions,
+      ],
+    };
   }
 
   async findOne(id: string, userId: string): Promise<Record<string, unknown>> {
@@ -185,6 +192,7 @@ export class PostingsService {
         salaryMaxUsd: item.salaryMaxUsd,
         stackKeywords: item.stackKeywords,
         regionTerms: item.regionTerms,
+        level: item.level,
         applyUrl: item.applyUrl,
         url: item.url,
         rawHtml: item.rawHtml,

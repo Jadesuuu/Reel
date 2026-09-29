@@ -49,7 +49,11 @@ export class BrowserController {
   @UseGuards(BrowserTokenGuard)
   @HttpCode(200)
   poll(@Req() request: BrowserRequest, @Body() dto: PollDto) {
-    return this.browser.poll(request.browserTokenId!, dto.userAgent);
+    return this.browser.poll(
+      request.browserTokenId!,
+      request.user!.userId,
+      dto.userAgent,
+    );
   }
 
   @Post('runs/:id/complete')

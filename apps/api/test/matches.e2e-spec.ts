@@ -5,6 +5,27 @@ import { createTestApp } from './create-app.js';
 
 const THREAD_ID = 'e2e-matches-thread';
 
+type ListedMatch = { postingId: string; posting: { postedAt: string } };
+
+async function collect(
+  server: Parameters<typeof request>[0],
+  cookie: string,
+  params: string,
+): Promise<ListedMatch[]> {
+  const items: ListedMatch[] = [];
+  for (let page = 1; page <= 50; page += 1) {
+    const res = await request(server)
+      .get(`/api/v1/matches?${params}&page=${page}&pageSize=100`)
+      .set('Cookie', cookie)
+      .expect(200);
+    items.push(...(res.body.items as ListedMatch[]));
+    if (page * res.body.pageSize >= res.body.total) {
+      break;
+    }
+  }
+  return items;
+}
+
 describe('Matches (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
@@ -135,6 +156,60 @@ describe('Matches (e2e)', () => {
     expect([...scores].sort((a: number, b: number) => b - a)).toEqual(scores);
     expect(res.body.items[0].posting).toHaveProperty('company');
     expect(res.body.items[0].posting).not.toHaveProperty('rawText');
+  });
+
+  it('filters by posted-within days and sorts newest first on request', async () => {
+    const strong = await prisma.posting.findFirstOrThrow({
+      where: { externalId: `${THREAD_ID}-strong` },
+      select: { id: true },
+    });
+    await prisma.posting.update({
+      where: { id: strong.id },
+      data: { postedAt: new Date(Date.now() - 20 * 86_400_000) },
+    });
+    await request(app.getHttpServer())
+      .post('/api/v1/matches/rescore')
+      .set('Cookie', cookie)
+      .expect(202);
+
+    const recent = await collect(app.getHttpServer(), cookie, 'days=7');
+    expect(recent.some((item) => item.postingId === strong.id)).toBe(false);
+
+    const wide = await collect(
+      app.getHttpServer(),
+      cookie,
+      'days=45&sort=newest',
+    );
+    expect(wide.some((item) => item.postingId === strong.id)).toBe(true);
+    const dates = wide.map((item) => item.posting.postedAt);
+    expect(dates.toSorted().toReversed()).toEqual(dates);
+
+    await request(app.getHttpServer())
+      .get('/api/v1/matches?sort=sideways')
+      .set('Cookie', cookie)
+      .expect(400);
+
+    await prisma.posting.update({
+      where: { id: strong.id },
+      data: { postedAt: new Date() },
+    });
+    await request(app.getHttpServer())
+      .post('/api/v1/matches/rescore')
+      .set('Cookie', cookie)
+      .expect(202);
+  });
+
+  it('records when the inbox was last seen', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/matches/seen')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(res.body.seenAt).toEqual(expect.any(String));
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email },
+      select: { matchesSeenAt: true },
+    });
+    expect(user.matchesSeenAt?.toISOString()).toBe(res.body.seenAt);
   });
 
   it('carries the application once the posting is saved to the pipeline', async () => {

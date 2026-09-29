@@ -1,4 +1,5 @@
 import type {
+  Level,
   Application,
   IngestRun,
   Posting,
@@ -11,6 +12,7 @@ import type {
 } from '../lib/types';
 import { SOURCES } from '../lib/sources';
 import { findRegionTerms, regionBasis } from './regions';
+import { detectLevel } from './level';
 import { score, MATCH_THRESHOLD } from './scoring';
 import type { DemoState, StoredMatch } from './store';
 
@@ -1188,6 +1190,7 @@ function buildPosting(
     ...s,
     stackKeywords: seed.stack,
     regionTerms: findRegionTerms(regionBasis(headline, seed.location)),
+    level: detectLevel(headline, seed.role),
     headline,
     fingerprint: `${slug(seed.company)}|${slug(seed.role)}`,
     createdAt: new Date(postedAt.getTime() + createdAtOffsetMs).toISOString(),
@@ -1411,6 +1414,8 @@ export function buildSeed(now: Date): DemoState {
     includeKeywords: ['typescript', 'node', 'react', 'nestjs', 'next.js', 'postgres', 'aws'],
     excludeKeywords: ['php', 'wordpress', 'principal', 'staff'],
     regionKeywords: ['philippines', 'apac', 'asia', 'worldwide', 'anywhere'],
+    nearbyKeywords: ['metro manila', 'makati', 'taguig', 'bgc'],
+    levels: [] as Level[],
     minSalaryUsd: null,
   };
 
@@ -1641,6 +1646,7 @@ export function buildSeed(now: Date): DemoState {
     sourceSettings,
     boards,
     browser: { linked: true, createdAt: new Date(now.getTime() - 6 * DAY).toISOString() },
+    matchesSeenAt: null,
     clockOffsetMs: 0,
     mail: [],
     counter: counter + 100,

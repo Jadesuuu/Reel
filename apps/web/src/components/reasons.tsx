@@ -6,6 +6,14 @@ export function explainReason(reason: string): { label: string; points: string; 
   if (reason === 'remote') {
     return { label: 'remote', points: '+25', detail: 'The posting is remote.' };
   }
+  if (reason.startsWith('nearby:')) {
+    const keyword = reason.slice(7);
+    return {
+      label: `near you · ${keyword}`,
+      points: '+20',
+      detail: `Not remote, but the location mentions “${keyword}”, which you listed as near you.`,
+    };
+  }
   if (reason.startsWith('role:')) {
     const keyword = reason.slice(5);
     return {
@@ -22,20 +30,50 @@ export function explainReason(reason: string): { label: string; points: string; 
       detail: `Your include keyword “${keyword}” appears in the headline or stack. Stack points cap at +40.`,
     };
   }
+  if (reason.startsWith('open:')) {
+    const term = reason.slice(5);
+    return {
+      label: `open · ${term}`,
+      points: '+10',
+      detail: `The posting says it is open to “${term}”, one of the places you can work from.`,
+    };
+  }
   if (reason === 'salary') {
     return { label: 'salary', points: '+10', detail: 'A USD salary was parsed from the posting.' };
   }
   if (reason === 'apply-url') {
     return { label: 'apply link', points: '+5', detail: 'The posting includes a link to apply.' };
   }
+  if (reason === 'fresh') {
+    return {
+      label: 'fresh',
+      points: '+10',
+      detail: 'Posted within the last three days. Early applications get read.',
+    };
+  }
+  if (reason === 'recent') {
+    return { label: 'recent', points: '+5', detail: 'Posted within the last ten days.' };
+  }
   if (reason === 'not-remote') {
-    return { label: 'not remote', points: '0', detail: 'Your criteria are remote-only.' };
+    return {
+      label: 'not remote',
+      points: '0',
+      detail: 'Your criteria are remote-only and the location is not near you.',
+    };
   }
   if (reason.startsWith('excluded:')) {
     return {
       label: `excluded · ${reason.slice(9)}`,
       points: '0',
       detail: 'An exclude keyword matched, so the posting scores zero.',
+    };
+  }
+  if (reason.startsWith('level:')) {
+    const level = reason.slice(6);
+    return {
+      label: `level · ${level}`,
+      points: '0',
+      detail: `The title reads as a ${level} role, which is not one of the levels you picked.`,
     };
   }
   if (reason.startsWith('outside:')) {

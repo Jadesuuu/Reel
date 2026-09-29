@@ -31,6 +31,8 @@ export class MatchingController {
         dismissed: query.dismissed,
         source: query.source,
         minScore: query.minScore,
+        days: query.days,
+        sort: query.sort,
       },
       query.page,
       query.pageSize,
@@ -41,6 +43,12 @@ export class MatchingController {
   @HttpCode(200)
   dismiss(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.matching.dismiss(user.userId, id);
+  }
+
+  @Post('seen')
+  @HttpCode(200)
+  seen(@CurrentUser() user: CurrentUserPayload) {
+    return this.matching.markSeen(user.userId);
   }
 
   @Post('rescore')

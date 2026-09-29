@@ -622,18 +622,37 @@ For each `ParsedPosting`: `prisma.posting.upsert({ where: { source_externalId: {
 function score(posting: PostingForScoring, criteria: CriteriaForScoring): { score: number; reasons: string[] }
 ```
 
-1. If `criteria.remoteOnly && posting.remote !== 'REMOTE'` → return `{ score: 0, reasons: ['not-remote'] }`. Stop.
+Rewritten in Step 25 (29 Sep 2026). `score(posting, criteria, now)`; the posting carries
+`regionTerms` (region labels computed at ingest) and `level` (detected at ingest) as well as
+`postedAt`.
+
+1. `nearby` = the first `nearbyKeywords` entry found in `headline + location`, only when
+   `posting.remote !== 'REMOTE'`. If `criteria.remoteOnly && posting.remote !== 'REMOTE'` and there
+   is no `nearby` hit → return `{ score: 0, reasons: ['not-remote'] }`. Stop.
 2. If any `excludeKeywords` entry appears (word-boundary, case-insensitive) in `headline` or `stackKeywords` → return `{ score: 0, reasons: ['excluded:<kw>'] }`. Stop.
-   2b. (Step 21) If `regionKeywords` is non-empty and no entry appears in `headline + location` but a `REGION_TERMS` entry does → return `{ score: 0, reasons: ['outside:<term>'] }`. Stop.
+   2a. (Step 25) If `criteria.levels` is non-empty, `posting.level` is not null and not in the list → return `{ score: 0, reasons: ['level:<level>'] }`. Stop.
+   2b. (Step 21, reworked in Step 25) When `regionKeywords` is non-empty: a keyword that is not an
+   open word (`worldwide`, `anywhere`, `global`, `any`, ...) and that either equals one of
+   `posting.regionTerms` or appears in `headline + location` → allowed, remember `open:<kw>`.
+   Otherwise, if `posting.regionTerms` is non-empty → return `{ score: 0, reasons: ['outside:<label>'] }`
+   with the first label. Otherwise, if an open word from the user's list or from `OPEN_TERMS` appears
+   → allowed, remember `open:<word>`. Otherwise allowed with nothing remembered: silence is not a
+   restriction, and an open word cannot rescue a posting that also names a region.
 3. Start `score = 0`, `reasons = []`.
-4. `+25` and `reasons.push('remote')` if `posting.remote === 'REMOTE'`.
+4. `+25` and `reasons.push('remote')` if `posting.remote === 'REMOTE'`; else `+20` and
+   `reasons.push('nearby:<kw>')` if step 1 found a nearby hit.
 5. `+30` and `reasons.push('role:<kw>')` for the **first** `roleKeywords` entry found in `headline` (only once).
 6. `+10` per `includeKeywords` entry found in `stackKeywords` or `headline`, **cap +40**, push `stack:<kw>` each.
+   6b. `+10` and push the remembered `open:<...>` reason from 2b, if any.
 7. `+10` and `reasons.push('salary')` if `salaryMinUsd !== null`. If `criteria.minSalaryUsd` is set and `salaryMaxUsd !== null && salaryMaxUsd < criteria.minSalaryUsd` → return `{ score: 0, reasons: ['below-min-salary'] }`.
 8. `+5` and `reasons.push('apply-url')` if `applyUrl !== null`.
-9. Max possible: 110. **Match threshold: `score >= 40`.** Below threshold → no Match row is written (and an existing one is deleted on rescore).
+   8b. `+10` and `reasons.push('fresh')` if `postedAt` is within 3 days of `now`; else `+5` and
+   `reasons.push('recent')` if within 10 days.
+9. Max possible: 130. **Match threshold: `score >= 40`.** Below threshold → no Match row is written (and an existing one is deleted on rescore). **Strong match: `score >= 80`** (the extension badge counts these).
 
-Rescore scope: `MatchingService.rescoreUser(userId)` = all postings with `postedAt >= now - 45 days`. Runs after every ingest (for every user) and on `POST /matches/rescore`.
+Rescore scope: `MatchingService.rescoreUser(userId)` = all postings with `postedAt >= now - 45 days`;
+matches whose posting is older than that are deleted first. Runs after every ingest (for every user)
+and on `POST /matches/rescore`.
 
 ---
 
@@ -1848,6 +1867,87 @@ branch; `browser.e2e-spec.ts` walks token → poll → claim → complete → ex
 extension typechecks, its pure modules are tested, and `pnpm --filter extension build` produces a
 loadable `dist/`; Settings shows the browser card in both real and demo mode; the copy says
 twenty sources; the gate is green.
+
+---
+
+### Step 25 — Fit: geography, level, near you, freshness, and a badge
+
+**Branch:** `feat/fit-v2`
+**Commit:** `feat: region gazetteer, levels, near-you and freshness in the score, inbox filters, extension badge`
+
+**Why.** On 29 Sep the real inbox held 258 matches and the top ten were "Remote" jobs located
+in Kentucky, Louisville, Toronto, Chicago and San Francisco. Rule 2b only knew countries and
+continents, so a state or city passed. 206 JobStreet and Kalibrr postings in Metro Manila
+scored zero as not-remote although Jade lives there. 144 of the 258 were senior, staff or lead
+titles. Nothing marked which matches were new, and nothing reached Jade when a strong one
+arrived. Jade asked for whatever most raises the chance of landing a job; this is the ranking
+half of that.
+
+**Decisions:**
+
+- `REGION_TERMS` becomes a gazetteer of `[label, terms]` pairs: 26 labels (`us`, `canada`,
+  `latam`, `uk`, `europe`, `middle east`, `africa`, `india`, `pakistan`, `australia`,
+  `new zealand`, `japan`, `korea`, `china`, `taiwan`, `hong kong`, `singapore`, `malaysia`,
+  `indonesia`, `vietnam`, `thailand`, `philippines`, `asia`, `apac`, `americas`, `emea`), each
+  with its countries, states or provinces, major cities, demonyms, time-zone shorthands and
+  phrases such as `us-based`. `findRegionTerms` returns labels, and `Posting.regionTerms`
+  stores labels. Short terms keep the uppercase-only rule from Step 21.
+- `restrictionSnippets(rawText)` extracts the place from sentences like "must be located in
+  …", "only open to candidates in …", "authorized to work in …", "US-based candidates", and
+  "… time zones". `normalizePosting` feeds the snippets into `findRegionTerms` alongside the
+  headline and location. The scorer reads `posting.regionTerms`; it does not scan text.
+- `OPEN_TERMS` (`worldwide`, `anywhere`, `any country`, …) give `open:<term>` and +10 only
+  when the posting names no region. Rule 2b in §6.5 has the exact order.
+- `Posting.level` is detected from the role (or the second headline segment) as
+  `intern | junior | mid | senior | lead | null` by `detectLevel` in
+  `apps/api/src/matching/level.ts`. Criteria gain `levels: string[]`; non-empty means a
+  detected level outside the list scores zero with `level:<level>`. Null passes.
+- Criteria gain `nearbyKeywords: string[]` ("Near you"). A non-remote posting whose
+  `headline + location` names one passes the remote-only gate and scores +20 `nearby:<kw>`.
+- `+10 fresh` within 3 days of `postedAt`, `+5 recent` within 10. Maximum 130. Strong match
+  is 80 or more.
+- `GET /matches` takes `days` (posting age in days, 1–365) and `sort` (`best` = score then
+  date, `newest` = date then score). The inbox defaults to `days=14`, `sort=best`, shows a dot
+  on matches created after the previous visit (a `localStorage` stamp), and calls
+  `POST /matches/seen` on open, which sets `User.matchesSeenAt`.
+- `POST /browser/poll` returns `fresh: { count, since, top: [{ company, role, score }] }`:
+  undismissed matches with `score >= 80` created after `matchesSeenAt` (or the last 24 hours
+  when null). The extension puts `count` on its toolbar badge, raises one Chrome notification
+  per batch (keyed on `since` and `count`), and opens `<webUrl>/inbox` when the icon or the
+  notification is clicked. The options page gains the web address (default
+  `http://localhost:3000`); the manifest gains `notifications` and an icon.
+- `rescoreUser` deletes matches whose posting is older than the 45-day window before scoring.
+- `INGEST_CRON` becomes `0 */3 * * *`. HiringCafe and JobStreet gain presets `typescript`,
+  `react`, `node.js`.
+- `pnpm --filter api backfill:fit` recomputes `regionTerms` and `level` for every stored
+  posting; run it once after the migration and again whenever the parsers change.
+- The demo copies `regions.ts` and `level.ts` verbatim and mirrors the scorer, the two new
+  criteria fields, `days`, `sort`, and `/matches/seen`.
+
+**Contract (adds to 11.3):**
+
+| Method | Path | Change |
+|---|---|---|
+| PUT | `/criteria` | body adds `nearbyKeywords?: string[]` and `levels?: string[]` (each entry one of `intern`, `junior`, `mid`, `senior`, `lead`; anything else → `400`). `GET` returns both. |
+| GET | `/matches` | adds `days?: number` (1–365) and `sort?: 'best' or 'newest'`; `minScore` max is 130. |
+| POST | `/matches/seen` | `200 { seenAt }`; stamps `User.matchesSeenAt`. |
+| POST | `/browser/poll` | response adds `fresh: { count, since, top }`. |
+| GET | `/postings` | `open=true` also keeps rows whose `regionTerms` contain one of the caller's region keywords. |
+
+**Schema (migration `v6_fit`):** `postings.level text`, `criteria.nearby_keywords text[] default '{}'`,
+`criteria.levels text[] default '{}'`, `users.matches_seen_at timestamp`, index
+`matches(user_id, created_at)`.
+
+**Measured on 29 Sep 2026, real account, after the backfill and a rescore:** 258 matches → 365,
+but the top thirty are now worldwide, Asia, Philippines and Metro Manila postings; 142 carry
+`nearby:metro manila`, 198 `open:philippines`, and no senior or lead title remains inside the
+45-day window. The two stale rows outside the window go on the next scheduled rescore.
+
+**Done when:** `regions`, `level` and `scorer` specs cover cities, body restrictions, the
+"anywhere in the US" trap, nearby, levels and freshness; `normalize.spec` covers `level` and
+body restrictions; `matches.e2e-spec` covers `days`, `sort` and `seen`; the criteria page has
+"Near you" and the level toggles; the inbox has the posted-within filter, the sort and the new
+dot; the extension builds with the badge; demo mode matches; the gate is green.
 
 ---
 

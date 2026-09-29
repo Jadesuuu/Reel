@@ -148,8 +148,8 @@
     <main>
       <h1>Reel browser sources</h1>
       <p class="lede">
-        This extension checks Reel every 30 seconds and reads HiringCafe and Wellfound from inside
-        this browser when Reel asks.
+        This extension checks Reel every 30 seconds, reads HiringCafe and Wellfound from inside this
+        browser when Reel asks, and shows a badge when strong new matches are waiting.
       </p>
 
       <form id="form">
@@ -171,6 +171,10 @@
             spellcheck="false"
             autocomplete="off"
           />
+        </label>
+        <label>
+          Reel web address (opens from the toolbar icon and notifications)
+          <input id="web-url" type="url" placeholder="http://localhost:3000" spellcheck="false" />
         </label>
         <div class="row">
           <button type="submit" class="primary" id="save">Save</button>
