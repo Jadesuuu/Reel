@@ -9,6 +9,8 @@ import type {
   ApplicationListItem,
   ApplicationStats,
   BoardProvider,
+  BrowserStatus,
+  BrowserToken,
   CreateApplicationInput,
   Criteria,
   IngestRun,
@@ -366,6 +368,30 @@ export function useRemoveBoard() {
   return useMutation({
     mutationFn: (id: string) => apiDelete<void>(`/sources/boards/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sources'] }),
+  });
+}
+
+export function useBrowserStatus() {
+  return useQuery({
+    queryKey: ['browser'],
+    queryFn: () => apiFetch<BrowserStatus>('/browser'),
+    refetchInterval: 15_000,
+  });
+}
+
+export function useCreateBrowserToken() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiPost<BrowserToken>('/browser/token'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['browser'] }),
+  });
+}
+
+export function useRevokeBrowserToken() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiDelete<void>('/browser/token'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['browser'] }),
   });
 }
 

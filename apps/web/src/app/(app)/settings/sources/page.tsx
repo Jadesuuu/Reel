@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, Play, Plus, Trash2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Play, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
 import { SourceBadge } from '../../../../components/source-badge';
@@ -13,11 +13,15 @@ import { ErrorState, Panel, SectionTitle } from '../../../../components/ui/state
 import { Switch } from '../../../../components/ui/switch';
 import { Tip } from '../../../../components/ui/tooltip';
 import { ApiError } from '../../../../lib/api';
+import { cn } from '../../../../lib/cn';
 import { relativeTime } from '../../../../lib/format';
 import {
   useAddBoard,
   useBoards,
+  useBrowserStatus,
+  useCreateBrowserToken,
   useRemoveBoard,
+  useRevokeBrowserToken,
   useRunIngest,
   useSources,
   useToggleSource,
@@ -39,9 +43,13 @@ function RunDot({ info }: { info: SourceInfo }) {
         ? 'bg-danger'
         : run.status === 'RUNNING'
           ? 'bg-info animate-pulse'
-          : 'bg-success';
+          : run.status === 'WAITING'
+            ? 'bg-warning'
+            : 'bg-success';
   const label = run
-    ? `${run.status.toLowerCase()} ${relativeTime(run.startedAt)} · ${run.itemsSeen} seen, ${run.postingsCreated} new`
+    ? run.status === 'WAITING'
+      ? `waiting for your browser since ${relativeTime(run.startedAt)}`
+      : `${run.status.toLowerCase()} ${relativeTime(run.startedAt)} · ${run.itemsSeen} seen, ${run.postingsCreated} new`
     : 'never run';
   return (
     <Tip content={label}>
@@ -97,7 +105,7 @@ function SourceRow({
         {info.postings.toLocaleString()}
       </span>
       <RunDot info={info} />
-      {info.kind === 'feed' ? (
+      {info.kind !== 'board' ? (
         <Button
           size="icon-sm"
           variant="ghost"
@@ -112,6 +120,156 @@ function SourceRow({
         <span className="size-8" />
       )}
     </li>
+  );
+}
+
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-t border-line bg-surface-2/50 px-4 py-2">
+      <span className="stamp text-faint">{children}</span>
+    </div>
+  );
+}
+
+function TokenReveal({ token, onDone }: { token: string; onDone: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(token);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast.error('Could not copy. Select the token and copy it by hand.');
+    }
+  };
+  return (
+    <div className="rounded-md border border-accent/40 bg-accent-soft/40 p-3">
+      <p className="mb-2 text-caption text-muted">
+        Shown once. Paste it into the extension&apos;s options page, then close this.
+      </p>
+      <div className="flex items-center gap-2">
+        <code className="min-w-0 flex-1 truncate rounded-sm bg-surface px-2 py-1.5 font-mono text-body-sm text-fg select-all">
+          {token}
+        </code>
+        <Button size="sm" variant="secondary" onClick={copy} aria-label="Copy token">
+          {copied ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
+          {copied ? 'Copied' : 'Copy'}
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onDone}>
+          Done
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function BrowserLink() {
+  const status = useBrowserStatus();
+  const create = useCreateBrowserToken();
+  const revoke = useRevokeBrowserToken();
+  const [token, setToken] = useState<string | null>(null);
+
+  const data = status.data;
+  const tone = !data
+    ? 'bg-line-strong'
+    : data.connected
+      ? 'bg-success'
+      : data.linked
+        ? 'bg-warning'
+        : 'bg-line-strong';
+  const headline = !data
+    ? 'Checking…'
+    : data.connected
+      ? 'Browser connected'
+      : data.linked
+        ? 'Linked, but the extension has not checked in'
+        : 'No browser linked';
+  const detail = !data
+    ? null
+    : data.connected
+      ? `Last check-in ${data.lastSeenAt ? relativeTime(data.lastSeenAt) : 'just now'}${data.userAgent ? ` · ${data.userAgent}` : ''}`
+      : data.linked
+        ? data.lastSeenAt
+          ? `Last seen ${relativeTime(data.lastSeenAt)}. Is Chrome open with the extension loaded?`
+          : 'The token has never been used. Paste it into the extension to finish.'
+        : 'Generate a token and paste it into the Reel extension once.';
+
+  const generate = () =>
+    create.mutate(undefined, {
+      onSuccess: (result) => setToken(result.token),
+      onError: () => toast.error('Could not create a token'),
+    });
+
+  return (
+    <Panel>
+      <SectionTitle aside="HiringCafe · Wellfound">Your browser</SectionTitle>
+      <p className="mb-4 max-w-[62ch] text-caption text-muted">
+        HiringCafe and Wellfound block servers, so the Reel extension reads them from inside Chrome
+        with your cookies. Every refetch and every six-hourly cycle hands those two sources to it.
+        Chrome has to be open; a run that finds no browser fails after fifteen minutes and the next
+        cycle tries again.
+      </p>
+
+      <div className="flex flex-wrap items-center gap-3 rounded-md border border-line px-4 py-3">
+        <span className={cn('size-2.5 shrink-0 rounded-full', tone)} aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p className="text-body text-fg">{headline}</p>
+          {detail ? <p className="text-fine text-faint">{detail}</p> : null}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant={data?.linked ? 'secondary' : 'primary'}
+            loading={create.isPending}
+            onClick={generate}
+          >
+            <RefreshCw className="size-4" /> {data?.linked ? 'New token' : 'Generate token'}
+          </Button>
+          {data?.linked ? (
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              aria-label="Revoke the browser token"
+              className="text-faint hover:text-danger"
+              loading={revoke.isPending}
+              onClick={() =>
+                revoke.mutate(undefined, {
+                  onSuccess: () => {
+                    setToken(null);
+                    toast('Browser token revoked');
+                  },
+                  onError: () => toast.error('Could not revoke the token'),
+                })
+              }
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {token ? (
+        <div className="mt-3">
+          <TokenReveal token={token} onDone={() => setToken(null)} />
+        </div>
+      ) : null}
+
+      <ol className="mt-5 list-decimal space-y-1.5 pl-5 text-caption text-muted">
+        <li>
+          Build it once: <span className="font-mono text-muted">pnpm --filter extension build</span>
+          .
+        </li>
+        <li>
+          In Chrome open <span className="font-mono text-muted">chrome://extensions</span>, turn on
+          Developer mode, choose Load unpacked, and pick{' '}
+          <span className="font-mono text-muted">apps/extension/dist</span>.
+        </li>
+        <li>
+          Click the Reel icon, paste the API address and the token, and save. The dot above turns
+          green within a minute.
+        </li>
+      </ol>
+    </Panel>
   );
 }
 
@@ -266,6 +424,22 @@ export default function SourcesPage() {
 
   const feeds = sources.data?.items.filter((item) => item.kind === 'feed') ?? [];
   const boards = sources.data?.items.filter((item) => item.kind === 'board') ?? [];
+  const browser = sources.data?.items.filter((item) => item.kind === 'browser') ?? [];
+
+  const runOne = (info: SourceInfo) =>
+    runIngest.mutate(
+      { source: info.source },
+      {
+        onSuccess: () =>
+          toast.success(`Queued ${info.label}`, {
+            description:
+              info.kind === 'browser'
+                ? 'Your browser picks it up on its next check-in.'
+                : undefined,
+          }),
+        onError: () => toast.error(`Could not queue ${info.label}`),
+      },
+    );
 
   return (
     <div className="space-y-4">
@@ -310,21 +484,22 @@ export default function SourcesPage() {
                   key={info.source}
                   info={info}
                   running={runIngest.isPending && runIngest.variables?.source === info.source}
-                  onRun={() =>
-                    runIngest.mutate(
-                      { source: info.source },
-                      {
-                        onSuccess: () => toast.success(`Queued ${info.label}`),
-                        onError: () => toast.error(`Could not queue ${info.label}`),
-                      },
-                    )
-                  }
+                  onRun={() => runOne(info)}
                 />
               ))}
             </ul>
-            <div className="border-t border-line bg-surface-2/50 px-4 py-2">
-              <span className="stamp text-faint">Board providers</span>
-            </div>
+            <GroupLabel>Through your browser</GroupLabel>
+            <ul className="divide-y divide-line">
+              {browser.map((info) => (
+                <SourceRow
+                  key={info.source}
+                  info={info}
+                  running={runIngest.isPending && runIngest.variables?.source === info.source}
+                  onRun={() => runOne(info)}
+                />
+              ))}
+            </ul>
+            <GroupLabel>Board providers</GroupLabel>
             <ul className="divide-y divide-line">
               {boards.map((info) => (
                 <SourceRow key={info.source} info={info} running={false} onRun={() => undefined} />
@@ -334,6 +509,7 @@ export default function SourcesPage() {
         ) : null}
       </Panel>
 
+      <BrowserLink />
       <Boards />
     </div>
   );

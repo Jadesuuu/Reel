@@ -23,7 +23,9 @@ function StatusPill({ run }: { run: IngestRun }) {
       ? 'border-success/40 bg-success-soft text-success'
       : run.status === 'FAILED'
         ? 'border-danger/40 bg-danger-soft text-danger'
-        : 'border-info/40 bg-info-soft text-info';
+        : run.status === 'WAITING'
+          ? 'border-warning/40 bg-warning-soft text-warning'
+          : 'border-info/40 bg-info-soft text-info';
   return (
     <span
       className={cn('stamp inline-flex h-6 items-center gap-1.5 rounded-[3px] border px-1.5', cls)}
@@ -31,7 +33,10 @@ function StatusPill({ run }: { run: IngestRun }) {
       {run.status === 'RUNNING' ? (
         <span className="size-2 animate-pulse rounded-full bg-info" />
       ) : null}
-      {run.status.toLowerCase()}
+      {run.status === 'WAITING' ? (
+        <span className="size-2 rounded-full border border-warning" />
+      ) : null}
+      {run.status === 'WAITING' ? 'waiting for browser' : run.status.toLowerCase()}
     </span>
   );
 }
@@ -51,7 +56,9 @@ export default function IngestPage() {
   const runIngest = useRunIngest();
 
   const items = runs.data?.items ?? [];
-  const running = items.filter((run) => run.status === 'RUNNING').length;
+  const running = items.filter(
+    (run) => run.status === 'RUNNING' || run.status === 'WAITING',
+  ).length;
 
   return (
     <Panel padded={false}>

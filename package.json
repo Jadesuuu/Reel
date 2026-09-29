@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "concurrently -n api,worker,web -c blue,yellow,magenta \"pnpm --filter api start:dev\" \"pnpm --filter api start:worker:dev\" \"pnpm --filter web dev\"",
     "build": "pnpm -r build",
-    "lint": "oxlint -c .oxlintrc.json apps/api/src apps/api/test apps/web/src",
+    "lint": "oxlint -c .oxlintrc.json apps/api/src apps/api/test apps/web/src apps/extension/src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",

@@ -21,6 +21,10 @@ const DEFAULT_BOARD: Record<Source, string | null> = {
   JOBSPRESSO: 'all',
   WORKABLE: null,
   SMARTRECRUITERS: null,
+  HIRINGCAFE: 'software-engineer',
+  WELLFOUND: 'software-engineer',
+  JOBSTREET: 'software-engineer',
+  KALIBRR: 'it-and-software',
 };
 
 export function sourceInfo(source: Source): SourceInfo {

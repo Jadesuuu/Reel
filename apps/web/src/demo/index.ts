@@ -8,6 +8,7 @@ import './handlers/ingest';
 import './handlers/postings';
 import './handlers/matches';
 import './handlers/applications';
+import './handlers/browser';
 
 export const DEMO_STORAGE_EVENT = 'reel-demo-changed';
 

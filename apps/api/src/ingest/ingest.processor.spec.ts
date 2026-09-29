@@ -4,6 +4,7 @@ import type { Job } from 'bullmq';
 import { MatchingService } from '../matching/matching.service.js';
 import { PostingsService } from '../postings/postings.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { BrowserRunsService } from '../sources/browser/browser-runs.service.js';
 import { SourceRegistry } from '../sources/source-registry.js';
 import type { RawPosting } from '../sources/source.types.js';
 import { SourcesService } from '../sources/sources.service.js';
@@ -48,6 +49,7 @@ describe('IngestProcessor', () => {
   const postings = { upsertMany: vi.fn() };
   const matching = { rescoreAllUsers: vi.fn() };
   const queue = { addBulk: vi.fn() };
+  const browserRuns = { request: vi.fn() };
   const prisma = {
     ingestRun: { create: vi.fn(), update: vi.fn() },
   };
@@ -66,6 +68,7 @@ describe('IngestProcessor', () => {
         { provide: PostingsService, useValue: postings },
         { provide: MatchingService, useValue: matching },
         { provide: PrismaService, useValue: prisma },
+        { provide: BrowserRunsService, useValue: browserRuns },
       ],
     }).compile();
 
@@ -176,6 +179,46 @@ describe('IngestProcessor', () => {
         error: expect.stringContaining('network down'),
       }),
     });
+  });
+
+  it('asks for a browser run instead of fetching a browser source', async () => {
+    browserRuns.request.mockResolvedValue({ runId: 'run-b', created: true });
+
+    const result = await processor.process(
+      makeJob(INGEST_SOURCE_JOB, {
+        source: 'HIRINGCAFE',
+        boardId: 'backend-engineer',
+      }),
+    );
+
+    expect(browserRuns.request).toHaveBeenCalledWith(
+      'HIRINGCAFE',
+      'backend-engineer',
+    );
+    expect(registry.get).not.toHaveBeenCalled();
+    expect(prisma.ingestRun.create).not.toHaveBeenCalled();
+    expect(matching.rescoreAllUsers).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      runId: 'run-b',
+      source: 'HIRINGCAFE',
+      boardId: 'backend-engineer',
+      itemsSeen: 0,
+      created: 0,
+      updated: 0,
+    });
+  });
+
+  it('uses the default board when a browser source job names none', async () => {
+    browserRuns.request.mockResolvedValue({ runId: 'run-b', created: false });
+
+    await processor.process(
+      makeJob(INGEST_SOURCE_JOB, { source: 'WELLFOUND' }),
+    );
+
+    expect(browserRuns.request).toHaveBeenCalledWith(
+      'WELLFOUND',
+      'software-engineer',
+    );
   });
 
   it('rejects a source job without a source', async () => {

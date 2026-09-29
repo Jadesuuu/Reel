@@ -1,0 +1,73 @@
+[
+  {
+    "id": "4697947",
+    "title": "Senior Software Engineer",
+    "slug": "senior-software-engineer",
+    "description": "# **About us**\n\nConfident powers analytical testing labs — the labs that test samples on behalf of food, cannabis and environmental companies.\n\n## The role\n\n- Own the TypeScript services behind our LIMS\n- Postgres, Node and React every day",
+    "jobType": "full-time",
+    "liveStartAt": 1789063154,
+    "locationNames": ["San Francisco Bay Area"],
+    "remote": true,
+    "remoteConfig": { "kind": "REMOTE", "wfhFlexible": false },
+    "acceptedRemoteLocationNames": [
+      "Canada",
+      "South America",
+      "United States",
+      "Latin America"
+    ],
+    "compensation": "$100k – $180k • 0.05% – 0.25%",
+    "yearsExperienceMin": 5,
+    "yearsExperienceMax": null,
+    "startup": {
+      "id": "829771",
+      "name": "Confident LIMS",
+      "slug": "confidentlims",
+      "highConcept": "The easiest way to test",
+      "companySize": "SIZE_11_50"
+    }
+  },
+  {
+    "id": "3392132",
+    "title": "Backend Engineer",
+    "slug": "backend-engineer",
+    "description": "Our mission is to reinvent the way people learn, starting with language. You will build Go and Python services on GCP.",
+    "jobType": "full-time",
+    "liveStartAt": 1756404860,
+    "locationNames": ["San Francisco"],
+    "remote": true,
+    "remoteConfig": { "kind": "ONSITE", "wfhFlexible": true },
+    "acceptedRemoteLocationNames": ["United States"],
+    "compensation": "$150k – $280k",
+    "yearsExperienceMin": null,
+    "yearsExperienceMax": null,
+    "startup": {
+      "id": "4294719",
+      "name": "Speak",
+      "slug": "speak-app",
+      "highConcept": "AI language tutor that helps you speak",
+      "companySize": "SIZE_51_200"
+    }
+  },
+  {
+    "id": "4762995",
+    "title": "Software Engineer, Staff",
+    "slug": "software-engineer-staff",
+    "description": "Rust and Kubernetes at scale.",
+    "jobType": "full-time",
+    "liveStartAt": 1788900000,
+    "locationNames": ["Berlin"],
+    "remote": false,
+    "remoteConfig": { "kind": "ONSITE", "wfhFlexible": false },
+    "acceptedRemoteLocationNames": [],
+    "compensation": "Not specified",
+    "yearsExperienceMin": 8,
+    "yearsExperienceMax": null,
+    "startup": null
+  },
+  {
+    "id": "",
+    "title": "Broken listing",
+    "slug": "broken",
+    "startup": { "id": "1", "name": "Nobody" }
+  }
+]

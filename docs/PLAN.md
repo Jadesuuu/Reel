@@ -53,7 +53,10 @@ job emails you to follow up.
 
 - ~~Any job source other than HN "Who is hiring?".~~ Lifted on 23 Sep 2026 — see Section 11. Public
   JSON/RSS job APIs and company boards are in; anything that needs scraping or an API key stays out.
-- Browser extension, scraping of arbitrary sites, LinkedIn/Wellfound integrations.
+- ~~Browser extension, scraping of arbitrary sites, LinkedIn/Wellfound integrations.~~ Partly
+  lifted on 29 Sep 2026 — see Step 24. A Chrome extension now reads HiringCafe and Wellfound
+  from Jade's own browser. Scraping arbitrary sites from the server stays out, and LinkedIn is
+  blocked at the network level on Jade's machine, so it stays out too.
 - AI/LLM-based matching or summarization.
 - Teams, sharing, multi-user collaboration. (Multiple accounts can exist; they never see each other.)
 - Mobile app. Push notifications. Slack/Discord bots.
@@ -1208,6 +1211,8 @@ realtime, OAuth, mobile apps.
 | Source settings | Global, not per user: `SourceSetting` rows toggle a source on or off; `WatchedBoard` rows list company boards | Postings are global already (Section 3.1). Per-user toggles over a global table would mean ingesting for everyone anyway. |
 | RSS parsing | Regex item extraction + `he.decode` | Same rule as HTML → text: no DOM parser. |
 | Board validation | `POST /sources/boards` fetches the board once before saving; unknown slug → `400` | The one place the API talks to a third party synchronously. It is a user-initiated check with a 10s timeout, not an ingest. |
+| Browser sources (Step 24) | **HiringCafe** and **Wellfound** are `Source` values with `kind: 'browser'`. The worker records a `WAITING` run for them; a Chrome extension polls `POST /browser/poll`, reads the pages in a background tab, and posts the hits to `POST /browser/runs/:id/complete`. The server maps, normalises and scores them like a feed. | Both sites answer only a real browser (Cloudflare and DataDome). The extension is a dumb worker driven by Reel, so Settings toggles, the header refetch and the six-hourly cycle treat them exactly like the other sources. Parsing stays on the server, pure and fixture-tested. |
+| Browser token | One `BrowserToken` per user, random 24 bytes shown once, stored as a SHA-256 hash, sent as `Authorization: Bearer`. `lastSeenAt` within 90 s means "connected". | The session cookie cannot leave the web origin. A per-user token the extension holds is the smallest thing that works; hashing it means a database read never reveals it. |
 | Job ids | `-` separators only (`stale-<id>`, `followup-<id>`, `manual-<source>-<board>-<minute>`) | BullMQ 5 throws on `:` in a custom id. v1's `stale:<id>` was already shipped as `stale-<id>`; Sections 3.3 and 4.3 are corrected above. |
 | Frontend libraries | `motion`, `@dnd-kit/core` + `@dnd-kit/sortable`, `radix-ui`, `cmdk`, `sonner`, `lucide-react`, `recharts`, `next-themes`, `class-variance-authority`, `clsx`, `tailwind-merge` | The shadcn/ui stack from Section 2 made concrete, plus motion and drag-and-drop. Nothing that fetches or owns server state — TanStack Query still does that. |
 | Demo mode | `NEXT_PUBLIC_DEMO_MODE=true` at build time swaps `apiFetch` for an in-browser implementation of the same Section 5 + 11.3 contract, seeded with realistic data and persisted to `localStorage` | Free to host on Vercel, no cold start, nothing to keep alive. The real backend still deploys per Step 14 when Jade wants it live. The demo is the resume link; the repo is the proof. |
@@ -1295,6 +1300,37 @@ Invariant additions:
     Scheduling again replaces it (remove job, upsert row).
 11. `SourceSetting` has one row per `Source` value, created lazily on first read with `enabled: true`.
 12. `WatchedBoard.provider` is one of `GREENHOUSE | LEVER | ASHBY`; the service rejects anything else.
+13. (Step 24) An `IngestRun` for a browser source is `WAITING` until a browser claims it, then
+    `RUNNING`. At most one open (`WAITING` or `RUNNING`) run per source and board; a second request
+    returns the existing one. A run older than 15 minutes in either state is failed by
+    `expireStale()`, which runs on every poll and every `GET /sources`.
+
+```prisma
+// Step 24 — migration v5_browser_sources
+enum Source {
+  // ... plus
+  HIRINGCAFE
+  WELLFOUND
+}
+
+enum RunStatus {
+  WAITING   // new: recorded by the worker, waiting for a browser to claim it
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model BrowserToken {
+  id         String    @id @default(cuid())
+  userId     String    @unique @map("user_id")
+  tokenHash  String    @unique @map("token_hash")   // sha256 of the token; the token itself is never stored
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime? @map("last_seen_at")        // set on every poll; "connected" = within 90 s
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("browser_tokens")
+}
+```
 
 ### 11.3 API additions
 
@@ -1310,6 +1346,16 @@ noted.
 | GET | `/sources/boards` | — | `200 { items: WatchedBoard[] }` |
 | POST | `/sources/boards` | `{ provider: 'GREENHOUSE' or 'LEVER' or 'ASHBY', slug: string }` | `201 WatchedBoard`. Fetches the board to confirm it exists and read the company name; unknown → `400 "Board not found"`. Duplicate → `409`. |
 | DELETE | `/sources/boards/:id` | — | `204` |
+
+**Browser (Step 24)**
+
+| Method | Path | Auth | Body | Response |
+|---|---|---|---|---|
+| GET | `/browser` | cookie | — | `200 { linked, connected, createdAt, lastSeenAt, userAgent }` |
+| POST | `/browser/token` | cookie | — | `201 { token, createdAt }`. Replaces any earlier token; the plain token is returned once. |
+| DELETE | `/browser/token` | cookie | — | `204` |
+| POST | `/browser/poll` | bearer | `{ userAgent? }` | `200 { jobs: [{ runId, source, boardId, since }], pollIntervalMs }`. Touches `lastSeenAt`, expires stale runs, claims up to two `WAITING` runs (oldest first) and marks them `RUNNING`. `since` is the start of the last `SUCCEEDED` run for that source and board, or null. |
+| POST | `/browser/runs/:id/complete` | bearer | `{ items?: unknown[], pagesFetched?, error? }` | `200 IngestRun`. With `error`: the run is `FAILED`. Otherwise the items go through the source's mapper, `normalizePosting`, `upsertMany` and a rescore; the run is `SUCCEEDED` with counts. A run that is not `RUNNING` → `409`. Unknown or non-browser run → `404`. JSON bodies up to 8 MB. |
 
 **Ingest**
 
@@ -1719,6 +1765,7 @@ job per board. The front-end feed was empty when checked and is not listed.
 **Probed and rejected:** Remotive ignores its `category` parameter (every category returns the
 same body), Recruitee, BambooHR, Breezy and Rippling could not be verified with a real slug, and
 Wellfound, Otta, YC Work at a Startup, LinkedIn, Indeed and Glassdoor need a login or a key.
+HiringCafe was not probed here; it and Wellfound came back in Step 24 through the browser.
 
 **Decisions:** `postJson` and `mapLimit` join `sources/http.ts`; detail fetches are capped at
 60 per board per run so a large company (Bosch has thousands) cannot stall a cycle. Enum values
@@ -1727,6 +1774,80 @@ are added by hand-written `ALTER TYPE … ADD VALUE` (migration `v4_more_sources
 **Done when:** every new mapper has a real fixture and a spec; the registry, `SOURCES`,
 `BOARD_PROVIDERS`, the web `SOURCE_META`, the board hints and the demo labels all know the six;
 the copy says sixteen sources; the gate is green; a live fetch of each new adapter returns items.
+
+---
+
+### Step 24 — Browser sources (HiringCafe, Wellfound) and two Philippine feeds (JobStreet, Kalibrr)
+
+**Branch:** `feat/browser-sources`
+**Commit:** `feat: browser sources through a chrome extension, plus jobstreet and kalibrr feeds`
+
+**Why.** On 29 Sep Jade looked at the sixteen sources and said they were boards he had never
+heard of. The rule in Section 11 (public JSON or RSS, no key, no browser) had selected for
+obscurity: the boards people use sit behind a login, a key, or a bot check. The plan's
+non-goals were the past; what he wanted was Reel reaching the boards he actually reads, with the
+same toggles and the same refetch button as everything else.
+
+**Probed live on 29 Sep 2026, from Jade's Chrome:**
+
+| Site | Result | How it is read |
+|---|---|---|
+| hiringcafe.com | Cloudflare challenge on every server request and on rapid programmatic `fetch()` calls from inside the page; a plain navigation passes, sometimes after a few seconds of interstitial, occasionally with a one-click human check | Server-rendered Next.js page; `__NEXT_DATA__.props.pageProps.ssrHits` holds 40 jobs per page with `v5_processed_job_data` (title, company, workplace type, countries, salary, publish date, tools, requirements summary). `searchState` in the query string takes `searchQuery`, `workplaceTypes: ['Remote']`, `defaultToUserLocation: false`, `locations: []`, `sortBy: 'date'`; `page` is zero-based. No full description in the list, and no per-job endpoint is used: the summary and tool list are the text the scorer sees. |
+| wellfound.com | Public role pages render without a login | `/role/r/<role>?page=N` (one-based after the first). `__NEXT_DATA__.props.pageProps.apolloState.data` holds `StartupResult:<id>` entities whose `highlightedJobListings` refs point at `JobListingSearchResult:<id>` entities (title, slug, markdown description, compensation text, remote config, locations, `liveStartAt`). The job url is `/jobs/<id>-<slug>`. Verified roles: software-engineer, backend-engineer, frontend-engineer, full-stack-engineer, devops-engineer. |
+| linkedin.com | Blocked by the Trend Micro web filter on Jade's machine | not possible from this browser |
+| indeed.com | Cloudflare "Additional Verification Required" even in a real tab | out |
+| ph.jobstreet.com | `GET /api/jobsearch/v5/search?siteKey=PH-Main&sourcesystem=houston&keywords=…&sortmode=ListedDate&pageSize=100&locale=en-PH` answers a plain server request with JSON, no key | **feed adapter**, not a browser source. Fields: `id`, `title`, `companyName` (falls back to `advertiser.description`), `listingDate`, `salaryLabel` (pesos, kept as text), `workArrangements.displayText` (Remote / Hybrid / On-site), `teaser`, `bulletPoints`, `locations[].label`. Job url `/job/<id>`. Four keyword boards. |
+| kalibrr.com | `GET /kjs/job_board/search?limit=100&offset=0&function=IT%20and%20Software&sort=Newest` answers the server with JSON | **feed adapter**. Fields: `id`, `name`, `slug`, `company.code`, `company_name`, `activation_date`, `base_salary`/`maximum_salary`/`salary_currency`/`salary_interval`, `is_work_from_home`, `is_hybrid`, `google_location.address_components`, `description` (HTML). Job url `/c/<company.code>/jobs/<id>/<slug>`. One board. |
+| workatastartup.com | The public page embeds 30 jobs in a `data-page` attribute, but every query, sort and page parameter returns the same 30 and there is no posted date; filters only apply after login | out |
+| glassdoor.com | "Humans only" block even in a real tab | out |
+| dice.com | Renders 38 cards through a React Server Components payload with no embedded JSON or JSON-LD; the frontend's search API needs a key read out of its bundle | out for now |
+| onlinejobs.ph | Plain HTML listing with no structured data | out |
+
+**What changes:**
+
+- `Source` gains `HIRINGCAFE` and `WELLFOUND`; `SourceKind` gains `'browser'`; `RunStatus` gains
+  `WAITING`; `BrowserToken` is new (schema in 11.2, migration `v5_browser_sources`).
+- `SOURCE_META.feedBoards` lists the search presets: four HiringCafe queries and five Wellfound
+  roles. `enabledTargets()` fans out anything that is not a board provider, so the presets get
+  one `ingest-source` job each, like We Work Remotely's category feeds.
+- `IngestProcessor.ingestSource()` calls `BrowserRunsService.request()` for a browser source and
+  returns; it never touches the registry. The run sits in `WAITING`.
+- `BrowserModule` (API only) owns the token endpoints, the bearer guard and `complete()`, which
+  reuses `PostingsService.upsertMany` and `MatchingService.rescoreAllUsers` exactly as the worker
+  does. `BrowserRunsService` (in `sources/browser`, shared with the worker) owns the run state
+  machine: `request`, `claim`, `expireStale`, `succeed`, `fail`.
+- Two pure mappers, `mapHiringCafe` and `mapWellfound`, with fixtures modelled on the live pages.
+  The extension sends a projection of the raw hits with the sites' own field names, so the fixture
+  and the real payload look the same and the parsing lives where the tests are.
+- `apps/extension`: a Manifest V3 extension, plain TypeScript compiled by `tsc`, no bundler. The
+  service worker polls on a 30 s alarm, opens a background tab per run, reads `__NEXT_DATA__`
+  through `chrome.scripting.executeScript`, walks up to three pages, and posts the projection.
+  HiringCafe stops early once a page is older than the previous run. A challenge page brings the
+  tab to the front and waits up to 150 s for the human. The options page holds the API address and
+  the token, and requests host permission when the address is not local.
+- Web: a third group "Through your browser" in Settings → Sources with the same rows and Run
+  buttons; a "Your browser" panel with connection status, token generation shown once, revoke, and
+  the three setup steps; `WAITING` rendered in the warning tone in the run table, the dashboard and
+  the header chip ("waiting" instead of "ingesting"). Demo mode simulates the browser: runs go
+  `WAITING → RUNNING → SUCCEEDED`, or fail with "No browser connected" when the demo token is
+  revoked.
+- `main.ts` raises the JSON body limit to 8 MB for the complete endpoint.
+- **JobStreet and Kalibrr** are ordinary `SourceAdapter`s (`jobstreet.adapter.ts`, `kalibrr.adapter.ts`)
+  with fixtures cut from live responses on 29 Sep. Peso salaries stay as `salaryText`; the HN
+  salary parser only produces USD numbers for `$` amounts, so nothing is mis-converted.
+
+**Decisions:** the extension is driven by Reel, never the other way round, so there is one
+place that knows which sources are enabled. The token is hashed like a password but with SHA-256,
+not argon2, because it is 24 random bytes (no dictionary to defend against) and it is checked on
+every poll. Stale runs are expired lazily on poll and on `GET /sources` rather than by a cron,
+so the worker needs no new job and the state is always right when someone looks. Two runs are
+claimed per poll so one slow site does not starve the other.
+
+**Done when:** both mappers have fixtures and specs; the processor spec covers the browser
+branch; `browser.e2e-spec.ts` walks token → poll → claim → complete → expiry → revoke; the
+extension typechecks, its pure modules are tested, and `pnpm --filter extension build` produces a
+loadable `dist/`; Settings shows the browser card in both real and demo mode; the copy says
+twenty sources; the gate is green.
 
 ---
 

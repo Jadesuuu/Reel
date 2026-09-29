@@ -15,6 +15,7 @@ import { PostingsModule } from './postings/postings.module.js';
 import { MatchingModule } from './matching/matching.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { SourcesModule } from './sources/sources.module.js';
+import { BrowserModule } from './browser/browser.module.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SourcesModule } from './sources/sources.module.js';
     MatchingModule,
     ApplicationsModule,
     SourcesModule,
+    BrowserModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -1,4 +1,4 @@
-import type { BoardProvider, Source, SourceKind } from './types';
+import type { BoardProvider, BrowserSource, Source, SourceKind } from './types';
 
 export type SourceMeta = {
   source: Source;
@@ -26,7 +26,13 @@ export const SOURCES: Source[] = [
   'JOBSPRESSO',
   'WORKABLE',
   'SMARTRECRUITERS',
+  'HIRINGCAFE',
+  'WELLFOUND',
+  'JOBSTREET',
+  'KALIBRR',
 ];
+
+export const BROWSER_SOURCES: BrowserSource[] = ['HIRINGCAFE', 'WELLFOUND'];
 
 export const BOARD_PROVIDERS: BoardProvider[] = [
   'GREENHOUSE',
@@ -164,6 +170,38 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
     kind: 'board',
     homepage: 'https://jobs.smartrecruiters.com',
     attribution: null,
+  },
+  HIRINGCAFE: {
+    source: 'HIRINGCAFE',
+    label: 'HiringCafe',
+    short: 'HiringCafe',
+    kind: 'browser',
+    homepage: 'https://hiringcafe.com',
+    attribution: 'Read from hiringcafe.com by the Reel browser extension',
+  },
+  WELLFOUND: {
+    source: 'WELLFOUND',
+    label: 'Wellfound',
+    short: 'Wellfound',
+    kind: 'browser',
+    homepage: 'https://wellfound.com/jobs',
+    attribution: 'Read from wellfound.com by the Reel browser extension',
+  },
+  JOBSTREET: {
+    source: 'JOBSTREET',
+    label: 'JobStreet',
+    short: 'JobStreet',
+    kind: 'feed',
+    homepage: 'https://ph.jobstreet.com/software-engineer-jobs',
+    attribution: 'Jobs from the JobStreet Philippines search API',
+  },
+  KALIBRR: {
+    source: 'KALIBRR',
+    label: 'Kalibrr',
+    short: 'Kalibrr',
+    kind: 'feed',
+    homepage: 'https://www.kalibrr.com/home/all-jobs',
+    attribution: 'Jobs from the Kalibrr job board API',
   },
 };
 

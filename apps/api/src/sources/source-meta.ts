@@ -146,6 +146,57 @@ export const SOURCE_META: Record<Source, SourceMeta> = {
     attribution: null,
     defaultBoardId: null,
   },
+  HIRINGCAFE: {
+    source: 'HIRINGCAFE',
+    label: 'HiringCafe',
+    kind: 'browser',
+    homepage: 'https://hiringcafe.com',
+    attribution: 'Read from hiringcafe.com by the Reel browser extension',
+    defaultBoardId: 'software-engineer',
+    feedBoards: [
+      'software-engineer',
+      'backend-engineer',
+      'frontend-engineer',
+      'full-stack-engineer',
+    ],
+  },
+  WELLFOUND: {
+    source: 'WELLFOUND',
+    label: 'Wellfound',
+    kind: 'browser',
+    homepage: 'https://wellfound.com/jobs',
+    attribution: 'Read from wellfound.com by the Reel browser extension',
+    defaultBoardId: 'software-engineer',
+    feedBoards: [
+      'software-engineer',
+      'backend-engineer',
+      'frontend-engineer',
+      'full-stack-engineer',
+      'devops-engineer',
+    ],
+  },
+  JOBSTREET: {
+    source: 'JOBSTREET',
+    label: 'JobStreet',
+    kind: 'feed',
+    homepage: 'https://ph.jobstreet.com/software-engineer-jobs',
+    attribution: 'Jobs from the JobStreet Philippines search API',
+    defaultBoardId: 'software-engineer',
+    feedBoards: [
+      'software-engineer',
+      'backend-developer',
+      'full-stack-developer',
+      'frontend-developer',
+    ],
+  },
+  KALIBRR: {
+    source: 'KALIBRR',
+    label: 'Kalibrr',
+    kind: 'feed',
+    homepage: 'https://www.kalibrr.com/home/all-jobs',
+    attribution: 'Jobs from the Kalibrr job board API',
+    defaultBoardId: 'it-and-software',
+  },
 };
 
 export function sourceLabel(source: Source): string {

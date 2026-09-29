@@ -334,7 +334,9 @@ function SourceHealth() {
                 ? 'bg-danger'
                 : run.status === 'RUNNING'
                   ? 'bg-info'
-                  : 'bg-success';
+                  : run.status === 'WAITING'
+                    ? 'bg-warning'
+                    : 'bg-success';
           return (
             <li key={item.source} className="flex items-center gap-3 py-2 text-body-sm">
               <Tip

@@ -24,9 +24,14 @@ enum Source {
   JOBSPRESSO
   WORKABLE
   SMARTRECRUITERS
+  HIRINGCAFE
+  WELLFOUND
+  JOBSTREET
+  KALIBRR
 }
 
 enum RunStatus {
+  WAITING
   RUNNING
   SUCCEEDED
   FAILED
@@ -69,6 +74,7 @@ model User {
   criteria     Criteria?
   applications Application[]
   matches      Match[]
+  browserToken BrowserToken?
 
   @@map("users")
 }
@@ -150,6 +156,19 @@ model SourceSetting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("source_settings")
+}
+
+model BrowserToken {
+  id         String    @id @default(cuid())
+  userId     String    @unique @map("user_id")
+  tokenHash  String    @unique @map("token_hash")
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime? @map("last_seen_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("browser_tokens")
 }
 
 model WatchedBoard {
