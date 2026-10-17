@@ -69,13 +69,24 @@ const RULES = [
   { points: '+20', rule: 'not remote, but the location is near you' },
   { points: '+30', rule: 'the first role keyword found in the headline' },
   { points: '+10', rule: 'each include keyword in the stack or headline, up to +40' },
-  { points: '+10', rule: 'the posting is explicitly open to one of your regions' },
+  {
+    points: '+10',
+    rule: 'the posting is open to one of your regions, or hires abroad through Deel, an EOR or contractors',
+  },
+  {
+    points: '−10',
+    rule: 'neither, and it says nothing about where you must be: check before applying',
+  },
   { points: '+10', rule: 'a USD salary was parsed' },
   { points: '+5', rule: 'there is an apply link' },
   { points: '+10', rule: 'posted in the last three days, or +5 in the last ten' },
   { points: '0', rule: 'any exclude keyword hits, or the salary ceiling is under your minimum' },
   { points: '0', rule: 'the title reads as a level you did not pick' },
   { points: '0', rule: 'the posting is limited to a region that is not one of yours' },
+  {
+    points: '·',
+    rule: 'it asks for another region’s working hours: flagged as overlap or full hours',
+  },
 ];
 
 export default function CriteriaPage() {
@@ -330,7 +341,9 @@ export default function CriteriaPage() {
             inbox
           </Link>{' '}
           are these rules, so every number can be traced. Regions are read from the headline, the
-          location, and sentences in the description like “must be located in”.
+          location, and sentences in the description like “must be located in”; “US citizen”, “W-2”
+          and “security clearance” count anywhere in the text. Time zones are working hours, not
+          places.
         </p>
       </Panel>
     </div>

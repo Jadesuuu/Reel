@@ -78,7 +78,10 @@ export function getState(): DemoState {
           Array.isArray(parsed.criteria?.regionKeywords) &&
           Array.isArray(parsed.criteria?.levels) &&
           parsed.postings?.every(
-            (posting) => Array.isArray(posting.regionTerms) && 'level' in posting,
+            (posting) =>
+              Array.isArray(posting.regionTerms) &&
+              Array.isArray(posting.hireSignals) &&
+              'level' in posting,
           );
         if (parsed.version === 1 && complete) {
           parsed.browser ??= { linked: true, createdAt: parsed.user.createdAt };

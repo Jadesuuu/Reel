@@ -160,26 +160,7 @@ const US_CITIES = [
   'puerto rico',
 ];
 
-const US_ZONES = [
-  'est',
-  'edt',
-  'pst',
-  'pdt',
-  'cst',
-  'cdt',
-  'mst',
-  'mdt',
-  'eastern time',
-  'pacific time',
-  'central time',
-  'mountain time',
-  'us time zone',
-  'us time zones',
-  'us hours',
-  'us business hours',
-  'u.s. time zones',
-  'american time zones',
-  'north american time zones',
+const US_RESIDENCY = [
   'us-based',
   'us based',
   'u.s.-based',
@@ -208,7 +189,7 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'north american',
         ...US_STATES,
         ...US_CITIES,
-        ...US_ZONES,
+        ...US_RESIDENCY,
       ],
     ],
     [
@@ -298,9 +279,6 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'oxford',
         'belfast',
         'cardiff',
-        'bst',
-        'uk time',
-        'uk hours',
         'uk-based',
         'uk based',
         'right to work in the uk',
@@ -315,10 +293,6 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'e.u.',
         'eea',
         'schengen',
-        'cet',
-        'cest',
-        'european time zones',
-        'eu time zones',
         'cet timezone',
         'eu-based',
         'eu based',
@@ -528,8 +502,6 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'coimbatore',
         'trivandrum',
         'thiruvananthapuram',
-        'ist timezone',
-        'ist time zone',
       ],
     ],
     [
@@ -560,21 +532,14 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'canberra',
         'gold coast',
         'hobart',
-        'aest',
-        'aedt',
-        'awst',
-        'australian time zones',
       ],
     ],
     [
       'new zealand',
-      ['new zealand', 'nz', 'auckland', 'wellington', 'christchurch', 'nzst'],
+      ['new zealand', 'nz', 'auckland', 'wellington', 'christchurch'],
     ],
-    [
-      'japan',
-      ['japan', 'japanese', 'tokyo', 'osaka', 'kyoto', 'fukuoka', 'jst'],
-    ],
-    ['korea', ['korea', 'south korea', 'korean', 'seoul', 'busan', 'kst']],
+    ['japan', ['japan', 'japanese', 'tokyo', 'osaka', 'kyoto', 'fukuoka']],
+    ['korea', ['korea', 'south korea', 'korean', 'seoul', 'busan']],
     [
       'china',
       [
@@ -590,8 +555,8 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
       ],
     ],
     ['taiwan', ['taiwan', 'taipei', 'hsinchu', 'kaohsiung']],
-    ['hong kong', ['hong kong', 'hongkong', 'hkt']],
-    ['singapore', ['singapore', 'sgt']],
+    ['hong kong', ['hong kong', 'hongkong']],
+    ['singapore', ['singapore']],
     [
       'malaysia',
       [
@@ -665,9 +630,6 @@ const GAZETTEER: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> =
         'batangas',
         'cagayan de oro',
         'dumaguete',
-        'pht',
-        'philippine time',
-        'manila time',
       ],
     ],
     ['asia', ['asia', 'asian', 'south asia', 'east asia']],
@@ -708,6 +670,138 @@ const OPEN_TERMS = [
   'location-independent',
 ];
 
+const ZONES: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]> = [
+  [
+    'us',
+    [
+      'est',
+      'edt',
+      'pst',
+      'pdt',
+      'cst',
+      'cdt',
+      'mst',
+      'mdt',
+      'et',
+      'eastern time',
+      'pacific time',
+      'central time',
+      'mountain time',
+      'us eastern',
+      'us pacific',
+      'us time zone',
+      'us time zones',
+      'us timezone',
+      'us timezones',
+      'us hours',
+      'us business hours',
+      'us working hours',
+      'u.s. time zones',
+      'u.s. business hours',
+      'american time zones',
+      'north american time zones',
+      'north american hours',
+    ],
+  ],
+  ['uk', ['bst', 'uk time', 'uk hours', 'uk business hours']],
+  [
+    'europe',
+    [
+      'cet',
+      'cest',
+      'eet',
+      'european time zones',
+      'european hours',
+      'european business hours',
+      'eu time zones',
+      'eu hours',
+    ],
+  ],
+  ['india', ['ist timezone', 'ist time zone', 'indian standard time']],
+  ['australia', ['aest', 'aedt', 'awst', 'australian time zones']],
+  ['new zealand', ['nzst', 'nzdt']],
+  ['japan', ['jst']],
+  ['korea', ['kst']],
+  ['hong kong', ['hkt']],
+  ['singapore', ['sgt']],
+  ['philippines', ['pht', 'philippine time', 'manila time']],
+];
+
+export type HireSignal =
+  'deel' | 'oyster' | 'remote.com' | 'eor' | 'contractor' | 'b2b' | 'global';
+
+const NOT_LOCAL =
+  '(?!\\s+(?:in|within|across|throughout)\\s+(?:the\\s+)?(?:US|U\\.S\\.|USA|United States|Canada|Europe|EU|UK|North America|LATAM)\\b)';
+
+const HIRE_SIGNALS: ReadonlyArray<
+  readonly [HireSignal, ReadonlyArray<RegExp>]
+> = [
+  ['deel', [/\bDeel\b/g]],
+  ['oyster', [/\bOyster\s?HR\b/gi, /\b(?:via|through|using|with)\s+Oyster\b/g]],
+  ['remote.com', [/\bremote\.com\b/gi]],
+  [
+    'eor',
+    [
+      /\bemployer[- ]of[- ]record\b/gi,
+      /\bEORs?\b/g,
+      /\b(?:velocity global|papaya global|globalization partners)\b/gi,
+    ],
+  ],
+  [
+    'contractor',
+    [
+      new RegExp(
+        `\\b(?:international|global)\\s+contractors?\\b${NOT_LOCAL}`,
+        'gi',
+      ),
+      /\bcontractors?\s+(?:from|based)\s+anywhere\b/gi,
+    ],
+  ],
+  [
+    'b2b',
+    [
+      /\bB2B\s+(?:contract|contracts|agreement|basis|cooperation|employment)\b/gi,
+    ],
+  ],
+  [
+    'global',
+    [
+      new RegExp(
+        `\\b(?:hire|hires|hiring)\\s+(?:from\\s+)?(?:anywhere|globally|worldwide|internationally)\\b${NOT_LOCAL}`,
+        'gi',
+      ),
+    ],
+  ],
+];
+
+const AUTHORIZATION_PATTERNS: ReadonlyArray<RegExp> = [
+  /\bU\.?S\.?A?\.?\s+(?:citizens?|citizenship|persons?|nationals?)\b/g,
+  /\bUnited States\s+(?:citizens?|citizenship|persons?|nationals?)\b/gi,
+  /\bgreen card\b/gi,
+  /\bW-?2\b/g,
+  /\b(?:security|active|secret|top secret|government)\s+clearance\b/gi,
+  /\bTS\/SCI\b/g,
+  /\bITAR\b/g,
+];
+
+const NEGATION =
+  /\b(?:no|not|without|don't|doesn't|do not|does not|never)\b[^.]*$/i;
+
+function affirmedAt(text: string, index: number): boolean {
+  return !NEGATION.test(text.slice(Math.max(0, index - 30), index));
+}
+
+function affirmed(text: string, pattern: RegExp): boolean {
+  pattern.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(text)) !== null) {
+    if (affirmedAt(text, match.index)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export const REGION_LABELS: ReadonlyArray<RegionLabel> = GAZETTEER.map(
   ([label]) => label,
 );
@@ -746,14 +840,62 @@ export function mentionsRegion(text: string, term: string): boolean {
   return patternFor(term).test(text);
 }
 
-export function findRegionTerms(text: string): RegionLabel[] {
+const stripCache = new Map<string, RegExp>();
+
+function withoutZones(text: string): string {
+  let stripped = text;
+  for (const [, terms] of ZONES) {
+    for (const term of terms) {
+      let pattern = stripCache.get(term);
+      if (!pattern) {
+        const base = patternFor(term);
+        pattern = new RegExp(base.source, `${base.flags}g`);
+        stripCache.set(term, pattern);
+      }
+      stripped = stripped.replace(pattern, '$1 $2');
+    }
+  }
+  return stripped;
+}
+
+function labelsIn(
+  table: ReadonlyArray<readonly [RegionLabel, ReadonlyArray<string>]>,
+  text: string,
+): RegionLabel[] {
   const found: RegionLabel[] = [];
-  for (const [label, terms] of GAZETTEER) {
+  for (const [label, terms] of table) {
     if (terms.some((term) => mentionsRegion(text, term))) {
       found.push(label);
     }
   }
   return found;
+}
+
+export function findRegionTerms(text: string): RegionLabel[] {
+  return labelsIn(GAZETTEER, withoutZones(text));
+}
+
+export function findZoneTerms(text: string): RegionLabel[] {
+  return labelsIn(ZONES, text);
+}
+
+export function authorizationLabels(rawText: string): RegionLabel[] {
+  return AUTHORIZATION_PATTERNS.some((pattern) => affirmed(rawText, pattern))
+    ? ['us']
+    : [];
+}
+
+export function findHireSignals(rawText: string): HireSignal[] {
+  const text = rawText.replace(/\s+/g, ' ');
+  return HIRE_SIGNALS.filter(([, patterns]) =>
+    patterns.some((pattern) => affirmed(text, pattern)),
+  ).map(([label]) => label);
+}
+
+const OVERLAP = /(?<!full |complete |100% )\boverlap(?:ping)?\b/gi;
+
+export function asksForOverlap(text: string): boolean {
+  return affirmed(text.replace(/\s+/g, ' '), OVERLAP);
 }
 
 export function mentionsOpenRegion(text: string): boolean {
@@ -771,18 +913,35 @@ const RESTRICTION_PATTERNS: ReadonlyArray<RegExp> = [
   /(?:work\s+)?(?:authori[sz]ation|permit|eligibility|right)\s+to\s+work\s+in\s+(?:the\s+)?([^.\n;:()]{1,40})/gi,
   /(?:based|located|residing|living)\s+in\s+(?:the\s+)?([^.\n;:()]{1,40}?)\s+only\b/gi,
   /\b([A-Za-z.]{2,20})[- ]based\s+(?:candidates|applicants|only|role|position|team members)\b/gi,
-  /(?:within|overlap(?:ping)?\s+with|with|in|across|during)\s+(?:the\s+)?([^.\n;:()]{1,30}?)\s+(?:time\s*zones?|business hours|working hours)\b/gi,
   /(?:this (?:role|position) is|we are|we're|position is|role is)\s+(?:only\s+)?(?:open|available)\s+(?:only\s+)?(?:to|for|in)\s+(?:candidates|applicants|residents|people)?\s*(?:in|from|of|within|based in|located in)?\s+(?:the\s+)?([^.\n;:()]{1,60})/gi,
 ];
 
+const ZONE_PATTERNS: ReadonlyArray<RegExp> = [
+  /(?:within|overlap(?:ping)?\s+with|with|in|across|during|on)\s+(?:the\s+)?([^.\n;:()]{1,30}?)\s+(?:time\s*zones?|timezones?|business hours|working hours|hours)\b/gi,
+  /\b([A-Za-z.]{2,12})\s+(?:business|working|office|core|work)\s+hours\b/gi,
+  /\boverlap(?:ping)?\b([^.\n;:()]{1,60})/gi,
+  /\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s*(?:-|–|to)\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s+([A-Za-z]{2,5})\b/gi,
+];
+
 export function restrictionSnippets(rawText: string): string[] {
+  return snippetsFor(RESTRICTION_PATTERNS, rawText);
+}
+
+export function zoneSnippets(rawText: string): string[] {
+  return snippetsFor(ZONE_PATTERNS, rawText);
+}
+
+function snippetsFor(
+  patterns: ReadonlyArray<RegExp>,
+  rawText: string,
+): string[] {
   if (rawText.length === 0) {
     return [];
   }
   const text = rawText.replace(/\s+/g, ' ');
   const snippets: string[] = [];
   const seen = new Set<string>();
-  for (const pattern of RESTRICTION_PATTERNS) {
+  for (const pattern of patterns) {
     pattern.lastIndex = 0;
     let match: RegExpExecArray | null;
     while ((match = pattern.exec(text)) !== null) {
@@ -805,4 +964,34 @@ export function restrictionSnippets(rawText: string): string[] {
 
 export function restrictionBasis(rawText: string): string {
   return restrictionSnippets(rawText).join(' | ');
+}
+
+export function zoneBasis(rawText: string): string {
+  return zoneSnippets(rawText).join(' | ');
+}
+
+export type Eligibility = {
+  regionTerms: RegionLabel[];
+  zoneTerms: RegionLabel[];
+  zoneOverlap: boolean;
+  hireSignals: HireSignal[];
+};
+
+export function eligibilityOf(
+  headline: string,
+  location: string | null,
+  rawText: string,
+): Eligibility {
+  const basis = regionBasis(headline, location);
+  const regions = new Set<RegionLabel>([
+    ...findRegionTerms(`${basis} | ${restrictionBasis(rawText)}`),
+    ...authorizationLabels(rawText),
+  ]);
+  const zoneTerms = findZoneTerms(`${basis} | ${zoneBasis(rawText)}`);
+  return {
+    regionTerms: REGION_LABELS.filter((label) => regions.has(label)),
+    zoneTerms,
+    zoneOverlap: zoneTerms.length > 0 && asksForOverlap(`${basis} ${rawText}`),
+    hireSignals: findHireSignals(rawText),
+  };
 }

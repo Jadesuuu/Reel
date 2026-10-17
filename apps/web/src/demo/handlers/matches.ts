@@ -47,6 +47,7 @@ route('GET', '/matches', ({ query }) => {
   const sort = query.get('sort') ?? 'best';
   if (sort !== 'best' && sort !== 'newest') bad('sort must be best or newest');
   const since = days > 0 ? demoNow().getTime() - days * 86_400_000 : null;
+  const untracked = query.get('untracked') === 'true';
 
   const items = state.matches
     .filter((match) => match.dismissed === dismissed && match.score >= minScore)
@@ -56,6 +57,7 @@ route('GET', '/matches', ({ query }) => {
     }))
     .filter((pair) => pair.posting !== undefined && (!source || pair.posting.source === source))
     .filter((pair) => since === null || new Date(pair.posting!.postedAt).getTime() >= since)
+    .filter((pair) => !untracked || trackedFor(state, pair.match.postingId) === null)
     .toSorted((a, b) =>
       sort === 'newest'
         ? b.posting!.postedAt.localeCompare(a.posting!.postedAt) || b.match.score - a.match.score

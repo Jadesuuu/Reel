@@ -64,6 +64,9 @@ export type PostingSummary = {
   salaryMaxUsd: number | null;
   stackKeywords: string[];
   regionTerms: string[];
+  zoneTerms: string[];
+  zoneOverlap: boolean;
+  hireSignals: string[];
   level: Level | null;
   applyUrl: string | null;
   headline: string;

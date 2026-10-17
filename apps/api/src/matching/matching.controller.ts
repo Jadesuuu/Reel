@@ -33,6 +33,7 @@ export class MatchingController {
         minScore: query.minScore,
         days: query.days,
         sort: query.sort,
+        untracked: query.untracked,
       },
       query.page,
       query.pageSize,

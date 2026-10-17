@@ -11,7 +11,7 @@ import type {
   WatchedBoard,
 } from '../lib/types';
 import { SOURCES } from '../lib/sources';
-import { findRegionTerms, regionBasis } from './regions';
+import { eligibilityOf } from './regions';
 import { detectLevel } from './level';
 import { score, MATCH_THRESHOLD } from './scoring';
 import type { DemoState, StoredMatch } from './store';
@@ -105,7 +105,7 @@ const POSTINGS: PostingSeed[] = [
     stack: ['typescript', 'nestjs', 'postgres', 'redis', 'kubernetes'],
     daysAgo: 3,
     blurb:
-      'Tidewater turns tide-gauge and buoy data into forecasts for ports. You would own the ingestion pipeline and the public API. We run one Postgres and are proud of it.',
+      'Tidewater turns tide-gauge and buoy data into forecasts for ports. You would own the ingestion pipeline and the public API. We run one Postgres and are proud of it. Contractors are paid through Deel, and we ask for four hours of overlap with US Eastern time.',
     host: 'tidewater.io',
   },
   {
@@ -1189,7 +1189,7 @@ function buildPosting(
     remote: seed.remote,
     ...s,
     stackKeywords: seed.stack,
-    regionTerms: findRegionTerms(regionBasis(headline, seed.location)),
+    ...eligibilityOf(headline, seed.location, rawTextFor(seed, headline)),
     level: detectLevel(headline, seed.role),
     headline,
     fingerprint: `${slug(seed.company)}|${slug(seed.role)}`,

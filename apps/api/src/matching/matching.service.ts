@@ -39,6 +39,9 @@ const POSTING_SUMMARY_SELECT = {
   salaryMaxUsd: true,
   stackKeywords: true,
   regionTerms: true,
+  zoneTerms: true,
+  zoneOverlap: true,
+  hireSignals: true,
   level: true,
   applyUrl: true,
   headline: true,
@@ -86,6 +89,9 @@ export class MatchingService {
         remote: true,
         stackKeywords: true,
         regionTerms: true,
+        zoneTerms: true,
+        zoneOverlap: true,
+        hireSignals: true,
         level: true,
         salaryMinUsd: true,
         salaryMaxUsd: true,
@@ -98,7 +104,7 @@ export class MatchingService {
       where: { userId, posting: { postedAt: { lt: since } } },
     });
 
-    let written = 0;
+    const kept: string[] = [];
 
     for (const posting of postings) {
       const result = score(posting, criteria, now);
@@ -114,15 +120,15 @@ export class MatchingService {
           },
           update: { score: result.score, reasons: result.reasons },
         });
-        written += 1;
-      } else {
-        await this.prisma.match.deleteMany({
-          where: { userId, postingId: posting.id },
-        });
+        kept.push(posting.id);
       }
     }
 
-    return written;
+    await this.prisma.match.deleteMany({
+      where: { userId, postingId: { notIn: kept } },
+    });
+
+    return kept.length;
   }
 
   async rescoreAllUsers(): Promise<void> {
@@ -140,6 +146,7 @@ export class MatchingService {
       minScore?: number;
       days?: number;
       sort?: MatchSort;
+      untracked?: boolean;
     },
     page: number,
     pageSize: number,
@@ -153,6 +160,7 @@ export class MatchingService {
             },
           }
         : {}),
+      ...(options.untracked ? { applications: { none: { userId } } } : {}),
     };
     const where = {
       userId,

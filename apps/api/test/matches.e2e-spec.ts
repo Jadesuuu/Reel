@@ -155,6 +155,11 @@ describe('Matches (e2e)', () => {
     const scores = res.body.items.map((item: { score: number }) => item.score);
     expect([...scores].sort((a: number, b: number) => b - a)).toEqual(scores);
     expect(res.body.items[0].posting).toHaveProperty('company');
+    expect(res.body.items[0].posting).toMatchObject({
+      zoneTerms: [],
+      zoneOverlap: false,
+      hireSignals: [],
+    });
     expect(res.body.items[0].posting).not.toHaveProperty('rawText');
   });
 
@@ -241,6 +246,21 @@ describe('Matches (e2e)', () => {
       id: created.body.id,
       stage: 'SAVED',
     });
+  });
+
+  it('drops tracked matches when untracked is set', async () => {
+    const total = async (params: string) =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/matches?pageSize=1${params}`)
+          .set('Cookie', cookie)
+          .expect(200)
+      ).body.total as number;
+    const tracked = await prisma.application.count({
+      where: { user: { email }, postingId: { not: null } },
+    });
+    expect(tracked).toBe(1);
+    expect((await total('')) - (await total('&untracked=true'))).toBe(1);
   });
 
   it('dismisses a match and hides it from the default list', async () => {
