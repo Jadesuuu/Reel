@@ -22,7 +22,7 @@ from this repo.
 pre-deploy `pnpm --filter api exec prisma migrate deploy`, healthcheck `/api/v1/health`.
 
 **worker** — same Dockerfile, start `node dist/worker.js`, no healthcheck and no exposed port.
-It runs both the six-hourly ingest scheduler and the delayed reminder queue.
+It runs both the three-hourly ingest scheduler and the delayed reminder queue.
 
 Both services need every variable below. The pre-deploy command is what applies migrations;
 the worker must not also run it, or two deploys race each other.

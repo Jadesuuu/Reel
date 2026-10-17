@@ -40,7 +40,7 @@ trusted to nag exactly once.
 
 - Inbox is read a few times a day; the pipeline is touched whenever something changes; settings
   are visited rarely.
-- Ingest runs every six hours in a separate worker process; the user can trigger one manually
+- Ingest runs every three hours in a separate worker process; the user can trigger one manually
   and watch the run history.
 - Emails arrive via Resend in production and are logged to the console in development.
 - A demo build (`NEXT_PUBLIC_DEMO_MODE=true`) runs the same interface against seeded in-browser

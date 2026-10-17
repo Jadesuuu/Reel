@@ -61,7 +61,7 @@ flowchart LR
 
 The API and the worker are **the same image with a different command**. The API only ever
 enqueues; it never waits on a job board or an email provider. The worker owns everything with a
-clock in it: the six-hourly `ingest-all` scheduler, the per-source `ingest-source` jobs it fans
+clock in it: the three-hourly `ingest-all` scheduler, the per-source `ingest-source` jobs it fans
 out to, and the delayed reminder jobs. Either process restarts without the other noticing.
 
 Each source is an **adapter** — one class, one network call, one pure `mapX(payload)` function
