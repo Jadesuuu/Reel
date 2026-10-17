@@ -8,6 +8,9 @@ export type PostingForScoring = {
   remote: RemoteType;
   stackKeywords: string[];
   regionTerms: string[];
+  zoneTerms: string[];
+  zoneOverlap: boolean;
+  hireSignals: string[];
   level: string | null;
   salaryMinUsd: number | null;
   salaryMaxUsd: number | null;
@@ -37,7 +40,8 @@ const NEARBY_POINTS = 20;
 const ROLE_POINTS = 30;
 const STACK_POINTS = 10;
 const STACK_CAP = 40;
-const OPEN_POINTS = 10;
+const ELIGIBLE_POINTS = 10;
+const UNVERIFIED_POINTS = -10;
 const SALARY_POINTS = 10;
 const APPLY_URL_POINTS = 5;
 const FRESH_POINTS = 10;
@@ -93,11 +97,14 @@ function regionVerdict(
   }
   const basis = regionBasis(posting.headline, posting.location);
   const labels = posting.regionTerms.map((term) => term.toLowerCase());
+  const zones = posting.zoneTerms.map((term) => term.toLowerCase());
 
   const explicit = criteria.regionKeywords.find(
     (keyword) =>
       !OPEN_KEYWORDS.has(keyword) &&
-      (labels.includes(keyword) || mentionsRegion(basis, keyword)),
+      (labels.includes(keyword) ||
+        zones.includes(keyword) ||
+        mentionsRegion(basis, keyword)),
   );
   if (explicit !== undefined) {
     return { allowed: true, reason: `open:${explicit}` };
@@ -192,9 +199,18 @@ export function score(
   }
   total += Math.min(stackTotal, STACK_CAP);
 
-  if (region.reason !== null) {
-    total += OPEN_POINTS;
-    reasons.push(region.reason);
+  const hire = posting.hireSignals[0];
+  if (region.reason !== null || hire !== undefined) {
+    total += ELIGIBLE_POINTS;
+    if (region.reason !== null) {
+      reasons.push(region.reason);
+    }
+    if (hire !== undefined) {
+      reasons.push(`hires:${hire}`);
+    }
+  } else if (criteria.regionKeywords.length > 0) {
+    total += UNVERIFIED_POINTS;
+    reasons.push('unverified');
   }
 
   if (
@@ -224,5 +240,12 @@ export function score(
     reasons.push('recent');
   }
 
-  return { score: total, reasons };
+  const zone = posting.zoneTerms.find(
+    (label) => !criteria.regionKeywords.includes(label.toLowerCase()),
+  );
+  if (zone !== undefined) {
+    reasons.push(posting.zoneOverlap ? `overlap:${zone}` : `hours:${zone}`);
+  }
+
+  return { score: Math.max(0, total), reasons };
 }

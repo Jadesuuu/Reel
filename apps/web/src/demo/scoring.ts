@@ -7,6 +7,9 @@ export type PostingForScoring = {
   remote: RemoteType;
   stackKeywords: string[];
   regionTerms: string[];
+  zoneTerms: string[];
+  zoneOverlap: boolean;
+  hireSignals: string[];
   level: Level | null;
   salaryMinUsd: number | null;
   salaryMaxUsd: number | null;
@@ -64,10 +67,12 @@ function regionVerdict(
   if (criteria.regionKeywords.length === 0) return { allowed: true, reason: null };
   const basis = regionBasis(posting.headline, posting.location);
   const labels = posting.regionTerms.map((term) => term.toLowerCase());
+  const zones = posting.zoneTerms.map((term) => term.toLowerCase());
 
   const explicit = criteria.regionKeywords.find(
     (keyword) =>
-      !OPEN_KEYWORDS.has(keyword) && (labels.includes(keyword) || mentionsRegion(basis, keyword)),
+      !OPEN_KEYWORDS.has(keyword) &&
+      (labels.includes(keyword) || zones.includes(keyword) || mentionsRegion(basis, keyword)),
   );
   if (explicit !== undefined) return { allowed: true, reason: `open:${explicit}` };
   if (labels.length > 0) return { allowed: false, reason: `outside:${labels[0]}` };
@@ -139,9 +144,14 @@ export function score(
   }
   total += Math.min(stackTotal, 40);
 
-  if (region.reason !== null) {
+  const hire = posting.hireSignals[0];
+  if (region.reason !== null || hire !== undefined) {
     total += 10;
-    reasons.push(region.reason);
+    if (region.reason !== null) reasons.push(region.reason);
+    if (hire !== undefined) reasons.push(`hires:${hire}`);
+  } else if (criteria.regionKeywords.length > 0) {
+    total -= 10;
+    reasons.push('unverified');
   }
 
   if (
@@ -170,5 +180,10 @@ export function score(
     reasons.push('recent');
   }
 
-  return { score: total, reasons };
+  const zone = posting.zoneTerms.find(
+    (label) => !criteria.regionKeywords.includes(label.toLowerCase()),
+  );
+  if (zone !== undefined) reasons.push(posting.zoneOverlap ? `overlap:${zone}` : `hours:${zone}`);
+
+  return { score: Math.max(0, total), reasons };
 }

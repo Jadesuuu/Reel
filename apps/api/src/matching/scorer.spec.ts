@@ -1,4 +1,4 @@
-import { findRegionTerms, regionBasis } from './regions.js';
+import { findRegionTerms, findZoneTerms, regionBasis } from './regions.js';
 import {
   MATCH_THRESHOLD,
   score,
@@ -24,6 +24,9 @@ function posting(
     remote: 'REMOTE',
     stackKeywords: [],
     regionTerms: findRegionTerms(regionBasis(headline, location)),
+    zoneTerms: findZoneTerms(regionBasis(headline, location)),
+    zoneOverlap: false,
+    hireSignals: [],
     level: null,
     salaryMinUsd: null,
     salaryMaxUsd: null,
@@ -106,12 +109,12 @@ describe('score', () => {
     expect(result.reasons).toEqual(['remote', 'open:philippines']);
   });
 
-  it('keeps a posting that names no region at all', () => {
+  it('keeps a posting that names no region at all, marked unverified', () => {
     const result = scoreNow(
       posting(),
       criteria({ regionKeywords: ['philippines'] }),
     );
-    expect(result.reasons).toEqual(['remote']);
+    expect(result).toEqual({ score: 15, reasons: ['remote', 'unverified'] });
   });
 
   it('ignores regions entirely when the user has none', () => {
@@ -313,5 +316,75 @@ describe('score', () => {
     );
     expect(result.score).toBe(40);
     expect(result.score).toBeGreaterThanOrEqual(MATCH_THRESHOLD);
+  });
+
+  it('awards 10 once for a hiring signal and lifts it out of unverified', () => {
+    expect(
+      scoreNow(
+        posting({ hireSignals: ['deel', 'eor'] }),
+        criteria({ regionKeywords: ['philippines'] }),
+      ),
+    ).toEqual({ score: 35, reasons: ['remote', 'hires:deel'] });
+    expect(
+      scoreNow(
+        posting({ location: 'Remote (worldwide)', hireSignals: ['deel'] }),
+        criteria({ regionKeywords: ['philippines'] }),
+      ),
+    ).toEqual({
+      score: 35,
+      reasons: ['remote', 'open:worldwide', 'hires:deel'],
+    });
+  });
+
+  it('does not let a hiring signal rescue a posting outside the user regions', () => {
+    expect(
+      scoreNow(
+        posting({ location: 'Remote (Canada)', hireSignals: ['deel'] }),
+        criteria({ regionKeywords: ['philippines'] }),
+      ),
+    ).toEqual({ score: 0, reasons: ['outside:canada'] });
+  });
+
+  it('gives a hiring signal its points when the user has no regions', () => {
+    expect(scoreNow(posting({ hireSignals: ['b2b'] }), criteria())).toEqual({
+      score: 35,
+      reasons: ['remote', 'hires:b2b'],
+    });
+  });
+
+  it('flags working hours without changing the score', () => {
+    const rules = criteria({ regionKeywords: ['philippines'] });
+    expect(
+      scoreNow(
+        posting({
+          zoneTerms: ['us'],
+          zoneOverlap: true,
+          hireSignals: ['deel'],
+        }),
+        rules,
+      ),
+    ).toEqual({ score: 35, reasons: ['remote', 'hires:deel', 'overlap:us'] });
+    expect(scoreNow(posting({ location: 'Remote (EST)' }), rules)).toEqual({
+      score: 15,
+      reasons: ['remote', 'unverified', 'hours:us'],
+    });
+  });
+
+  it('counts a zone in the user regions as open', () => {
+    expect(
+      scoreNow(
+        posting({ location: 'Remote (PHT hours)' }),
+        criteria({ regionKeywords: ['philippines'] }),
+      ),
+    ).toEqual({ score: 35, reasons: ['remote', 'open:philippines'] });
+  });
+
+  it('never scores below zero', () => {
+    expect(
+      scoreNow(
+        posting({ remote: 'UNKNOWN' }),
+        criteria({ remoteOnly: false, regionKeywords: ['philippines'] }),
+      ),
+    ).toEqual({ score: 0, reasons: ['unverified'] });
   });
 });

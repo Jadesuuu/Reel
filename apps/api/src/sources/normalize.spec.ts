@@ -238,4 +238,24 @@ describe('normalizePosting level and restrictions', () => {
     );
     expect(normalized.regionTerms).toEqual(['us']);
   });
+
+  it('computes working hours, overlap and hiring signals from the description', () => {
+    const normalized = normalizePosting(
+      raw({
+        location: 'Remote',
+        html: '<p>We need 4 hours of overlap with US Eastern time.</p><p>Contractors are paid through Deel.</p>',
+      }),
+    );
+    expect(normalized.regionTerms).toEqual([]);
+    expect(normalized.zoneTerms).toEqual(['us']);
+    expect(normalized.zoneOverlap).toBe(true);
+    expect(normalized.hireSignals).toEqual(['deel']);
+  });
+
+  it('leaves the three columns empty for a description that says nothing', () => {
+    const normalized = normalizePosting(raw({ location: 'Remote' }));
+    expect(normalized.zoneTerms).toEqual([]);
+    expect(normalized.zoneOverlap).toBe(false);
+    expect(normalized.hireSignals).toEqual([]);
+  });
 });

@@ -2,6 +2,16 @@ import { cn } from '../lib/cn';
 import { Badge } from './ui/badge';
 import { Tip } from './ui/tooltip';
 
+const HIRE_DETAIL: Record<string, string> = {
+  deel: 'Deel',
+  oyster: 'Oyster',
+  'remote.com': 'Remote.com',
+  eor: 'an employer of record',
+  contractor: 'international contractors',
+  b2b: 'a B2B contract',
+  global: 'hiring globally',
+};
+
 export function explainReason(reason: string): { label: string; points: string; detail: string } {
   if (reason === 'remote') {
     return { label: 'remote', points: '+25', detail: 'The posting is remote.' };
@@ -36,6 +46,38 @@ export function explainReason(reason: string): { label: string; points: string; 
       label: `open · ${term}`,
       points: '+10',
       detail: `The posting says it is open to “${term}”, one of the places you can work from.`,
+    };
+  }
+  if (reason.startsWith('hires:')) {
+    const signal = reason.slice(6);
+    return {
+      label: `hires abroad · ${signal}`,
+      points: '+10',
+      detail: `The description mentions ${HIRE_DETAIL[signal] ?? signal}, a way companies pay people outside their own country. Counts once with “open”.`,
+    };
+  }
+  if (reason === 'unverified') {
+    return {
+      label: 'unverified',
+      points: '−10',
+      detail:
+        'The posting says nothing about where you must live or how it hires abroad. Check before applying.',
+    };
+  }
+  if (reason.startsWith('overlap:')) {
+    const zone = reason.slice(8);
+    return {
+      label: `overlap · ${zone}`,
+      points: '0',
+      detail: `Asks for some overlap with ${zone} working hours. Usually a few hours, not a full shift.`,
+    };
+  }
+  if (reason.startsWith('hours:')) {
+    const zone = reason.slice(6);
+    return {
+      label: `hours · ${zone}`,
+      points: '0',
+      detail: `Asks for ${zone} working hours. From your time zone that may mean working nights; decide before you apply.`,
     };
   }
   if (reason === 'salary') {

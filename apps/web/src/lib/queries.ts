@@ -50,6 +50,7 @@ export type MatchFilters = {
   days?: number;
   sort?: MatchSort;
   pageSize?: number;
+  untracked?: boolean;
 };
 
 export function useMatches(filters: MatchFilters) {
@@ -65,6 +66,7 @@ export function useMatches(filters: MatchFilters) {
           minScore: filters.minScore,
           days: filters.days,
           sort: filters.sort,
+          untracked: filters.untracked ? 'true' : undefined,
         })}`,
       ),
     placeholderData: (previous) => previous,
@@ -93,6 +95,7 @@ export function usePrefetchMatches(filters: MatchFilters, enabled: boolean) {
             minScore: filters.minScore,
             days: filters.days,
             sort: filters.sort,
+            untracked: filters.untracked ? 'true' : undefined,
           })}`,
         ),
       staleTime: 30_000,

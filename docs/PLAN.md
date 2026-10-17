@@ -622,8 +622,10 @@ For each `ParsedPosting`: `prisma.posting.upsert({ where: { source_externalId: {
 function score(posting: PostingForScoring, criteria: CriteriaForScoring): { score: number; reasons: string[] }
 ```
 
-Rewritten in Step 25 (29 Sep 2026). `score(posting, criteria, now)`; the posting carries
-`regionTerms` (region labels computed at ingest) and `level` (detected at ingest) as well as
+Rewritten in Step 25 (29 Sep 2026), extended in Step 26 (17 Oct 2026). `score(posting, criteria, now)`;
+the posting carries `regionTerms` (region labels computed at ingest), `zoneTerms` and
+`zoneOverlap` (working-hours labels and whether only partial overlap is asked, Step 26),
+`hireSignals` (international-hiring labels, Step 26) and `level` (detected at ingest) as well as
 `postedAt`.
 
 1. `nearby` = the first `nearbyKeywords` entry found in `headline + location`, only when
@@ -633,7 +635,8 @@ Rewritten in Step 25 (29 Sep 2026). `score(posting, criteria, now)`; the posting
    2a. (Step 25) If `criteria.levels` is non-empty, `posting.level` is not null and not in the list → return `{ score: 0, reasons: ['level:<level>'] }`. Stop.
    2b. (Step 21, reworked in Step 25) When `regionKeywords` is non-empty: a keyword that is not an
    open word (`worldwide`, `anywhere`, `global`, `any`, ...) and that either equals one of
-   `posting.regionTerms` or appears in `headline + location` → allowed, remember `open:<kw>`.
+   `posting.regionTerms` or `posting.zoneTerms` (Step 26), or appears in `headline + location`
+   → allowed, remember `open:<kw>`. Zone labels never cause `outside`.
    Otherwise, if `posting.regionTerms` is non-empty → return `{ score: 0, reasons: ['outside:<label>'] }`
    with the first label. Otherwise, if an open word from the user's list or from `OPEN_TERMS` appears
    → allowed, remember `open:<word>`. Otherwise allowed with nothing remembered: silence is not a
@@ -643,11 +646,17 @@ Rewritten in Step 25 (29 Sep 2026). `score(posting, criteria, now)`; the posting
    `reasons.push('nearby:<kw>')` if step 1 found a nearby hit.
 5. `+30` and `reasons.push('role:<kw>')` for the **first** `roleKeywords` entry found in `headline` (only once).
 6. `+10` per `includeKeywords` entry found in `stackKeywords` or `headline`, **cap +40**, push `stack:<kw>` each.
-   6b. `+10` and push the remembered `open:<...>` reason from 2b, if any.
+   6b. Eligibility (Step 26). If 2b remembered `open:<...>` or `posting.hireSignals` is non-empty:
+   `+10` once, push the `open:<...>` reason if any, then `hires:<first signal>` if any. Otherwise,
+   when `regionKeywords` is non-empty: `-10` and push `unverified` (the posting says nothing about
+   who it can hire; check before applying).
 7. `+10` and `reasons.push('salary')` if `salaryMinUsd !== null`. If `criteria.minSalaryUsd` is set and `salaryMaxUsd !== null && salaryMaxUsd < criteria.minSalaryUsd` → return `{ score: 0, reasons: ['below-min-salary'] }`.
 8. `+5` and `reasons.push('apply-url')` if `applyUrl !== null`.
    8b. `+10` and `reasons.push('fresh')` if `postedAt` is within 3 days of `now`; else `+5` and
    `reasons.push('recent')` if within 10 days.
+   8c. Working hours (Step 26), no points. The first `posting.zoneTerms` label not in
+   `regionKeywords` → push `overlap:<label>` when `posting.zoneOverlap`, else `hours:<label>`.
+   The score never goes below 0.
 9. Max possible: 130. **Match threshold: `score >= 40`.** Below threshold → no Match row is written (and an existing one is deleted on rescore). **Strong match: `score >= 80`** (the extension badge counts these).
 
 Rescore scope: `MatchingService.rescoreUser(userId)` = all postings with `postedAt >= now - 45 days`;
@@ -1989,6 +1998,94 @@ theoretical, and a partial unique index can follow if it ever happens.
 **Done when:** the new e2e cases (match has `application: null`, then the saved application;
 a second save answers 409 while another user can still save; the posting list and detail carry
 the application) pass; the demo mirrors the field; the gate is green.
+
+---
+
+### Step 26 — Eligibility: working hours, hiring signals, the unverified tier, and a daily queue
+
+**Branch:** `feat/eligibility`
+**Commit:** `feat: working hours as flags, international hiring signals, an unverified tier, authorization phrases, and a top-15 queue`
+
+**Why.** On 17 Oct 2026 Jade's real account held 931 open matches and 11 applications in
+`applied` with no reply at all. The search is now aimed at employers abroad, US or otherwise,
+that pay above Philippine rates and can hire someone living in the Philippines, and three things
+in the scorer worked against that. A posting asking for "4 hours of
+overlap with EST" was labelled `us` by the time-zone restriction pattern and scored zero, exactly
+like a US-only posting, although partial overlap is the workable case. Nothing rewarded a
+posting that says it hires through Deel, Oyster or an employer of record: 57 of the 931 say so
+somewhere in the text. And a posting that says nothing about location passed with the same
+standing as one that says "worldwide" (88 of the 931, 15 of them strong).
+
+**Decisions:**
+
+- **Working hours are a flag, not a location.** Time-zone vocabulary leaves the region gazetteer
+  for a `ZONES` table of `[label, terms]` pairs in `regions.ts` (`us`: EST/PST/CST/MST and their
+  daylight forms, "eastern time", "US hours", "US time zones", …; `uk`: BST, "UK hours"; `europe`:
+  CET/CEST, "European time zones"; `india`, `australia`, `new zealand`, `japan`, `korea`,
+  `hong kong`, `singapore`, `philippines`: their abbreviations). `findZoneTerms` returns labels.
+  The time-zone restriction pattern moves from `restrictionSnippets` to `zoneSnippets`, which
+  also captures overlap sentences. `Posting.zoneTerms` = zone labels found in
+  `headline + location + zone snippets`; `Posting.zoneOverlap` = the posting asks for overlap
+  (the word "overlap" or "overlapping", not preceded by "full" or "complete").
+- Residency and authorization words (`us-based`, `us citizen`, `green card`, `w-2`, …) stay in the
+  `us` region entry, because they say where you must be, not when you must work.
+- **Authorization phrases are read from the whole body.** `authorizationLabels(rawText)` returns
+  `['us']` when the text contains `us citizen(s)`, `u.s. citizen(s)`, `us person(s)`,
+  `green card`, `W-2`/`W2`, `security clearance`, `active clearance`, `secret clearance`,
+  `TS/SCI` or `ITAR`. These never appear in a posting that hires abroad, so unlike the other
+  region terms they are safe outside the restriction sentences. `regionTerms` is the union.
+  "Security clearance" is labelled `us` because every feed Reel reads is US-centric; a UK
+  clearance posting is equally closed to Jade.
+- **Hiring signals.** `findHireSignals(rawText)` returns labels from a fixed vocabulary in
+  `regions.ts`: `deel`; `oyster` ("Oyster HR", "via/through Oyster"); `remote.com`; `eor`
+  ("employer of record", "EOR", Velocity Global, Papaya Global, Globalization Partners);
+  `contractor` ("international contractor(s)", "global contractor(s)", "contractor from
+  anywhere"); `b2b` ("B2B contract", "B2B agreement", "B2B basis"); `global` ("hire/hiring
+  anywhere", "hire/hiring globally", "hire/hiring worldwide", "hire/hiring internationally",
+  "hire/hiring from anywhere"). Deliberately left out: `1099` (a US contractor), plain `B2B`
+  (business-to-business, in half of all SaaS postings), plain `contractor`, "work from
+  anywhere" (often "anywhere in the US") and "global team".
+- **Eligibility tier.** Scoring rule 6b in §6.5: an `open:` reason or a hiring signal earns `+10`
+  once; neither, with region keywords set, costs `-10` and the chip `unverified`. A hiring
+  signal cannot rescue a posting that names a region outside your list (same rule as open
+  words in Step 21).
+- **Hours chip.** Rule 8c: `overlap:us` or `hours:us`, no points. A zone in your own regions
+  (PHT for Jade) counts as `open:` instead, through rule 2b.
+- **Daily queue.** The inbox gains a "Top 15" mode: `GET /matches` with `pageSize=15`,
+  `sort=best`, `untracked=true`, first page only, no pagination. It respects the source and
+  posted-within filters. Saving or dismissing a row lets the next one in. A view, not a cap:
+  "All" still lists everything.
+- `GET /matches` gains `untracked?: boolean`: `true` drops matches whose posting already has an
+  application of the caller's.
+- `pnpm --filter api backfill:fit` also recomputes `zoneTerms`, `zoneOverlap` and
+  `hireSignals`. Run it after the migration, then rescore.
+- The demo copies `regions.ts` verbatim, mirrors the scorer, seeds the three new columns, and
+  supports `untracked`.
+
+- `rescoreUser` deletes below-threshold matches in one `deleteMany` (`postingId notIn` the kept
+  ids) instead of one query per posting. With 14,114 postings in the 45-day window, a new user's
+  rescore was 14,000 round trips and timed out three e2e tests before this step changed anything.
+
+**Contract (adds to 11.3):**
+
+| Method | Path | Change |
+|---|---|---|
+| GET | `/matches` | adds `untracked?: boolean`. Each `posting` carries `zoneTerms`, `zoneOverlap`, `hireSignals`. |
+| GET | `/postings`, `/postings/:id` | each posting carries `zoneTerms`, `zoneOverlap`, `hireSignals`. |
+
+**Schema (migration `v7_eligibility`):** `postings.zone_terms text[] default '{}'`,
+`postings.zone_overlap boolean default false`, `postings.hire_signals text[] default '{}'`.
+
+**Measured on 17 Oct 2026, real account, after the backfill (511 of 16,011 postings changed) and a
+rescore (2.8 s):** 899 matches → 905, strong 52 → 57. 26 carry a `hires:` chip (12 `global`, 9
+`remote.com`, 4 `eor`, 1 `b2b`), 48 are `unverified`, 2 `overlap:us`, 3 `hours:us`.
+
+**Done when:** `regions.spec` covers zones apart from regions, overlap versus full hours, body
+authorization phrases and each hiring-signal label plus the deliberate misses (`1099`, plain
+`B2B`, "work from anywhere in the US"); `scorer.spec` covers `hires:`, `unverified`, `overlap:`,
+`hours:`, a zone in your own regions, and the floor at 0; `normalize.spec` covers the three
+columns; `matches.e2e-spec` covers `untracked`; the inbox has All / Top 15; the chips explain
+themselves; the demo matches; the gate is green.
 
 ---
 

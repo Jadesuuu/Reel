@@ -32,6 +32,11 @@ export class ListMatchesQueryDto extends PaginationQueryDto {
   days?: number;
 
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  untracked: boolean = false;
+
+  @IsOptional()
   @IsIn(MATCH_SORTS)
   sort: MatchSort = 'best';
 }

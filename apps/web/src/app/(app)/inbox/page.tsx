@@ -42,6 +42,8 @@ const MIN_SCORE_OPTIONS = [
   { value: '100', label: '100 and up' },
 ];
 
+const QUEUE_SIZE = 15;
+
 const DAYS_OPTIONS = [
   { value: '3', label: 'Last 3 days' },
   { value: '7', label: 'Last 7 days' },
@@ -218,6 +220,7 @@ function MatchRow({
 
 export default function InboxPage() {
   const [dismissed, setDismissed] = useState(false);
+  const [queue, setQueue] = useState(false);
   const [page, setPage] = useState(1);
   const [source, setSource] = useState<Source | ''>('');
   const [minScore, setMinScore] = useState('0');
@@ -229,11 +232,12 @@ export default function InboxPage() {
 
   const matches = useMatches({
     dismissed,
-    page,
+    page: queue ? 1 : page,
     source,
     minScore: minScore === '0' ? undefined : Number(minScore),
     days: days === '0' ? undefined : Number(days),
-    sort,
+    sort: queue ? 'best' : sort,
+    ...(queue ? { pageSize: QUEUE_SIZE, untracked: true } : {}),
   });
   const sources = useSources();
   const dismiss = useDismissMatch();
@@ -259,7 +263,7 @@ export default function InboxPage() {
       days: days === '0' ? undefined : Number(days),
       sort,
     },
-    matches.data !== undefined && page * matches.data.pageSize < matches.data.total,
+    !queue && matches.data !== undefined && page * matches.data.pageSize < matches.data.total,
   );
 
   useEffect(() => {
@@ -339,13 +343,16 @@ export default function InboxPage() {
           <>
             <Segmented
               ariaLabel="Show"
-              value={dismissed ? 'dismissed' : 'new'}
+              value={dismissed ? 'dismissed' : queue ? 'top' : 'new'}
               onValueChange={(value) => {
                 setDismissed(value === 'dismissed');
+                setQueue(value === 'top');
                 setPage(1);
+                setFocusIndex(0);
               }}
               options={[
-                { value: 'new', label: 'New' },
+                { value: 'new', label: 'All' },
+                { value: 'top', label: `Top ${QUEUE_SIZE}` },
                 { value: 'dismissed', label: 'Dismissed' },
               ]}
             />
@@ -400,18 +407,20 @@ export default function InboxPage() {
           options={DAYS_OPTIONS}
           className="min-w-36"
         />
-        <Segmented
-          ariaLabel="Sort"
-          value={sort}
-          onValueChange={(value) => {
-            setSort(value as MatchSort);
-            setPage(1);
-          }}
-          options={[
-            { value: 'best', label: 'Best' },
-            { value: 'newest', label: 'Newest' },
-          ]}
-        />
+        {queue ? null : (
+          <Segmented
+            ariaLabel="Sort"
+            value={sort}
+            onValueChange={(value) => {
+              setSort(value as MatchSort);
+              setPage(1);
+            }}
+            options={[
+              { value: 'best', label: 'Best' },
+              { value: 'newest', label: 'Newest' },
+            ]}
+          />
+        )}
         <div className="ml-auto hidden items-center gap-1.5 text-caption text-muted lg:flex">
           <Kbd>j</Kbd>
           <Kbd>k</Kbd> move · <Kbd>s</Kbd> save · <Kbd>d</Kbd> dismiss · <Kbd>a</Kbd> apply ·{' '}
@@ -489,7 +498,14 @@ export default function InboxPage() {
         </div>
       ) : null}
 
-      {matches.data ? (
+      {queue && items.length > 0 ? (
+        <p className="mt-3 text-caption text-muted">
+          The {QUEUE_SIZE} best matches you have not saved yet. Give each one a tailored
+          application; saving or dismissing one brings in the next.
+        </p>
+      ) : null}
+
+      {matches.data && !queue ? (
         <Pagination
           page={page}
           pageSize={matches.data.pageSize}

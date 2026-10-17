@@ -22,8 +22,8 @@ role, location, remote type, salary, stack keywords, region labels, level, and t
 
 **Score.** A pure function turns one posting plus your criteria into a number and a list of
 reasons. Remote or near you, a role keyword in the headline, your stack keywords, an explicit
-"open to your region", a parsed salary, an apply link and freshness add points, to a maximum of 130. Exclude keywords, a level you did not pick, a region you cannot work from, or a salary
-ceiling under your minimum drop it to zero. Forty or more is a match. Every chip in the inbox is
+"open to your region" or a sign that the company pays people abroad (Deel, an employer of record, a B2B contract), a parsed salary, an apply link and freshness add points, to a maximum of 130. Exclude keywords, a level you did not pick, a region you cannot work from, or a salary
+ceiling under your minimum drop it to zero. A posting that says nothing about who it can hire loses 10 as unverified, and one that asks for another region's working hours carries a flag. Forty or more is a match. Every chip in the inbox is
 one of those rules.
 
 **Triage.** The inbox lists matches, best first, filtered to the last two weeks by default, with
@@ -90,6 +90,7 @@ reading order**, **Concepts**, **Gotchas**.
 | 23   | [Refetch and tracked matches](step-23-refetch-and-tracked-matches.md) | `feat/refetch-and-tracked-matches` |
 | 24   | [Browser sources](step-24-browser-sources.md)                         | `feat/browser-sources`             |
 | 25   | [Fit: geography, level, near you, freshness](step-25-fit.md)          | `feat/fit-v2`                      |
+| 26   | [Eligibility: hours, hiring signals, queue](step-26-eligibility.md)   | `feat/eligibility`                 |
 
 Steps 1 to 6 were built in one pass before the reviewers existed. Their documents were written
 afterwards from the code as it stands; the repairs document records what had to change before
@@ -119,3 +120,4 @@ Everything else is wiring around those three.
 | how the demo works without a server              | Step 19                                                               |
 | how the extension reads a site the server cannot | Step 24                                                               |
 | what the badge on the extension icon means       | Step 25                                                               |
+| why a posting is unverified or flagged for hours | Step 26                                                               |
